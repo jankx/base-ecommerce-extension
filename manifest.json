@@ -1,0 +1,20 @@
+{
+    "name": "E-Commerce Base",
+    "description": "Base extension for e-commerce functionality. Provides interfaces and abstract classes for products, carts, and orders.",
+    "version": "1.0.0",
+    "author": "Puleeno Nguyen",
+    "caller": {
+        "file": "EcommerceExtension.php",
+        "class": "Jankx\\Extensions\\Ecommerce\\EcommerceExtension"
+    },
+    "requirements": {
+        "php": ">=7.4"
+    },
+    "context": [
+        "frontend",
+        "admin",
+        "ajax",
+        "rest"
+    ],
+    "auto_activate": true
+}
