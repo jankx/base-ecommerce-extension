@@ -1,6 +1,6 @@
 {
     "name": "jankx/base-ecommerce-extension",
-    "description": "Jankx E-Commerce Base Extension",
+    "description": "Jankx E-Commerce Base Extension: shared cart, checkout, payment, order + product type registry",
     "type": "library",
     "autoload": {
         "psr-4": {
@@ -13,5 +13,8 @@
             "email": "puleeno@gmail.com"
         }
     ],
-    "require": {}
+    "require": {},
+    "config": {
+        "vendor-dir": "libs"
+    }
 }
