@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "jankx/add-to-cart",
+    "title": "Add to Cart",
+    "category": "jankx",
+    "icon": "cart",
+    "description": "Add the current product/tour to the cart. Place it on single product or tour pages.",
+    "textdomain": "jankx",
+    "usesContext": ["postId", "postType"],
+    "attributes": {
+        "title": {
+            "type": "string",
+            "default": ""
+        },
+        "show_quantity": {
+            "type": "boolean",
+            "default": true
+        },
+        "show_departure": {
+            "type": "boolean",
+            "default": false
+        }
+    },
+    "supports": {
+        "html": false,
+        "align": ["wide", "full"],
+        "spacing": {
+            "margin": true,
+            "padding": true
+        }
+    }
+}

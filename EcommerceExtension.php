@@ -3,6 +3,7 @@ namespace Jankx\Extensions\Ecommerce;
 
 use Jankx\Extensions\AbstractExtension;
 use Jankx\Extensions\Ecommerce\Blocks\AccountTabOrdersBlock;
+use Jankx\Extensions\Ecommerce\Blocks\AddToCartBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CartBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CheckoutBlock;
 use Jankx\Extensions\Ecommerce\Cart\Cart;
@@ -87,8 +88,12 @@ class EcommerceExtension extends AbstractExtension
         // Editor integration for the blocks.
         add_action('enqueue_block_editor_assets', [$this, 'enqueue_block_editor_assets']);
 
-        // Frontend assets on the cart/checkout pages.
+        // Frontend assets on the cart/checkout pages and single product pages.
         add_action('wp_enqueue_scripts', [$this, 'enqueue_frontend_assets']);
+
+        // Auto render an "Add to cart" area on single pages of supported
+        // product types (tour, product, ...).
+        add_filter('the_content', [$this, 'append_add_to_cart_to_content']);
 
         // Inject the "Orders" sub-page into My Account.
         add_action('jankx/my_account/register_sub_pages', [$this, 'register_my_account_sub_pages']);
@@ -105,6 +110,7 @@ class EcommerceExtension extends AbstractExtension
             'cart'               => CartBlock::class,
             'checkout'           => CheckoutBlock::class,
             'account-tab-orders' => AccountTabOrdersBlock::class,
+            'add-to-cart'        => AddToCartBlock::class,
         ];
 
         foreach ($blockClasses as $blockName => $blockClass) {
@@ -132,7 +138,7 @@ class EcommerceExtension extends AbstractExtension
 
         $blocksDir = $this->get_extension_path() . '/blocks';
         $blockMetadata = [];
-        foreach (['cart', 'checkout', 'account-tab-orders'] as $slug) {
+        foreach (['cart', 'checkout', 'account-tab-orders', 'add-to-cart'] as $slug) {
             $blockJson = $blocksDir . '/' . $slug . '/block.json';
             if (file_exists($blockJson)) {
                 $metadata = json_decode(file_get_contents($blockJson), true);
@@ -146,7 +152,14 @@ class EcommerceExtension extends AbstractExtension
 
     public function enqueue_frontend_assets(): void
     {
-        if (!is_page(self::get_cart_page_id()) && !is_page(self::get_checkout_page_id())) {
+        $productTypes = self::get_supported_product_types();
+        $isProductPage = !empty($productTypes) && is_singular($productTypes);
+
+        if (
+            !is_page(self::get_cart_page_id()) &&
+            !is_page(self::get_checkout_page_id()) &&
+            !$isProductPage
+        ) {
             return;
         }
 
@@ -167,12 +180,37 @@ class EcommerceExtension extends AbstractExtension
 
         wp_localize_script('jankx-ecommerce', 'jankxEcommerce', [
             'restUrl'   => esc_url_raw(rest_url(EcommerceController::REST_NAMESPACE)),
+            'cartUrl'   => self::get_cart_page_url(),
             'ordersUrl' => self::get_orders_page_url(),
             'i18n'      => [
                 'successTitle'   => __('Order placed successfully!', 'jankx'),
                 'successMessage' => __('Your order number is %s.', 'jankx'),
             ],
         ]);
+    }
+
+    /**
+     * Append an "Add to cart" area after the content of single pages whose
+     * post type is registered into the ecommerce flow (tour, product, ...).
+     *
+     * Skipped when the jankx/add-to-cart block is already placed in content.
+     */
+    public function append_add_to_cart_to_content(string $content): string
+    {
+        if (is_admin() || !is_singular()) {
+            return $content;
+        }
+
+        $post = get_post();
+        if (!$post || !self::is_product($post)) {
+            return $content;
+        }
+
+        if (has_block(AddToCartBlock::BLOCK_ID, $post)) {
+            return $content;
+        }
+
+        return $content . (new AddToCartBlock())->render([]);
     }
 
     /**

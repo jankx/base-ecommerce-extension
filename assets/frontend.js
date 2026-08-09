@@ -42,6 +42,64 @@
         });
     });
 
+    document.addEventListener('submit', function (event) {
+        var form = event.target.closest('.jankx-add-to-cart-form');
+        if (!form) {
+            return;
+        }
+
+        event.preventDefault();
+
+        var productId = form.querySelector('[name="product_id"]').value;
+        var quantityInput = form.querySelector('[name="quantity"]');
+        var departureInput = form.querySelector('[name="departure_date"]');
+        var statusBox = form.querySelector('.jankx-add-to-cart__status');
+        var button = form.querySelector('button[type="submit"]');
+
+        var body = {
+            product_id: parseInt(productId, 10) || 0,
+            quantity: quantityInput ? parseInt(quantityInput.value, 10) || 1 : 1
+        };
+
+        if (departureInput && departureInput.value) {
+            body.args = { departure_date: departureInput.value };
+        }
+
+        if (statusBox) {
+            statusBox.textContent = '';
+        }
+        button.disabled = true;
+
+        getJson({
+            url: window.jankxEcommerce.restUrl + '/cart/items',
+            method: 'POST',
+            body: body
+        }).then(function (response) {
+            if (!response.success) {
+                if (statusBox) {
+                    statusBox.textContent = response.message || 'Failed to add item.';
+                }
+                button.disabled = false;
+                return;
+            }
+
+            if (window.jankxEcommerce.cartUrl) {
+                window.location.href = window.jankxEcommerce.cartUrl;
+                return;
+            }
+            if (statusBox) {
+                statusBox.textContent = 'Added to cart.';
+            }
+            button.disabled = false;
+        }).catch(function (error) {
+            var message = error && error.message;
+            if (statusBox) {
+                statusBox.textContent = (Array.isArray(message) ? message.join(', ') : message) || 'Failed to add item.';
+            }
+            button.disabled = false;
+        });
+    });
+
     var checkoutForm = document.querySelector('.jankx-checkout-form');
     if (checkoutForm) {
         checkoutForm.addEventListener('submit', function (event) {
