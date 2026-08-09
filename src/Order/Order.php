@@ -43,7 +43,7 @@ class Order extends AbstractOrder
         $customerId = (int) ($customer['id'] ?? get_current_user_id());
 
         $postId = wp_insert_post([
-            'post_type'   => self::POST_TYPE,
+            'post_type'   => OrderPostType::POST_TYPE,
             'post_title'  => sprintf(
                 __('Order %s', 'jankx'),
                 current_time('YmdHis')
