@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "jankx/cart",
+    "title": "Shopping Cart",
+    "category": "jankx",
+    "icon": "cart",
+    "description": "Shopping cart page. Lists the items in the customer's cart with totals and checkout action.",
+    "textdomain": "jankx",
+    "supports": {
+        "html": false,
+        "align": ["wide", "full"],
+        "spacing": {
+            "margin": true,
+            "padding": true
+        }
+    }
+}

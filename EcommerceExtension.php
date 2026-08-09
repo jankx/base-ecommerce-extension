@@ -2,6 +2,9 @@
 namespace Jankx\Extensions\Ecommerce;
 
 use Jankx\Extensions\AbstractExtension;
+use Jankx\Extensions\Ecommerce\Blocks\AccountTabOrdersBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CartBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CheckoutBlock;
 use Jankx\Extensions\Ecommerce\Cart\Cart;
 use Jankx\Extensions\Ecommerce\Checkout\CheckoutManager;
 use Jankx\Extensions\Ecommerce\Order\Order;
@@ -77,6 +80,207 @@ class EcommerceExtension extends AbstractExtension
 
         // Core ecommerce hooks shared across models.
         add_action('init', [$this, 'init_ecommerce_core']);
+
+        // Gutenberg blocks for cart, checkout and account orders.
+        $this->register_blocks();
+
+        // Editor integration for the blocks.
+        add_action('enqueue_block_editor_assets', [$this, 'enqueue_block_editor_assets']);
+
+        // Frontend assets on the cart/checkout pages.
+        add_action('wp_enqueue_scripts', [$this, 'enqueue_frontend_assets']);
+
+        // Inject the "Orders" sub-page into My Account.
+        add_action('jankx/my_account/register_sub_pages', [$this, 'register_my_account_sub_pages']);
+    }
+
+    public function register_blocks(): void
+    {
+        $blocksDir = __DIR__ . '/blocks';
+        if (!is_dir($blocksDir)) {
+            return;
+        }
+
+        $blockClasses = [
+            'cart'               => CartBlock::class,
+            'checkout'           => CheckoutBlock::class,
+            'account-tab-orders' => AccountTabOrdersBlock::class,
+        ];
+
+        foreach ($blockClasses as $blockName => $blockClass) {
+            $blockPath = $blocksDir . '/' . $blockName;
+            if (!is_dir($blockPath)) {
+                continue;
+            }
+
+            $block = new $blockClass($blockPath);
+            $block->setBlockPath($blockPath);
+            $block->boot();
+            $block->register();
+        }
+    }
+
+    public function enqueue_block_editor_assets(): void
+    {
+        wp_enqueue_script(
+            'jankx-ecommerce-blocks-editor',
+            $this->get_extension_url() . '/assets/blocks-editor.js',
+            ['wp-blocks', 'wp-block-editor', 'wp-element', 'wp-i18n', 'wp-server-side-render', 'wp-hooks'],
+            filemtime($this->get_extension_path() . '/assets/blocks-editor.js'),
+            true
+        );
+
+        $blocksDir = $this->get_extension_path() . '/blocks';
+        $blockMetadata = [];
+        foreach (['cart', 'checkout', 'account-tab-orders'] as $slug) {
+            $blockJson = $blocksDir . '/' . $slug . '/block.json';
+            if (file_exists($blockJson)) {
+                $metadata = json_decode(file_get_contents($blockJson), true);
+                if ($metadata) {
+                    $blockMetadata[$metadata['name']] = $metadata;
+                }
+            }
+        }
+        wp_localize_script('jankx-ecommerce-blocks-editor', 'jankxEcommerceBlockMetadata', $blockMetadata);
+    }
+
+    public function enqueue_frontend_assets(): void
+    {
+        if (!is_page(self::get_cart_page_id()) && !is_page(self::get_checkout_page_id())) {
+            return;
+        }
+
+        wp_enqueue_style(
+            'jankx-ecommerce',
+            $this->get_extension_url() . '/assets/frontend.css',
+            [],
+            filemtime($this->get_extension_path() . '/assets/frontend.css')
+        );
+
+        wp_enqueue_script(
+            'jankx-ecommerce',
+            $this->get_extension_url() . '/assets/frontend.js',
+            [],
+            filemtime($this->get_extension_path() . '/assets/frontend.js'),
+            true
+        );
+
+        wp_localize_script('jankx-ecommerce', 'jankxEcommerce', [
+            'restUrl'   => esc_url_raw(rest_url(EcommerceController::REST_NAMESPACE)),
+            'ordersUrl' => self::get_orders_page_url(),
+            'i18n'      => [
+                'successTitle'   => __('Order placed successfully!', 'jankx'),
+                'successMessage' => __('Your order number is %s.', 'jankx'),
+            ],
+        ]);
+    }
+
+    /**
+     * Register the "Orders" sub-page inside the My Account extension.
+     */
+    public function register_my_account_sub_pages(): void
+    {
+        if (!class_exists('\Jankx\Extensions\MyAccount\MyAccountExtension')) {
+            return;
+        }
+
+        \Jankx\Extensions\MyAccount\MyAccountExtension::registerSubPage('orders', [
+            'label'       => __('Orders', 'jankx'),
+            'icon'        => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+            'priority'    => 15,
+            'extension'   => 'my-account',
+            'show_in_nav' => true,
+            'callback'    => [new AccountTabOrdersBlock(), 'render'],
+        ]);
+    }
+
+    /**
+     * Create the Cart and Checkout pages on install.
+     */
+    public function install(): bool
+    {
+        $this->create_cart_page();
+        $this->create_checkout_page();
+
+        flush_rewrite_rules();
+
+        return parent::install();
+    }
+
+    protected function create_cart_page(): void
+    {
+        $pageId = get_option('jankx_cart_page_id', 0);
+        if ($pageId && get_post_status($pageId) === 'publish') {
+            return;
+        }
+
+        $pageId = wp_insert_post([
+            'post_title'   => __('Giỏ hàng', 'jankx'),
+            'post_content' => '<!-- wp:jankx/cart {"align":"wide"} /-->',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+            'post_author'  => get_current_user_id(),
+        ]);
+
+        if ($pageId && !is_wp_error($pageId)) {
+            update_option('jankx_cart_page_id', $pageId);
+        }
+    }
+
+    protected function create_checkout_page(): void
+    {
+        $pageId = get_option('jankx_checkout_page_id', 0);
+        if ($pageId && get_post_status($pageId) === 'publish') {
+            return;
+        }
+
+        $pageId = wp_insert_post([
+            'post_title'   => __('Thanh toán', 'jankx'),
+            'post_content' => '<!-- wp:jankx/checkout {"align":"wide"} /-->',
+            'post_status'  => 'publish',
+            'post_type'    => 'page',
+            'post_author'  => get_current_user_id(),
+        ]);
+
+        if ($pageId && !is_wp_error($pageId)) {
+            update_option('jankx_checkout_page_id', $pageId);
+        }
+    }
+
+    public static function get_cart_page_id(): int
+    {
+        return (int) get_option('jankx_cart_page_id', 0);
+    }
+
+    public static function get_checkout_page_id(): int
+    {
+        return (int) get_option('jankx_checkout_page_id', 0);
+    }
+
+    public static function get_cart_page_url(): string
+    {
+        $pageId = self::get_cart_page_id();
+
+        return $pageId ? (string) get_permalink($pageId) : '';
+    }
+
+    public static function get_checkout_page_url(): string
+    {
+        $pageId = self::get_checkout_page_id();
+
+        return $pageId ? (string) get_permalink($pageId) : '';
+    }
+
+    public static function get_orders_page_url(): string
+    {
+        $accountPageId = (int) get_option('jankx_my_account_page_id', 0);
+        if (!$accountPageId) {
+            return '';
+        }
+
+        $accountUrl = get_permalink($accountPageId);
+
+        return $accountUrl ? trailingslashit($accountUrl) . 'orders/' : '';
     }
 
     public function register_rest_routes(): void

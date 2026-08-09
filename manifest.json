@@ -1,7 +1,7 @@
 {
     "name": "E-Commerce Base",
     "description": "Base extension for e-commerce functionality. Provides shared cart, checkout, payment and order flows plus an API to register any post type (tour, product, ...) as a purchasable item.",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "author": "Puleeno Nguyen",
     "extension_id": "base-ecommerce",
     "caller": {

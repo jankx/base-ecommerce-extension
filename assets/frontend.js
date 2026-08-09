@@ -1,0 +1,101 @@
+(function () {
+    'use strict';
+
+    function getJson(data) {
+        return fetch(data.url, {
+            method: data.method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: data.body ? JSON.stringify(data.body) : undefined
+        }).then(function (response) {
+            return response.json().then(function (json) {
+                if (!response.ok) {
+                    throw json;
+                }
+                return json;
+            });
+        });
+    }
+
+    document.addEventListener('click', function (event) {
+        var button = event.target.closest('.jankx-cart-remove');
+        if (!button) {
+            return;
+        }
+
+        event.preventDefault();
+        var itemKey = button.getAttribute('data-item-key');
+        var url = window.jankxEcommerce.restUrl + '/cart/items/' + encodeURIComponent(itemKey);
+
+        button.disabled = true;
+        getJson({ url: url, method: 'DELETE' }).then(function (response) {
+            if (response.success) {
+                window.location.reload();
+                return;
+            }
+            alert(response.message || 'Failed to remove item.');
+            button.disabled = false;
+        }).catch(function () {
+            alert('Failed to remove item.');
+            button.disabled = false;
+        });
+    });
+
+    var checkoutForm = document.querySelector('.jankx-checkout-form');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var errorBox = checkoutForm.querySelector('.jankx-checkout-error');
+            var submitButton = checkoutForm.querySelector('.jankx-btn-place-order');
+
+            function showError(message) {
+                errorBox.textContent = message;
+                errorBox.hidden = false;
+            }
+
+            errorBox.hidden = true;
+            submitButton.disabled = true;
+
+            var customer = {
+                name: checkoutForm.querySelector('#jankx_customer_name').value,
+                email: checkoutForm.querySelector('#jankx_customer_email').value,
+                phone: checkoutForm.querySelector('#jankx_customer_phone').value,
+                address: checkoutForm.querySelector('#jankx_customer_address').value
+            };
+
+            var gatewayInput = checkoutForm.querySelector('input[name="payment_method"]:checked');
+            var gateway = gatewayInput ? gatewayInput.value : '';
+
+            getJson({
+                url: window.jankxEcommerce.restUrl + '/checkout',
+                method: 'POST',
+                body: { customer: customer, gateway: gateway }
+            }).then(function (response) {
+                if (!response.success) {
+                    var message = Array.isArray(response.message) ? response.message.join(', ') : response.message;
+                    showError(message || 'Checkout failed.');
+                    submitButton.disabled = false;
+                    return;
+                }
+
+                var redirect = window.jankxEcommerce.ordersUrl;
+                if (redirect) {
+                    window.location.href = redirect;
+                    return;
+                }
+
+                checkoutForm.innerHTML = '<div class="jankx-checkout-success">'
+                    + '<span class="jankx-empty-icon" aria-hidden="true">&#10004;</span>'
+                    + '<h2 class="jankx-section-title">' + window.jankxEcommerce.i18n.successTitle + '</h2>'
+                    + '<p>' + window.jankxEcommerce.i18n.successMessage.replace('%s', response.order.order_number) + '</p>'
+                    + '</div>';
+            }).catch(function (error) {
+                var message = Array.isArray(error && error.message) ? error.message.join(', ') : (error && error.message);
+                showError(message || 'Checkout failed.');
+                submitButton.disabled = false;
+            });
+        });
+    }
+})();

@@ -1,0 +1,271 @@
+.jankx-cart-block,
+.jankx-checkout-block {
+    max-width: 100%;
+}
+
+.jankx-empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    border: 1px dashed #d9d9d9;
+    border-radius: 8px;
+}
+
+.jankx-empty-state .jankx-empty-icon {
+    display: block;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.jankx-empty-state .jankx-section-title {
+    margin: 0 0 0.5rem;
+}
+
+.jankx-cart-items {
+    border-top: 1px solid #eee;
+}
+
+.jankx-cart-item-head,
+.jankx-cart-item {
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr 1fr 0.8fr;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.jankx-cart-item-head {
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: #666;
+}
+
+.jankx-cart-item .jankx-col-product {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.jankx-cart-thumb img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.jankx-cart-name a {
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.jankx-cart-args {
+    display: block;
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.jankx-cart-remove {
+    background: none;
+    border: none;
+    color: #c0392b;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.jankx-cart-totals {
+    margin-top: 1.5rem;
+    max-width: 420px;
+    margin-left: auto;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 1.25rem;
+}
+
+.jankx-total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.4rem 0;
+}
+
+.jankx-total-row.jankx-total-grand {
+    font-size: 1.15rem;
+    font-weight: 700;
+    border-top: 1px solid #eee;
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+}
+
+.jankx-cart-actions {
+    margin-top: 1rem;
+}
+
+.jankx-btn {
+    display: inline-block;
+    padding: 0.7rem 1.4rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.jankx-btn-primary {
+    background: #2c3e50;
+    color: #fff;
+}
+
+.jankx-btn-primary:hover {
+    background: #1a252f;
+}
+
+.jankx-checkout-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 782px) {
+    .jankx-checkout-cols {
+        grid-template-columns: 1fr;
+    }
+}
+
+.jankx-field {
+    margin-bottom: 1rem;
+}
+
+.jankx-field label {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-weight: 500;
+}
+
+.jankx-required {
+    color: #c0392b;
+}
+
+.jankx-input {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.jankx-payment-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.jankx-payment-method {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    cursor: pointer;
+}
+
+.jankx-order-review {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.jankx-review-item,
+.jankx-review-total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.4rem 0;
+}
+
+.jankx-review-total-row.jankx-review-total {
+    border-top: 1px solid #eee;
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    font-weight: 700;
+}
+
+.jankx-review-qty {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+.jankx-checkout-error {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: #fdecea;
+    color: #c0392b;
+    border-radius: 6px;
+}
+
+.jankx-btn-place-order {
+    width: 100%;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.jankx-checkout-success {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.jankx-order-card {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.jankx-order-card-head,
+.jankx-order-card-meta,
+.jankx-order-card-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.jankx-order-card-meta {
+    color: #888;
+    font-size: 0.85rem;
+    margin: 0.5rem 0;
+}
+
+.jankx-order-total {
+    font-weight: 700;
+}
+
+.jankx-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    background: #eee;
+}
+
+.jankx-badge-pending {
+    background: #fef9e7;
+    color: #b7950b;
+}
+
+.jankx-badge-processing {
+    background: #eaf2f8;
+    color: #2980b9;
+}
+
+.jankx-badge-completed {
+    background: #eafaf1;
+    color: #27ae60;
+}
+
+.jankx-badge-failed,
+.jankx-badge-cancelled,
+.jankx-badge-refunded {
+    background: #fdecea;
+    color: #c0392b;
+}
