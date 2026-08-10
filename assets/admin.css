@@ -2,7 +2,7 @@
    Orders management screen (wp-admin)
    ========================================================= */
 
-/* ── Make the main meta-boxes full-bleed ─────────────────── */
+/* ── Meta-box full-bleed ───────────────────────────────── */
 #jankx_order_details .inside,
 #jankx_order_history .inside {
     padding: 0 !important;
@@ -12,15 +12,6 @@
 #jankx_order_details,
 #jankx_order_history {
     overflow: hidden;
-}
-
-/* Ensure the summary bar + cards fill the full postbox width */
-.jankx-order-summary-bar,
-.jankx-order-card,
-.jankx-order-items-table,
-.jankx-order-history {
-    width: 100%;
-    box-sizing: border-box;
 }
 
 /* ── Status badges ─────────────────────────────────────── */
@@ -79,29 +70,26 @@
 }
 
 
-/* ── Order Summary Header Bar ──────────────────────────── */
+/* ── Summary bar ───────────────────────────────────────── */
 .jankx-order-summary-bar {
     display: flex;
     align-items: stretch;
     flex-wrap: wrap;
     background: #fff;
-    border: 1px solid #e2e4e7;
-    border-radius: 8px;
-    margin: 0 0 16px;
-    overflow: hidden;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid #e2e4e7;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .jankx-order-summary-bar__item {
     flex: 1 1 140px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: 14px 12px;
-    border-right: 1px solid #e2e4e7;
-    border-bottom: 1px solid #e2e4e7;
-    text-align: center;
+    padding: 14px 18px;
+    border-right: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
     min-width: 0;
 }
 
@@ -111,9 +99,9 @@
 
 .jankx-order-summary-bar__label {
     font-size: 10px;
-    color: #757575;
+    color: #8c8f94;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
     font-weight: 600;
     margin-bottom: 4px;
     white-space: nowrap;
@@ -129,7 +117,7 @@
 
 .jankx-order-summary-bar__value--highlight {
     color: #2271b1;
-    font-size: 16px;
+    font-size: 15px;
 }
 
 
@@ -137,34 +125,33 @@
 .jankx-order-card {
     background: #fff;
     border: 1px solid #e2e4e7;
-    border-radius: 8px;
-    margin-bottom: 16px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+    margin: 12px;
     overflow: hidden;
 }
 
 .jankx-order-card__header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px 18px;
+    gap: 8px;
+    padding: 10px 14px;
     border-bottom: 1px solid #e2e4e7;
     background: #f8f9fa;
 }
 
 .jankx-order-card__header-icon {
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1;
-    opacity: 0.7;
+    opacity: 0.65;
 }
 
 .jankx-order-card__title {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
-    color: #1d2327;
+    color: #50575e;
     margin: 0;
     text-transform: uppercase;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.5px;
 }
 
 .jankx-order-card__body {
@@ -172,17 +159,17 @@
 }
 
 
-/* ── Customer info grid ────────────────────────────────── */
+/* ── Customer 2-column grid ────────────────────────────── */
 .jankx-customer-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0;
 }
 
 .jankx-customer-grid__item {
-    padding: 12px 18px;
+    padding: 12px 14px;
     border-bottom: 1px solid #f0f0f0;
     border-right: 1px solid #f0f0f0;
+    box-sizing: border-box;
 }
 
 .jankx-customer-grid__item:nth-child(even) {
@@ -194,10 +181,10 @@
 }
 
 .jankx-customer-grid__label {
-    font-size: 11px;
-    color: #757575;
+    font-size: 10px;
+    color: #8c8f94;
     text-transform: uppercase;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.5px;
     font-weight: 600;
     margin-bottom: 3px;
 }
@@ -219,7 +206,7 @@
 }
 
 .jankx-customer-grid__value--empty {
-    color: #bbb;
+    color: #c3c4c7;
     font-style: italic;
     font-weight: 400;
 }
@@ -234,12 +221,12 @@
 
 .jankx-order-items-table thead th {
     background: #f8f9fa;
-    color: #444;
+    color: #50575e;
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    padding: 10px 18px;
+    padding: 9px 14px;
     border-bottom: 1px solid #e2e4e7;
     text-align: left;
 }
@@ -250,7 +237,6 @@
 
 .jankx-order-items-table tbody tr {
     border-bottom: 1px solid #f0f0f0;
-    transition: background 0.15s;
 }
 
 .jankx-order-items-table tbody tr:last-child {
@@ -262,7 +248,7 @@
 }
 
 .jankx-order-items-table tbody td {
-    padding: 12px 18px;
+    padding: 11px 14px;
     vertical-align: middle;
     color: #1d2327;
 }
@@ -287,17 +273,17 @@
     align-items: center;
     justify-content: center;
     background: #e2e4e7;
-    color: #444;
+    color: #3c434a;
     font-weight: 700;
     font-size: 12px;
-    min-width: 28px;
-    height: 24px;
+    min-width: 26px;
+    height: 22px;
     border-radius: 4px;
-    padding: 0 6px;
+    padding: 0 5px;
 }
 
 .jankx-order-items-table .unit-price {
-    color: #555;
+    color: #757575;
 }
 
 .jankx-order-items-table .item-total {
@@ -311,32 +297,27 @@
 }
 
 .jankx-order-items-table tfoot td {
-    padding: 12px 18px;
+    padding: 11px 14px;
     font-weight: 700;
-    font-size: 14px;
 }
 
 .jankx-order-items-table tfoot .total-label {
     text-align: right;
-    color: #444;
+    color: #50575e;
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    font-size: 12px;
+    font-size: 11px;
 }
 
 .jankx-order-items-table tfoot .total-value {
     text-align: right;
     color: #2271b1;
-    font-size: 16px;
+    font-size: 15px;
 }
 
 
 /* ── Status sidebar box ────────────────────────────────── */
-.jankx-order-status-box {
-    padding: 0 !important;
-}
-
-.jankx-order-status-box .inside {
+#jankx_order_status .inside {
     padding: 0 !important;
     margin: 0 !important;
 }
@@ -345,55 +326,56 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px;
+    padding: 12px 14px;
     background: #f8f9fa;
     border-bottom: 1px solid #e2e4e7;
 }
 
 .jankx-status-current__label {
-    font-size: 12px;
-    color: #757575;
+    font-size: 11px;
+    color: #8c8f94;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.4px;
 }
 
 .jankx-status-form {
-    padding: 14px 16px;
+    padding: 12px 14px;
 }
 
 .jankx-status-form label {
     display: block;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
-    color: #444;
+    color: #50575e;
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 }
 
 .jankx-status-form select,
 .jankx-status-form textarea {
     width: 100%;
-    border: 1px solid #d0d5dd;
-    border-radius: 6px;
-    padding: 8px 10px;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    padding: 7px 10px;
     font-size: 13px;
     color: #1d2327;
     background: #fff;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     transition: border-color 0.15s, box-shadow 0.15s;
+    box-sizing: border-box;
 }
 
 .jankx-status-form select:focus,
 .jankx-status-form textarea:focus {
     border-color: #2271b1;
-    box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.15);
+    box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.12);
     outline: none;
 }
 
 .jankx-status-form .form-group {
-    margin-bottom: 14px;
+    margin-bottom: 12px;
 }
 
 .jankx-status-form .form-group:last-child {
@@ -403,43 +385,42 @@
 .jankx-status-form .button-update {
     display: block;
     width: 100%;
-    padding: 10px;
+    padding: 9px 12px;
     background: #2271b1;
     color: #fff;
     border: none;
-    border-radius: 6px;
+    border-radius: 4px;
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
     text-align: center;
-    transition: background 0.15s, transform 0.1s;
-    letter-spacing: 0.3px;
+    transition: background 0.15s, box-shadow 0.15s;
+    letter-spacing: 0.2px;
 }
 
 .jankx-status-form .button-update:hover {
     background: #135e96;
-    transform: translateY(-1px);
-    box-shadow: 0 3px 8px rgba(19, 94, 150, 0.3);
+    box-shadow: 0 2px 6px rgba(19, 94, 150, 0.25);
 }
 
 .jankx-status-form .button-update:active {
-    transform: translateY(0);
+    background: #0a4b78;
     box-shadow: none;
 }
 
 .jankx-status-no-transition {
-    padding: 14px 16px;
+    padding: 14px;
     font-size: 13px;
-    color: #757575;
+    color: #8c8f94;
     font-style: italic;
     text-align: center;
 }
 
 .jankx-handler-info {
-    padding: 10px 16px;
-    border-top: 1px solid #e2e4e7;
+    padding: 9px 14px;
+    border-top: 1px solid #f0f0f0;
     font-size: 12px;
-    color: #757575;
+    color: #8c8f94;
     display: flex;
     align-items: center;
     gap: 6px;
@@ -447,31 +428,37 @@
 
 .jankx-handler-info img.avatar {
     border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.jankx-handler-info strong {
+    color: #3c434a;
 }
 
 
 /* ── Order History timeline ────────────────────────────── */
 .jankx-order-history {
     margin: 0;
-    padding: 16px 18px;
+    padding: 14px 14px 4px;
     list-style: none;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .jankx-history-entry {
     position: relative;
-    padding: 0 0 20px 44px;
+    padding: 0 0 18px 42px;
 }
 
 .jankx-history-entry:last-child {
-    padding-bottom: 0;
+    padding-bottom: 4px;
 }
 
-/* vertical line */
 .jankx-history-entry::before {
     content: '';
     position: absolute;
-    left: 15px;
-    top: 26px;
+    left: 13px;
+    top: 28px;
     bottom: 0;
     width: 2px;
     background: #e2e4e7;
@@ -484,9 +471,9 @@
 .jankx-history-head {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: wrap;
-    min-height: 32px;
+    min-height: 28px;
 }
 
 .jankx-history-head img.avatar {
@@ -505,32 +492,32 @@
 }
 
 .jankx-history-action {
-    color: #555;
+    color: #50575e;
     font-size: 13px;
 }
 
 .jankx-history-time {
-    color: #aaa;
+    color: #a7aaad;
     font-size: 11px;
     margin-left: auto;
     white-space: nowrap;
 }
 
 .jankx-history-note {
-    margin-top: 8px;
+    margin-top: 7px;
     padding: 8px 12px;
     background: #f6f7f7;
-    border-left: 3px solid #c8ccd0;
-    border-radius: 0 4px 4px 0;
+    border-left: 3px solid #c3c4c7;
+    border-radius: 0 3px 3px 0;
     font-size: 13px;
-    color: #444;
+    color: #3c434a;
     line-height: 1.6;
 }
 
 .jankx-history-empty {
-    padding: 24px 18px;
+    padding: 20px 14px;
     text-align: center;
-    color: #aaa;
+    color: #a7aaad;
     font-style: italic;
     font-size: 13px;
 }
