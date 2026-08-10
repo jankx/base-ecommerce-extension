@@ -17,5 +17,6 @@
         "ajax",
         "rest"
     ],
-    "auto_activate": true
+    "auto_activate": true,
+    "settings_url": "admin.php?page=jankx-ecommerce-settings"
 }
