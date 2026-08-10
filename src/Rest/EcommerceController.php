@@ -3,6 +3,7 @@ namespace Jankx\Extensions\Ecommerce\Rest;
 
 use Jankx\Extensions\Ecommerce\Cart\Cart;
 use Jankx\Extensions\Ecommerce\Checkout\CheckoutManager;
+use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
 
 /**
  * REST API for the shared cart & checkout flow.

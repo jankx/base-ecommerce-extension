@@ -1,0 +1,104 @@
+/* Currency Switcher Styles */
+.jcs-switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.jcs--single {
+    padding: 6px 12px;
+    background: #f9f9f9;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.jcs-flag {
+    font-size: 1.2em;
+    line-height: 1;
+}
+
+.jcs-code {
+    font-weight: 600;
+}
+
+.jcs-symbol {
+    color: #666;
+    font-size: 0.9em;
+}
+
+/* Dropdown */
+.jcs-select {
+    padding: 8px 32px 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 10px center;
+    appearance: none;
+    cursor: pointer;
+    font-size: 0.9em;
+    min-width: 100px;
+}
+
+.jcs-select:focus {
+    border-color: #599F12;
+    outline: none;
+    box-shadow: 0 0 0 1px #599F12;
+}
+
+/* Buttons */
+.jcs--buttons {
+    gap: 4px;
+}
+
+.jcs-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.2s ease;
+}
+
+.jcs-btn:hover {
+    border-color: #599F12;
+    color: #599F12;
+}
+
+.jcs-btn.jcs--active {
+    background: #599F12;
+    border-color: #599F12;
+    color: #fff;
+}
+
+/* List */
+.jcs--list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 4px;
+}
+
+.jcs-list-item a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    text-decoration: none;
+    color: inherit;
+    border-radius: 4px;
+    font-size: 0.9em;
+    transition: all 0.2s ease;
+}
+
+.jcs-list-item a:hover {
+    background: #f0f0f0;
+}
+
+.jcs-list-item.jcs--active a {
+    background: #599F12;
+    color: #fff;
+}
