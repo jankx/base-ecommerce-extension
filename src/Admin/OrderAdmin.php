@@ -227,7 +227,7 @@ class OrderAdmin
             echo '<td>' . esc_html($item->getName()) . $this->renderItemArgs($item->getMeta()) . '</td>';
             echo '<td>' . (int) $item->getQuantity() . '</td>';
             echo '<td>' . esc_html($this->formatPrice($item->getUnitPrice())) . '</td>';
-            echo '<td><strong>' . esc_html($this->formatPrice($item->getSubtotal())) . '</strong></td>';
+            echo '<td><strong>' . esc_html($this->formatPrice($item->getTotal())) . '</strong></td>';
             echo '</tr>';
         }
 
