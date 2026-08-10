@@ -131,15 +131,24 @@
             var gatewayInput = checkoutForm.querySelector('input[name="payment_method"]:checked');
             var gateway = gatewayInput ? gatewayInput.value : '';
 
+            var createAccountCheckbox = checkoutForm.querySelector('#jankx_create_account');
+            var createAccount = createAccountCheckbox ? createAccountCheckbox.checked : false;
+
             getJson({
                 url: window.jankxEcommerce.restUrl + '/checkout',
                 method: 'POST',
-                body: { customer: customer, gateway: gateway }
+                body: { customer: customer, gateway: gateway, create_account: createAccount }
             }).then(function (response) {
                 if (!response.success) {
                     var message = Array.isArray(response.message) ? response.message.join(', ') : response.message;
                     showError(message || 'Checkout failed.');
                     submitButton.disabled = false;
+                    return;
+                }
+
+                // Redirect to payment gateway if needed
+                if (response.redirect_url) {
+                    window.location.href = response.redirect_url;
                     return;
                 }
 

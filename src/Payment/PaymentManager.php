@@ -43,11 +43,12 @@ class PaymentManager
      * @param Order  $order
      * @param string $gateway Gateway slug (e.g. "momo", "vnpay", "bank_transfer").
      * @param array  $params  Gateway params (return_url, cancel_url, ...).
-     * @return array Result: [success, transaction_id, payment]
+     * @return array Result: [success, transaction_id, payment, redirect_url]
      */
     public function process(Order $order, string $gateway = '', array $params = []): array
     {
         $transactionId = 0;
+        $redirectUrl = '';
 
         if ($this->isPaymentSystemAvailable()) {
             $transactionId = $this->createTransaction($order, $gateway, $params);
@@ -65,12 +66,20 @@ class PaymentManager
             'status' => 'pending',
         ], $order, $gateway);
 
+        // Capture redirect URL from gateway (e.g. OnePay, VNPay, MoMo)
+        if (!empty($payment['redirectUrl'])) {
+            $redirectUrl = $payment['redirectUrl'];
+        } elseif (!empty($payment['redirect_url'])) {
+            $redirectUrl = $payment['redirect_url'];
+        }
+
         return [
             'success'        => true,
             'transaction_id' => $transactionId,
             'order_id'       => $order->getId(),
             'order_number'   => $order->getOrderNumber(),
             'payment'        => $payment,
+            'redirect_url'   => $redirectUrl,
         ];
     }
 

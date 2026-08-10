@@ -123,12 +123,15 @@ class EcommerceController
         $params = $request->get_param('payment_params');
         $params = is_array($params) ? $params : [];
 
+        $createAccount = (bool) $request->get_param('create_account');
+
         $result = CheckoutManager::get_instance()->checkout(
             Cart::get_instance(),
             $customer,
             [
                 'gateway'        => $gateway,
                 'payment_params' => $params,
+                'create_account' => $createAccount,
             ]
         );
 
@@ -142,9 +145,15 @@ class EcommerceController
         /** @var \Jankx\Extensions\Ecommerce\Order\Order $order */
         $order = $result['order'];
 
-        return rest_ensure_response([
+        $response = [
             'success' => true,
             'order'   => $order->toArray(),
-        ]);
+        ];
+
+        if (!empty($result['redirect_url'])) {
+            $response['redirect_url'] = $result['redirect_url'];
+        }
+
+        return rest_ensure_response($response);
     }
 }

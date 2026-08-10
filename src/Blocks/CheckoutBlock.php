@@ -79,6 +79,16 @@ class CheckoutBlock extends Block
             . '<textarea id="jankx_customer_address" name="customer_address" class="jankx-input" rows="3"></textarea>'
             . '</div>';
 
+        if (!is_user_logged_in()) {
+            $output .= '<div class="jankx-field jankx-create-account-field">'
+                . '<label class="jankx-checkbox">'
+                . '<input type="checkbox" id="jankx_create_account" name="create_account" value="1" checked>'
+                . '<span>' . esc_html__('Tạo tài khoản với email này', 'jankx') . '</span>'
+                . '</label>'
+                . '<p class="jankx-field-desc">' . esc_html__('Tạo mật khẩu sẽ được gửi qua email sau khi đặt hàng.', 'jankx') . '</p>'
+                . '</div>';
+        }
+
         $output .= $this->renderPaymentMethods();
 
         $output .= '</div>';
