@@ -37,11 +37,11 @@ class OrderAdmin
         foreach ($columns as $key => $label) {
             if ($key === 'title') {
                 $newColumns['order_number'] = __('Order', 'jankx');
-                $newColumns['customer']     = __('Customer', 'jankx');
-                $newColumns['items']        = __('Items', 'jankx');
-                $newColumns['total']        = __('Total', 'jankx');
-                $newColumns['status']       = __('Status', 'jankx');
-                $newColumns['handler']      = __('Handler', 'jankx');
+                $newColumns['customer'] = __('Customer', 'jankx');
+                $newColumns['items'] = __('Items', 'jankx');
+                $newColumns['total'] = __('Total', 'jankx');
+                $newColumns['status'] = __('Status', 'jankx');
+                $newColumns['handler'] = __('Handler', 'jankx');
                 continue;
             }
             if ($key === 'date') {
@@ -69,7 +69,7 @@ class OrderAdmin
                 break;
 
             case 'customer':
-                $name  = $order->getCustomerName();
+                $name = $order->getCustomerName();
                 $email = $order->getCustomerEmail();
                 $phone = $order->getCustomerPhone();
 
@@ -154,7 +154,7 @@ class OrderAdmin
 
         $query->query_vars['meta_query'] = [
             [
-                'key'   => '_order_status',
+                'key' => '_order_status',
                 'value' => sanitize_key($_GET['order_status']),
             ],
         ];
@@ -198,45 +198,88 @@ class OrderAdmin
     public function renderDetailsBox(\WP_Post $post): void
     {
         $order = new Order($post->ID);
+        $items = $order->getItems();
+        $itemCount = count($items);
 
-        echo '<div class="jankx-order-admin">';
+        // ── Summary bar ──
+        echo '<div class="jankx-order-summary-bar">';
+        echo '<div class="jankx-order-summary-bar__item">';
+        echo '<div class="jankx-order-summary-bar__label">' . esc_html__('Status', 'jankx') . '</div>';
+        echo '<div class="jankx-order-summary-bar__value">' . $this->renderStatusBadge($order->getStatus()) . '</div>';
+        echo '</div>';
 
-        echo '<h3>' . esc_html__('Customer', 'jankx') . '</h3>';
-        echo '<table class="widefat striped" style="max-width:560px">';
-        echo '<tbody>';
-        $this->detailRow(__('Name', 'jankx'), $order->getCustomerName());
-        $this->detailRow(__('Email', 'jankx'), $order->getCustomerEmail() ? '<a href="mailto:' . esc_attr($order->getCustomerEmail()) . '">' . esc_html($order->getCustomerEmail()) . '</a>' : '');
-        $this->detailRow(__('Phone', 'jankx'), $order->getCustomerPhone());
-        $this->detailRow(__('Address', 'jankx'), $order->getCustomerAddress());
-        $this->detailRow(__('Payment method', 'jankx'), $order->getPaymentMethod());
-        $this->detailRow(__('Created', 'jankx'), $order->getDateCreated());
-        $this->detailRow(__('Status', 'jankx'), $this->renderStatusBadge($order->getStatus()));
-        echo '</tbody></table>';
+        echo '<div class="jankx-order-summary-bar__item">';
+        echo '<div class="jankx-order-summary-bar__label">' . esc_html__('Order Total', 'jankx') . '</div>';
+        echo '<div class="jankx-order-summary-bar__value jankx-order-summary-bar__value--highlight">' . esc_html($this->formatPrice($order->getTotal())) . '</div>';
+        echo '</div>';
 
-        echo '<h3>' . esc_html__('Items', 'jankx') . '</h3>';
-        echo '<table class="widefat striped">';
+        echo '<div class="jankx-order-summary-bar__item">';
+        echo '<div class="jankx-order-summary-bar__label">' . esc_html__('Items', 'jankx') . '</div>';
+        echo '<div class="jankx-order-summary-bar__value">' . $itemCount . '</div>';
+        echo '</div>';
+
+        echo '<div class="jankx-order-summary-bar__item">';
+        echo '<div class="jankx-order-summary-bar__label">' . esc_html__('Payment', 'jankx') . '</div>';
+        echo '<div class="jankx-order-summary-bar__value">' . esc_html($order->getPaymentMethod() ?: '—') . '</div>';
+        echo '</div>';
+
+        echo '<div class="jankx-order-summary-bar__item">';
+        echo '<div class="jankx-order-summary-bar__label">' . esc_html__('Created', 'jankx') . '</div>';
+        echo '<div class="jankx-order-summary-bar__value">' . esc_html(mysql2date(get_option('date_format') . ' H:i', $order->getDateCreated())) . '</div>';
+        echo '</div>';
+        echo '</div>'; // /.jankx-order-summary-bar
+
+        // ── Customer card ──
+        echo '<div class="jankx-order-card">';
+        echo '<div class="jankx-order-card__header">';
+        echo '<span class="jankx-order-card__header-icon">👤</span>';
+        echo '<h3 class="jankx-order-card__title">' . esc_html__('Customer Information', 'jankx') . '</h3>';
+        echo '</div>';
+        echo '<div class="jankx-order-card__body">';
+        echo '<div class="jankx-customer-grid">';
+        $this->customerGridItem(__('Full Name', 'jankx'), $order->getCustomerName());
+        $this->customerGridItem(__('Email', 'jankx'), $order->getCustomerEmail() ? '<a href="mailto:' . esc_attr($order->getCustomerEmail()) . '">' . esc_html($order->getCustomerEmail()) . '</a>' : '');
+        $this->customerGridItem(__('Phone', 'jankx'), $order->getCustomerPhone());
+        $this->customerGridItem(__('Address', 'jankx'), $order->getCustomerAddress());
+        echo '</div>'; // /.jankx-customer-grid
+        echo '</div>'; // /.jankx-order-card__body
+        echo '</div>'; // /.jankx-order-card
+
+        // ── Items card ──
+        echo '<div class="jankx-order-card">';
+        echo '<div class="jankx-order-card__header">';
+        echo '<span class="jankx-order-card__header-icon">🛒</span>';
+        echo '<h3 class="jankx-order-card__title">' . esc_html__('Order Items', 'jankx') . '</h3>';
+        echo '</div>';
+        echo '<div class="jankx-order-card__body">';
+        echo '<table class="jankx-order-items-table">';
         echo '<thead><tr>'
             . '<th>' . esc_html__('Product', 'jankx') . '</th>'
             . '<th>' . esc_html__('Qty', 'jankx') . '</th>'
-            . '<th>' . esc_html__('Unit price', 'jankx') . '</th>'
+            . '<th>' . esc_html__('Unit Price', 'jankx') . '</th>'
             . '<th>' . esc_html__('Total', 'jankx') . '</th>'
-            . '</tr></thead><tbody>';
+            . '</tr></thead>';
+        echo '<tbody>';
 
-        foreach ($order->getItems() as $item) {
+        foreach ($items as $item) {
             echo '<tr>';
-            echo '<td>' . esc_html($item->getName()) . $this->renderItemArgs($item->getMeta()) . '</td>';
-            echo '<td>' . (int) $item->getQuantity() . '</td>';
-            echo '<td>' . esc_html($this->formatPrice($item->getUnitPrice())) . '</td>';
-            echo '<td><strong>' . esc_html($this->formatPrice($item->getTotal())) . '</strong></td>';
+            echo '<td><div class="item-name">' . esc_html($item->getName()) . '</div>' . $this->renderItemArgs($item->getMeta()) . '</td>';
+            echo '<td><span class="qty-badge">' . (int) $item->getQuantity() . '</span></td>';
+            echo '<td><span class="unit-price">' . esc_html($this->formatPrice($item->getUnitPrice())) . '</span></td>';
+            echo '<td class="item-total">' . esc_html($this->formatPrice($item->getTotal())) . '</td>';
             echo '</tr>';
         }
 
-        echo '<tr><td colspan="3" style="text-align:right;font-weight:600">'
-            . esc_html__('Total', 'jankx') . '</td>'
-            . '<td><strong>' . esc_html($this->formatPrice($order->getTotal())) . '</strong></td></tr>';
-        echo '</tbody></table>';
-
-        echo '</div>';
+        echo '</tbody>';
+        echo '<tfoot>';
+        echo '<tr>';
+        echo '<td colspan="3" class="total-label">' . esc_html__('Order Total', 'jankx') . '</td>';
+        echo '<td class="total-value">' . esc_html($this->formatPrice($order->getTotal())) . '</td>';
+        echo '</tr>';
+        echo '</tfoot>';
+        echo '</table>';
+        echo '</div>'; // /.jankx-order-card__body
+        echo '</div>'; // /.jankx-order-card
     }
 
     public function renderStatusBox(\WP_Post $post): void
@@ -246,21 +289,20 @@ class OrderAdmin
 
         wp_nonce_field('jankx_update_order_status', 'jankx_order_status_nonce');
 
-        echo '<div class="jankx-order-admin jankx-order-status-box">';
-        echo '<p>' . esc_html__('Current status', 'jankx') . ' '
-            . $this->renderStatusBadge($order->getStatus()) . '</p>';
-
-        if ($order->getHandler()) {
-            echo '<p class="description">' . esc_html__('Last handled by', 'jankx') . ' '
-                . esc_html($order->getHandler()) . '</p>';
-        }
+        // Current status row
+        echo '<div class="jankx-status-current">';
+        echo '<span class="jankx-status-current__label">' . esc_html__('Current status', 'jankx') . '</span>';
+        echo $this->renderStatusBadge($order->getStatus());
+        echo '</div>';
 
         if (empty($allowed)) {
-            echo '<p><em>' . esc_html__('This order cannot be transitioned further.', 'jankx') . '</em></p>';
+            echo '<div class="jankx-status-no-transition">' . esc_html__('This order cannot be transitioned further.', 'jankx') . '</div>';
         } else {
-            echo '<p><label for="jankx_order_new_status"><strong>'
-                . esc_html__('Move to', 'jankx') . '</strong></label></p>';
-            echo '<select name="jankx_order_new_status" id="jankx_order_new_status" style="width:100%">';
+            echo '<div class="jankx-status-form">';
+
+            echo '<div class="form-group">';
+            echo '<label for="jankx_order_new_status">' . esc_html__('Move to', 'jankx') . '</label>';
+            echo '<select name="jankx_order_new_status" id="jankx_order_new_status">';
             foreach ($allowed as $status) {
                 printf(
                     '<option value="%s">%s</option>',
@@ -269,16 +311,24 @@ class OrderAdmin
                 );
             }
             echo '</select>';
+            echo '</div>';
 
-            echo '<p><label for="jankx_order_status_note"><strong>'
-                . esc_html__('Note', 'jankx') . '</strong></label></p>';
-            echo '<textarea name="jankx_order_status_note" id="jankx_order_status_note" rows="3" style="width:100%"></textarea>';
+            echo '<div class="form-group">';
+            echo '<label for="jankx_order_status_note">' . esc_html__('Note', 'jankx') . '</label>';
+            echo '<textarea name="jankx_order_status_note" id="jankx_order_status_note" rows="3" placeholder="' . esc_attr__('Optional note…', 'jankx') . '"></textarea>';
+            echo '</div>';
 
-            echo '<p><button type="submit" class="button button-primary button-large" style="width:100%">'
-                . esc_html__('Update status', 'jankx') . '</button></p>';
+            echo '<button type="submit" class="button-update">' . esc_html__('Update Status', 'jankx') . '</button>';
+
+            echo '</div>'; // /.jankx-status-form
         }
 
-        echo '</div>';
+        if ($order->getHandler()) {
+            echo '<div class="jankx-handler-info">';
+            echo $this->renderAvatar($order->getHandlerId());
+            echo '<span>' . esc_html__('Last handled by', 'jankx') . ' <strong>' . esc_html($order->getHandler()) . '</strong></span>';
+            echo '</div>';
+        }
     }
 
     public function renderHistoryBox(\WP_Post $post): void
@@ -287,7 +337,7 @@ class OrderAdmin
         $history = $order->getHistory();
 
         if (empty($history)) {
-            echo '<p><em>' . esc_html__('No history recorded for this order yet.', 'jankx') . '</em></p>';
+            echo '<div class="jankx-history-empty">' . esc_html__('No history recorded for this order yet.', 'jankx') . '</div>';
 
             return;
         }
@@ -296,26 +346,29 @@ class OrderAdmin
         foreach (array_reverse($history) as $entry) {
             echo '<li class="jankx-history-entry">';
 
-            $user = $entry['user_id'] ? get_userdata((int) $entry['user_id']) : null;
+            $user = !empty($entry['user_id']) ? get_userdata((int) $entry['user_id']) : null;
             $userName = $user ? $user->display_name : __('System', 'jankx');
 
-            $action = $entry['action'] === 'note'
-                ? __('added a note', 'jankx')
-                : sprintf(
+            if ($entry['action'] === 'note') {
+                $action = __('added a note', 'jankx');
+            } else {
+                $action = sprintf(
+                    /* translators: 1: old status, 2: new status */
                     __('changed status from %1$s to %2$s', 'jankx'),
-                    '<strong>' . esc_html(Order::getStatusLabel($entry['from'])) . '</strong>',
-                    '<strong>' . esc_html(Order::getStatusLabel($entry['to'])) . '</strong>'
+                    '<strong>' . esc_html(Order::getStatusLabel($entry['from'] ?? '')) . '</strong>',
+                    '<strong>' . esc_html(Order::getStatusLabel($entry['to'] ?? '')) . '</strong>'
                 );
+            }
 
             echo '<div class="jankx-history-head">';
-            echo $this->renderAvatar((int) $entry['user_id']);
+            echo $this->renderAvatar((int) ($entry['user_id'] ?? 0));
             echo '<span class="jankx-history-user">' . esc_html($userName) . '</span>';
             echo '<span class="jankx-history-action">' . $action . '</span>';
-            echo '<span class="jankx-history-time">' . esc_html(mysql2date(get_option('date_format') . ' H:i', $entry['created_at'])) . '</span>';
+            echo '<span class="jankx-history-time">' . esc_html(mysql2date(get_option('date_format') . ' H:i', $entry['created_at'] ?? '')) . '</span>';
             echo '</div>';
 
             if (!empty($entry['note'])) {
-                echo '<div class="jankx-history-note">' . esc_html($entry['note']) . '</div>';
+                echo '<div class="jankx-history-note">' . nl2br(esc_html($entry['note'])) . '</div>';
             }
 
             echo '</li>';
@@ -369,12 +422,28 @@ class OrderAdmin
         );
     }
 
+    /**
+     * Render a 2-column customer grid item.
+     */
+    protected function customerGridItem(string $label, string $value): void
+    {
+        $isEmpty = ($value === '' || $value === null);
+        echo '<div class="jankx-customer-grid__item">';
+        echo '<div class="jankx-customer-grid__label">' . esc_html($label) . '</div>';
+        if ($isEmpty) {
+            echo '<div class="jankx-customer-grid__value jankx-customer-grid__value--empty">&mdash;</div>';
+        } else {
+            echo '<div class="jankx-customer-grid__value">' . $value . '</div>';
+        }
+        echo '</div>';
+    }
+
+    /**
+     * @deprecated Use customerGridItem() instead.
+     */
     protected function detailRow(string $label, string $value): void
     {
-        echo '<tr>'
-            . '<th scope="row" style="width:160px">' . esc_html($label) . '</th>'
-            . '<td>' . ($value ?: '&mdash;') . '</td>'
-            . '</tr>';
+        $this->customerGridItem($label, $value);
     }
 
     protected function renderItemArgs(array $args): string

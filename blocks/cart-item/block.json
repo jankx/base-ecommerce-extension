@@ -1,0 +1,24 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "jankx/cart-item",
+    "title": "Cart Item (Mini Cart)",
+    "category": "jankx",
+    "icon": "cart",
+    "description": "Cart icon with item counter that opens a slide-out mini cart drawer.",
+    "textdomain": "jankx",
+    "attributes": {
+        "jankxHideOnUltrawide": { "type": "boolean", "default": false },
+        "jankxHideOnPc": { "type": "boolean", "default": false },
+        "jankxHideOnTablet": { "type": "boolean", "default": false },
+        "jankxHideOnMobile": { "type": "boolean", "default": false },
+        "jankxFlexGrow": { "type": "boolean", "default": false }
+    },
+    "supports": {
+        "html": false,
+        "spacing": {
+            "margin": true,
+            "padding": true
+        }
+    }
+}

@@ -1,0 +1,241 @@
+.jankx-mini-cart {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.jankx-mini-cart-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: inherit;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.jankx-mini-cart-toggle:hover {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+.jankx-mini-cart-icon {
+    display: inline-flex;
+    line-height: 1;
+}
+
+.jankx-mini-cart-count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: #e74c3c;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.jankx-mini-cart-count.is-empty {
+    display: none;
+}
+
+.jankx-mini-cart-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99990;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.jankx-mini-cart-overlay.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.jankx-mini-cart-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 99999;
+    width: min(400px, 100vw);
+    height: 100vh;
+    height: 100dvh;
+    background: #fff;
+    color: #1f2a35;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
+}
+
+.jankx-mini-cart-drawer.is-open {
+    transform: translateX(0);
+}
+
+.jankx-mini-cart-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #eee;
+}
+
+.jankx-mini-cart-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.jankx-mini-cart-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: #f1f3f5;
+    color: #1f2a35;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.jankx-mini-cart-close:hover {
+    background: #e2e6ea;
+}
+
+.jankx-mini-cart-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem 1.25rem;
+}
+
+.jankx-mini-cart-empty {
+    margin: 2rem 0;
+    text-align: center;
+    color: #888;
+}
+
+.jankx-mini-cart-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.jankx-mini-cart-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.jankx-mini-cart-name {
+    font-weight: 600;
+    text-decoration: none;
+    color: inherit;
+    overflow-wrap: anywhere;
+}
+
+.jankx-mini-cart-name:hover {
+    text-decoration: underline;
+}
+
+.jankx-mini-cart-meta {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.jankx-mini-cart-side {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.jankx-mini-cart-price {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.jankx-mini-cart-remove {
+    width: 26px;
+    height: 26px;
+    border: none;
+    border-radius: 50%;
+    background: #fdecea;
+    color: #c0392b;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.jankx-mini-cart-remove:hover {
+    background: #fadbd8;
+}
+
+.jankx-mini-cart-foot {
+    border-top: 1px solid #eee;
+    padding: 1rem 1.25rem;
+}
+
+.jankx-mini-cart-total-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.9rem;
+}
+
+.jankx-mini-cart-total-row strong {
+    font-size: 1.15rem;
+}
+
+.jankx-mini-cart-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+}
+
+.jankx-mini-cart-actions .jankx-mini-cart-link {
+    text-align: center;
+    padding: 0.7rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.jankx-mini-cart-actions .jankx-btn-outline {
+    border: 1px solid #d0d5da;
+    color: #1f2a35;
+    background: #fff;
+}
+
+.jankx-mini-cart-actions .jankx-btn-outline:hover {
+    background: #f5f6f8;
+}
+
+.jankx-mini-cart-actions .jankx-btn-primary {
+    background: #2c3e50;
+    color: #fff;
+}
+
+.jankx-mini-cart-actions .jankx-btn-primary:hover {
+    background: #1a252f;
+}
+
+body.jankx-mini-cart-open {
+    overflow: hidden;
+}

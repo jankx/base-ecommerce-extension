@@ -5,6 +5,7 @@ use Jankx\Extensions\AbstractExtension;
 use Jankx\Extensions\Ecommerce\Blocks\AccountTabOrdersBlock;
 use Jankx\Extensions\Ecommerce\Blocks\AddToCartBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CartBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CartItemBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CheckoutBlock;
 use Jankx\Extensions\Ecommerce\Cart\Cart;
 use Jankx\Extensions\Ecommerce\Checkout\CheckoutManager;
@@ -115,6 +116,7 @@ class EcommerceExtension extends AbstractExtension
 
         $blockClasses = [
             'cart'               => CartBlock::class,
+            'cart-item'          => CartItemBlock::class,
             'checkout'           => CheckoutBlock::class,
             'account-tab-orders' => AccountTabOrdersBlock::class,
             'add-to-cart'        => AddToCartBlock::class,
@@ -151,7 +153,7 @@ class EcommerceExtension extends AbstractExtension
 
         $blocksDir = $this->get_extension_path() . '/blocks';
         $blockMetadata = [];
-        foreach (['cart', 'checkout', 'account-tab-orders', 'add-to-cart'] as $slug) {
+        foreach (['cart', 'cart-item', 'checkout', 'account-tab-orders', 'add-to-cart'] as $slug) {
             $blockJson = $blocksDir . '/' . $slug . '/block.json';
             if (file_exists($blockJson)) {
                 $metadata = json_decode(file_get_contents($blockJson), true);

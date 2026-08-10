@@ -83,6 +83,11 @@
                 return;
             }
 
+            if (document.querySelector('.jankx-mini-cart-toggle')) {
+                document.dispatchEvent(new CustomEvent('jankx:cart-updated'));
+                button.disabled = false;
+                return;
+            }
             if (window.jankxEcommerce.cartUrl) {
                 window.location.href = window.jankxEcommerce.cartUrl;
                 return;
