@@ -166,7 +166,7 @@ class Order extends AbstractOrder
         ]);
 
         if ($note) {
-            $this->addNote($note, false, $handlerId);
+            $this->appendNote($note, false, $handlerId);
         }
 
         do_action('jankx/ecommerce/order/status_changed', $this, $newStatus, $oldStatus, $handlerId);
@@ -193,6 +193,28 @@ class Order extends AbstractOrder
             return;
         }
 
+        $this->appendNote($note, $isCustomerNote, $userId);
+
+        $this->recordHistory([
+            'action'     => 'note',
+            'note'       => sanitize_textarea_field($note),
+            'customer'   => (bool) $isCustomerNote,
+            'user_id'    => $userId ?: get_current_user_id(),
+            'created_at' => current_time('mysql'),
+        ]);
+
+        do_action('jankx/ecommerce/order/note_added', $this, $note, $isCustomerNote);
+    }
+
+    /**
+     * Append a note to _order_notes without recording a history entry.
+     */
+    protected function appendNote(string $note, bool $isCustomerNote = false, int $userId = 0): void
+    {
+        if (!$note) {
+            return;
+        }
+
         $notes = get_post_meta($this->getId(), '_order_notes', true);
         $notes = is_array($notes) ? $notes : [];
 
@@ -204,16 +226,6 @@ class Order extends AbstractOrder
         ];
 
         update_post_meta($this->getId(), '_order_notes', $notes);
-
-        $this->recordHistory([
-            'action'     => 'note',
-            'note'       => sanitize_textarea_field($note),
-            'customer'   => (bool) $isCustomerNote,
-            'user_id'    => $userId ?: get_current_user_id(),
-            'created_at' => current_time('mysql'),
-        ]);
-
-        do_action('jankx/ecommerce/order/note_added', $this, $note, $isCustomerNote);
     }
 
     public function getNotes(bool $customerOnly = false): array

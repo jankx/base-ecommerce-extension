@@ -149,6 +149,45 @@ class EcommerceExtension extends AbstractExtension
             true
         );
 
+        $blocksDir = $this->get_extension_path() . '/blocks';
+        $blockMetadata = [];
+        foreach (['cart', 'checkout', 'account-tab-orders', 'add-to-cart'] as $slug) {
+            $blockJson = $blocksDir . '/' . $slug . '/block.json';
+            if (file_exists($blockJson)) {
+                $metadata = json_decode(file_get_contents($blockJson), true);
+                if ($metadata) {
+                    $blockMetadata[$metadata['name']] = $metadata;
+                }
+            }
+        }
+        wp_localize_script('jankx-ecommerce-blocks-editor', 'jankxEcommerceBlockMetadata', $blockMetadata);
+    }
+
+    /**
+     * Enqueue admin styles used by the Orders management screen.
+     */
+    public function enqueue_admin_assets(): void
+    {
+        $screen = get_current_screen();
+        if (!$screen) {
+            return;
+        }
+
+        if (
+            $screen->post_type !== OrderPostType::POST_TYPE ||
+            !in_array($screen->base, ['edit', 'post'], true)
+        ) {
+            return;
+        }
+
+        wp_enqueue_style(
+            'jankx-ecommerce-admin',
+            $this->get_extension_url() . '/assets/admin.css',
+            [],
+            filemtime($this->get_extension_path() . '/assets/admin.css')
+        );
+    }
+
     public function enqueue_frontend_assets(): void
     {
         $productTypes = self::get_supported_product_types();

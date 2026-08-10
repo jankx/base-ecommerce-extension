@@ -76,7 +76,7 @@ class OrderPostType
                 'read_private_posts'    => self::CAP_READ,
                 'publish_posts'         => self::CAP_MANAGE,
             ],
-            'map_meta_cap'    => true,
+            'map_meta_cap'    => false,
         ]);
     }
 
