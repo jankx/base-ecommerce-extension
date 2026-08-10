@@ -63,6 +63,25 @@ class EcommerceController
             'callback'            => [$this, 'checkout'],
             'permission_callback' => '__return_true',
         ]);
+
+        register_rest_route(self::REST_NAMESPACE, '/currency', [
+            'methods'             => \WP_REST_Server::READABLE,
+            'callback'            => [$this, 'getCurrencies'],
+            'permission_callback' => '__return_true',
+        ]);
+
+        register_rest_route(self::REST_NAMESPACE, '/currency/switch', [
+            'methods'             => \WP_REST_Server::CREATABLE,
+            'callback'            => [$this, 'switchCurrency'],
+            'permission_callback' => '__return_true',
+            'args'                => [
+                'currency' => [
+                    'required'          => true,
+                    'type'              => 'string',
+                    'sanitize_callback' => 'sanitize_text_field',
+                ],
+            ],
+        ]);
     }
 
     public function getCart(\WP_REST_Request $request): \WP_REST_Response
@@ -156,5 +175,34 @@ class EcommerceController
         }
 
         return rest_ensure_response($response);
+    }
+
+    public function getCurrencies(\WP_REST_Request $request): \WP_REST_Response
+    {
+        return rest_ensure_response([
+            'current'  => CurrencyManager::getDefaultCurrency(),
+            'selected' => CurrencyManager::getCurrentCurrency(),
+            'enabled'  => CurrencyManager::getEnabledCurrenciesList(),
+            'all'      => CurrencyManager::getAllCurrencies(),
+            'position' => CurrencyManager::getCurrencyPosition(),
+        ]);
+    }
+
+    public function switchCurrency(\WP_REST_Request $request): \WP_REST_Response
+    {
+        $currency = sanitize_text_field($request->get_param('currency'));
+
+        if (CurrencyManager::setCurrentCurrency($currency)) {
+            return rest_ensure_response([
+                'success'  => true,
+                'currency' => $currency,
+                'symbol'   => CurrencyManager::getCurrency($currency)['symbol'] ?? $currency,
+            ]);
+        }
+
+        return new \WP_REST_Response([
+            'success' => false,
+            'message' => __('Tiền tệ không hợp lệ.', 'jankx'),
+        ], 400);
     }
 }

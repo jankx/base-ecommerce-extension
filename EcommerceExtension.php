@@ -7,11 +7,14 @@ use Jankx\Extensions\Ecommerce\Blocks\AddToCartBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CartBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CartItemBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CheckoutBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CurrencySwitcherBlock;
 use Jankx\Extensions\Ecommerce\Cart\Cart;
 use Jankx\Extensions\Ecommerce\Checkout\CheckoutManager;
+use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
 use Jankx\Extensions\Ecommerce\Order\Order;
 use Jankx\Extensions\Ecommerce\Order\OrderPostType;
 use Jankx\Extensions\Ecommerce\Admin\OrderAdmin;
+use Jankx\Extensions\Ecommerce\Admin\EcommerceSettingsPage;
 use Jankx\Extensions\Ecommerce\Payment\PaymentManager;
 use Jankx\Extensions\Ecommerce\Registry\ProductRegistry;
 use Jankx\Extensions\Ecommerce\Rest\EcommerceController;
@@ -78,6 +81,7 @@ class EcommerceExtension extends AbstractExtension
         // Professional Orders management screen (wp-admin).
         if (is_admin()) {
             (new OrderAdmin())->register();
+            (new EcommerceSettingsPage())->register();
             add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
         }
 
@@ -120,6 +124,7 @@ class EcommerceExtension extends AbstractExtension
             'checkout'           => CheckoutBlock::class,
             'account-tab-orders' => AccountTabOrdersBlock::class,
             'add-to-cart'        => AddToCartBlock::class,
+            'currency-switcher'  => CurrencySwitcherBlock::class,
         ];
 
         foreach ($blockClasses as $blockName => $blockClass) {
@@ -153,7 +158,7 @@ class EcommerceExtension extends AbstractExtension
 
         $blocksDir = $this->get_extension_path() . '/blocks';
         $blockMetadata = [];
-        foreach (['cart', 'cart-item', 'checkout', 'account-tab-orders', 'add-to-cart'] as $slug) {
+        foreach (['cart', 'cart-item', 'checkout', 'account-tab-orders', 'add-to-cart', 'currency-switcher'] as $slug) {
             $blockJson = $blocksDir . '/' . $slug . '/block.json';
             if (file_exists($blockJson)) {
                 $metadata = json_decode(file_get_contents($blockJson), true);
