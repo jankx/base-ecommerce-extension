@@ -374,6 +374,15 @@ class EcommerceExtension extends AbstractExtension
 
     public function init_ecommerce_core(): void
     {
+        // Initialize currency manager
+        add_filter('jankx/ecommerce/currency', function ($currency) {
+            return CurrencyManager::getCurrentCurrency();
+        });
+
+        add_filter('jankx/ecommerce/price_format', function ($formatted, $price, $currency) {
+            return CurrencyManager::formatPriceRaw($price, $currency);
+        }, 10, 3);
+
         do_action('jankx/ecommerce/init');
     }
 

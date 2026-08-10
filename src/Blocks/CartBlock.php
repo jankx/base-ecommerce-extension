@@ -3,6 +3,7 @@ namespace Jankx\Extensions\Ecommerce\Blocks;
 
 use Jankx\Extensions\Ecommerce\Block;
 use Jankx\Extensions\Ecommerce\Cart\Cart;
+use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
 use Jankx\Extensions\Ecommerce\EcommerceExtension;
 
 class CartBlock extends Block
@@ -166,14 +167,6 @@ class CartBlock extends Block
 
     protected function formatPrice(float $price): string
     {
-        $currency = (string) apply_filters('jankx/ecommerce/currency', 'VND');
-        $symbol = $currency === 'VND' ? 'đ' : $currency;
-
-        return (string) apply_filters(
-            'jankx/ecommerce/price_format',
-            number_format($price, 0, ',', '.') . $symbol,
-            $price,
-            $currency
-        );
+        return CurrencyManager::formatPrice($price);
     }
 }

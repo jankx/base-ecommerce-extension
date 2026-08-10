@@ -353,55 +353,147 @@ class EcommerceSettingsPage
     protected function renderPaymentTab(): void
     {
         settings_fields(self::OPTION_GROUP);
-        $gateways = get_option('jankx_payment_gateways', []);
+
+        $enabledGateways = get_option('jankx_payment_gateways', []);
+
+        // Get registered gateways from payment-system extension
+        $registeredGateways = $this->getRegisteredGateways();
         ?>
         <h2><?php esc_html_e('Phương thức thanh toán', 'jankx'); ?></h2>
-        <p class="description"><?php esc_html_e('Kích hoạt và cấu hình các phương thức thanh toán.', 'jankx'); ?></p>
+        <p class="description"><?php esc_html_e('Kích hoạt và cấu hình các phương thức thanh toán từ các extension.', 'jankx'); ?></p>
 
         <table class="widefat striped" style="margin-top: 16px;">
             <thead>
                 <tr>
                     <th style="width:50px;"><?php esc_html_e('Bật', 'jankx'); ?></th>
+                    <th style="width:50px;"></th>
                     <th><?php esc_html_e('Phương thức', 'jankx'); ?></th>
                     <th><?php esc_html_e('Mô tả', 'jankx'); ?></th>
-                    <th style="width:120px;"><?php esc_html_e('Trạng thái', 'jankx'); ?></th>
+                    <th style="width:100px;"><?php esc_html_e('Trạng thái', 'jankx'); ?></th>
+                    <th style="width:100px;"><?php esc_html_e('Chế độ', 'jankx'); ?></th>
+                    <th style="width:120px;"><?php esc_html_e('Thao tác', 'jankx'); ?></th>
                 </tr>
             </thead>
             <tbody>
                 <?php
-                $availableGateways = apply_filters('jankx/ecommerce/payment/available_gateways', [
+                // Built-in gateways (fallback if payment-system not active)
+                $builtInGateways = [
                     'cod' => [
                         'name' => __('Thanh toán khi nhận hàng (COD)', 'jankx'),
                         'description' => __('Khách hàng thanh toán bằng tiền mặt khi nhận hàng.', 'jankx'),
-                        'enabled' => true,
+                        'icon' => '💵',
                     ],
                     'bank_transfer' => [
                         'name' => __('Chuyển khoản ngân hàng', 'jankx'),
                         'description' => __('Khách hàng chuyển khoản trực tiếp vào tài khoản ngân hàng.', 'jankx'),
-                        'enabled' => false,
+                        'icon' => '🏦',
                     ],
-                ]);
+                ];
 
-                foreach ($availableGateways as $id => $gateway): ?>
+                // Merge registered gateways from payment-system
+                $allGateways = array_merge($builtInGateways, $registeredGateways);
+
+                foreach ($allGateways as $id => $gateway): ?>
                     <tr>
                         <td>
                             <input type="checkbox" name="jankx_payment_gateways[]"
                                    value="<?php echo esc_attr($id); ?>"
-                                   <?php checked(in_array($id, $gateways)); ?>>
+                                   <?php checked(in_array($id, $enabledGateways)); ?>>
                         </td>
+                        <td style="font-size:1.4em;"><?php echo esc_html($gateway['icon'] ?? '💳'); ?></td>
                         <td><strong><?php echo esc_html($gateway['name']); ?></strong></td>
-                        <td><?php echo esc_html($gateway['description']); ?></td>
+                        <td><?php echo esc_html($gateway['description'] ?? ''); ?></td>
                         <td>
-                            <span class="jankx-status-badge <?php echo $gateway['enabled'] ? 'jankx-status-active' : 'jankx-status-inactive'; ?>">
-                                <?php echo $gateway['enabled'] ? __('Đang hoạt động', 'jankx') : __('Tắt', 'jankx'); ?>
-                            </span>
+                            <?php if (!empty($gateway['available'])): ?>
+                                <span class="jankx-status-badge jankx-status-active"><?php esc_html_e('Sẵn sàng', 'jankx'); ?></span>
+                            <?php else: ?>
+                                <span class="jankx-status-badge jankx-status-inactive"><?php esc_html_e('Chưa cấu hình', 'jankx'); ?></span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if (!empty($gateway['sandbox_mode'])): ?>
+                                <span class="jankx-status-badge" style="background:#fff3cd; color:#856404;"><?php esc_html_e('Sandbox', 'jankx'); ?></span>
+                            <?php else: ?>
+                                <span class="jankx-status-badge" style="background:#d1ecf1; color:#0c5460;"><?php esc_html_e('Production', 'jankx'); ?></span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if (!empty($gateway['settings_url'])): ?>
+                                <a href="<?php echo esc_url($gateway['settings_url']); ?>" class="button button-small">
+                                    <?php esc_html_e('Cài đặt', 'jankx'); ?>
+                                </a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
+
         <?php submit_button(); ?>
         <?php
+    }
+
+    /**
+     * Get registered gateways from payment-system extension
+     */
+    protected function getRegisteredGateways(): array
+    {
+        if (!class_exists('\\Jankx\\Extensions\\PaymentSystem\\Gateways\\GatewayManager')) {
+            return [];
+        }
+
+        $manager = \Jankx\Extensions\PaymentSystem\Gateways\GatewayManager::getInstance();
+        $allGateways = $manager->getAll();
+        $modes = $manager->getGatewayModes();
+        $result = [];
+
+        foreach ($allGateways as $name => $class) {
+            $gateway = $manager->get($name);
+            if (!$gateway) {
+                continue;
+            }
+
+            $result[$name] = [
+                'name'         => $gateway->getName(),
+                'description'  => $this->getGatewayDescription($name),
+                'icon'         => $this->getGatewayIcon($name),
+                'available'    => $gateway->isAvailable(),
+                'sandbox_mode' => $modes[$name]['is_sandbox'] ?? false,
+                'settings_url' => admin_url('admin.php?page=jankx-ecommerce-settings&tab=payment&gateway=' . $name),
+            ];
+        }
+
+        return $result;
+    }
+
+    protected function getGatewayDescription(string $gatewayName): string
+    {
+        $descriptions = [
+            'onepay'          => __('Thanh toán thẻ quốc tế (Visa, Mastercard, JCB) qua OnePay.', 'jankx'),
+            'onepay_domestic' => __('Thanh toán thẻ nội địa (ATM/Napas) qua OnePay.', 'jankx'),
+            'momo'            => __('Ví điện tử MoMo - thanh toán nhanh bằng QR code.', 'jankx'),
+            'vnpay'           => __('Cổng thanh toán VNPay - hỗ trợ ATM, Visa, Mastercard.', 'jankx'),
+            'zalopay'         => __('Ví điện tử ZaloPay - thanh toán bằng QR code.', 'jankx'),
+            'stripe'          => __('Thanh toán quốc tế qua Stripe (Visa, Mastercard, AMEX).', 'jankx'),
+            'paypal'          => __('Thanh toán quốc tế qua PayPal.', 'jankx'),
+        ];
+
+        return $descriptions[$gatewayName] ?? __('Phương thức thanh toán trực tuyến.', 'jankx');
+    }
+
+    protected function getGatewayIcon(string $gatewayName): string
+    {
+        $icons = [
+            'onepay'          => '💳',
+            'onepay_domestic' => '🏧',
+            'momo'            => '📱',
+            'vnpay'           => '🏦',
+            'zalopay'         => '💜',
+            'stripe'          => '💰',
+            'paypal'          => '🅿️',
+        ];
+
+        return $icons[$gatewayName] ?? '💳';
     }
 
     // ── COUPONS TAB ──────────────────────────────────────────────────

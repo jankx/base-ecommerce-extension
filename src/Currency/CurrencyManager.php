@@ -146,7 +146,7 @@ class CurrencyManager
         return true;
     }
 
-    public static function formatPrice(float $price, ?string $currencyCode = null): string
+    public static function formatPriceRaw(float $price, ?string $currencyCode = null): string
     {
         $currencyCode = $currencyCode ?? self::getCurrentCurrency();
         $currency = self::getCurrency($currencyCode);
@@ -164,20 +164,23 @@ class CurrencyManager
 
         switch ($position) {
             case 'left':
-                $result = $currency['symbol'] . $formatted;
-                break;
+                return $currency['symbol'] . $formatted;
             case 'right':
-                $result = $formatted . $currency['symbol'];
-                break;
+                return $formatted . $currency['symbol'];
             case 'left_space':
-                $result = $currency['symbol'] . ' ' . $formatted;
-                break;
+                return $currency['symbol'] . ' ' . $formatted;
             case 'right_space':
-                $result = $formatted . ' ' . $currency['symbol'];
-                break;
+                return $formatted . ' ' . $currency['symbol'];
             default:
-                $result = $currency['symbol'] . $formatted;
+                return $currency['symbol'] . $formatted;
         }
+    }
+
+    public static function formatPrice(float $price, ?string $currencyCode = null): string
+    {
+        $currencyCode = $currencyCode ?? self::getCurrentCurrency();
+        $currency = self::getCurrency($currencyCode);
+        $result = self::formatPriceRaw($price, $currencyCode);
 
         return (string) apply_filters('jankx/ecommerce/price_format', $result, $price, $currencyCode, $currency);
     }
