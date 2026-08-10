@@ -7,6 +7,13 @@
     "icon": "money",
     "description": "Checkout page. Collects customer billing details and payment method, then turns the cart into an order.",
     "textdomain": "jankx",
+    "attributes": {
+        "jankxHideOnUltrawide": { "type": "boolean", "default": false },
+        "jankxHideOnPc": { "type": "boolean", "default": false },
+        "jankxHideOnTablet": { "type": "boolean", "default": false },
+        "jankxHideOnMobile": { "type": "boolean", "default": false },
+        "jankxFlexGrow": { "type": "boolean", "default": false }
+    },
     "supports": {
         "html": false,
         "align": ["wide", "full"],

@@ -128,20 +128,48 @@ class Order extends AbstractOrder
         return $status ?: self::STATUS_PENDING;
     }
 
-    public function updateStatus(string $newStatus, string $note = ''): bool
+    /**
+     * Get the list of statuses this order can transition to next.
+     */
+    public function getAllowedStatusTransitions(): array
     {
+        return self::getAllowedTransitions()[$this->getStatus()] ?? [];
+    }
+
+    /**
+     * Update the order status and record a history entry with the handler.
+     *
+     * @param string $newStatus New order status.
+     * @param string $note      Optional note attached to the transition.
+     * @param int    $handlerId User ID who performed the change (0 = current user).
+     */
+    public function updateStatus(string $newStatus, string $note = '', int $handlerId = 0): bool
+    {
+        $newStatus = sanitize_key($newStatus);
         $oldStatus = $this->getStatus();
         if ($oldStatus === $newStatus) {
             return true;
         }
 
-        update_post_meta($this->getId(), '_order_status', sanitize_key($newStatus));
+        $handlerId = $handlerId ?: get_current_user_id();
+
+        update_post_meta($this->getId(), '_order_status', $newStatus);
+        update_post_meta($this->getId(), '_order_handler_id', $handlerId);
+
+        $this->recordHistory([
+            'action'     => 'status',
+            'from'       => $oldStatus,
+            'to'         => $newStatus,
+            'note'       => $note,
+            'user_id'    => $handlerId,
+            'created_at' => current_time('mysql'),
+        ]);
 
         if ($note) {
-            $this->addNote($note);
+            $this->addNote($note, false, $handlerId);
         }
 
-        do_action('jankx/ecommerce/order/status_changed', $this, $newStatus, $oldStatus);
+        do_action('jankx/ecommerce/order/status_changed', $this, $newStatus, $oldStatus, $handlerId);
 
         return true;
     }
@@ -159,7 +187,7 @@ class Order extends AbstractOrder
         }, $raw);
     }
 
-    public function addNote(string $note, bool $isCustomerNote = false): void
+    public function addNote(string $note, bool $isCustomerNote = false, int $userId = 0): void
     {
         if (!$note) {
             return;
@@ -171,10 +199,20 @@ class Order extends AbstractOrder
         $notes[] = [
             'note'       => sanitize_textarea_field($note),
             'customer'   => (bool) $isCustomerNote,
+            'user_id'    => $userId ?: get_current_user_id(),
             'created_at' => current_time('mysql'),
         ];
 
         update_post_meta($this->getId(), '_order_notes', $notes);
+
+        $this->recordHistory([
+            'action'     => 'note',
+            'note'       => sanitize_textarea_field($note),
+            'customer'   => (bool) $isCustomerNote,
+            'user_id'    => $userId ?: get_current_user_id(),
+            'created_at' => current_time('mysql'),
+        ]);
+
         do_action('jankx/ecommerce/order/note_added', $this, $note, $isCustomerNote);
     }
 
@@ -188,6 +226,93 @@ class Order extends AbstractOrder
                 return !empty($n['customer']);
             }))
             : $notes;
+    }
+
+    /**
+     * The user ID who last handled (changed the status of) this order.
+     */
+    public function getHandlerId(): int
+    {
+        return (int) get_post_meta($this->getId(), '_order_handler_id', true);
+    }
+
+    /**
+     * Display name of the last handler (empty when unknown).
+     */
+    public function getHandler(): string
+    {
+        $handlerId = $this->getHandlerId();
+        if (!$handlerId) {
+            return '';
+        }
+
+        $user = get_userdata($handlerId);
+
+        return $user ? $user->display_name : '';
+    }
+
+    /**
+     * Full order history: status transitions + notes with handlers.
+     *
+     * @return array[]
+     */
+    public function getHistory(): array
+    {
+        $history = get_post_meta($this->getId(), '_order_history', true);
+
+        return is_array($history) ? $history : [];
+    }
+
+    protected function recordHistory(array $entry): void
+    {
+        $history = $this->getHistory();
+        $history[] = $entry;
+
+        update_post_meta($this->getId(), '_order_history', $history);
+    }
+
+    /**
+     * Default status transition map. Extendable via the
+     * `jankx/ecommerce/order/status_transitions` filter.
+     */
+    public static function getAllowedTransitions(): array
+    {
+        $transitions = [
+            self::STATUS_PENDING    => [self::STATUS_PROCESSING, self::STATUS_FAILED, self::STATUS_CANCELLED],
+            self::STATUS_PROCESSING => [self::STATUS_COMPLETED, self::STATUS_FAILED, self::STATUS_CANCELLED],
+            self::STATUS_COMPLETED  => [self::STATUS_REFUNDED],
+            self::STATUS_FAILED     => [self::STATUS_PROCESSING, self::STATUS_CANCELLED],
+            self::STATUS_CANCELLED  => [self::STATUS_PENDING],
+            self::STATUS_REFUNDED   => [],
+        ];
+
+        return apply_filters('jankx/ecommerce/order/status_transitions', $transitions);
+    }
+
+    /**
+     * All order statuses with their labels.
+     *
+     * @return array<string, string>
+     */
+    public static function getStatusLabels(): array
+    {
+        $labels = [
+            self::STATUS_PENDING    => __('Pending', 'jankx'),
+            self::STATUS_PROCESSING => __('Processing', 'jankx'),
+            self::STATUS_COMPLETED  => __('Completed', 'jankx'),
+            self::STATUS_FAILED     => __('Failed', 'jankx'),
+            self::STATUS_CANCELLED  => __('Cancelled', 'jankx'),
+            self::STATUS_REFUNDED   => __('Refunded', 'jankx'),
+        ];
+
+        return apply_filters('jankx/ecommerce/order/status_labels', $labels);
+    }
+
+    public static function getStatusLabel(string $status): string
+    {
+        $labels = self::getStatusLabels();
+
+        return $labels[$status] ?? ucfirst($status);
     }
 
     public function getPaymentTransactionId(): int
@@ -215,14 +340,19 @@ class Order extends AbstractOrder
             'id'              => $this->getId(),
             'order_number'    => $this->getOrderNumber(),
             'status'          => $this->getStatus(),
+            'status_label'    => self::getStatusLabel($this->getStatus()),
+            'handler_id'      => $this->getHandlerId(),
+            'handler'         => $this->getHandler(),
             'customer_id'     => $this->getCustomerId(),
             'customer_name'   => $this->getCustomerName(),
             'customer_email'  => $this->getCustomerEmail(),
             'customer_phone'  => $this->getCustomerPhone(),
+            'customer_address' => $this->getCustomerAddress(),
             'total'           => $this->getTotal(),
             'currency'        => $this->getCurrency(),
             'payment_method'  => $this->getPaymentMethod(),
             'created_at'      => $this->getDateCreated(),
+            'history'         => $this->getHistory(),
             'items'           => array_map(function (OrderItem $item) {
                 return $item->toArray();
             }, $this->getItems()),

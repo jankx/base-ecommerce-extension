@@ -20,7 +20,12 @@
         "show_departure": {
             "type": "boolean",
             "default": false
-        }
+        },
+        "jankxHideOnUltrawide": { "type": "boolean", "default": false },
+        "jankxHideOnPc": { "type": "boolean", "default": false },
+        "jankxHideOnTablet": { "type": "boolean", "default": false },
+        "jankxHideOnMobile": { "type": "boolean", "default": false },
+        "jankxFlexGrow": { "type": "boolean", "default": false }
     },
     "supports": {
         "html": false,

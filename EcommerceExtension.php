@@ -10,6 +10,7 @@ use Jankx\Extensions\Ecommerce\Cart\Cart;
 use Jankx\Extensions\Ecommerce\Checkout\CheckoutManager;
 use Jankx\Extensions\Ecommerce\Order\Order;
 use Jankx\Extensions\Ecommerce\Order\OrderPostType;
+use Jankx\Extensions\Ecommerce\Admin\OrderAdmin;
 use Jankx\Extensions\Ecommerce\Payment\PaymentManager;
 use Jankx\Extensions\Ecommerce\Registry\ProductRegistry;
 use Jankx\Extensions\Ecommerce\Rest\EcommerceController;
@@ -73,6 +74,12 @@ class EcommerceExtension extends AbstractExtension
         // Shared order post type on every request.
         (new OrderPostType())->register();
 
+        // Professional Orders management screen (wp-admin).
+        if (is_admin()) {
+            (new OrderAdmin())->register();
+            add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
+        }
+
         // Allow hook-based registration of product types on init.
         add_action('init', [ProductRegistry::get_instance(), 'boot'], 10);
 
@@ -119,6 +126,12 @@ class EcommerceExtension extends AbstractExtension
                 continue;
             }
 
+            $blockJson = json_decode((string) file_get_contents($blockPath . '/block.json'), true);
+            $registeredName = $blockJson['name'] ?? '';
+            if ($registeredName && \WP_Block_Type_Registry::get_instance()->is_registered($registeredName)) {
+                continue;
+            }
+
             $block = new $blockClass($blockPath);
             $block->setBlockPath($blockPath);
             $block->boot();
@@ -135,20 +148,6 @@ class EcommerceExtension extends AbstractExtension
             filemtime($this->get_extension_path() . '/assets/blocks-editor.js'),
             true
         );
-
-        $blocksDir = $this->get_extension_path() . '/blocks';
-        $blockMetadata = [];
-        foreach (['cart', 'checkout', 'account-tab-orders', 'add-to-cart'] as $slug) {
-            $blockJson = $blocksDir . '/' . $slug . '/block.json';
-            if (file_exists($blockJson)) {
-                $metadata = json_decode(file_get_contents($blockJson), true);
-                if ($metadata) {
-                    $blockMetadata[$metadata['name']] = $metadata;
-                }
-            }
-        }
-        wp_localize_script('jankx-ecommerce-blocks-editor', 'jankxEcommerceBlockMetadata', $blockMetadata);
-    }
 
     public function enqueue_frontend_assets(): void
     {

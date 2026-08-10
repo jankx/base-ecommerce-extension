@@ -1,0 +1,120 @@
+/* Orders management screen (wp-admin) */
+
+.jankx-order-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    line-height: 1.6;
+}
+
+.jankx-order-badge--pending {
+    background: #fef9e7;
+    color: #b7950b;
+    border: 1px solid #f5e6a8;
+}
+
+.jankx-order-badge--processing {
+    background: #eaf2f8;
+    color: #2980b9;
+    border: 1px solid #c5dff0;
+}
+
+.jankx-order-badge--completed {
+    background: #eafaf1;
+    color: #27ae60;
+    border: 1px solid #c3ecd6;
+}
+
+.jankx-order-badge--failed,
+.jankx-order-badge--cancelled,
+.jankx-order-badge--refunded {
+    background: #fdecea;
+    color: #c0392b;
+    border: 1px solid #f5c2bd;
+}
+
+.jankx-order-admin h3 {
+    margin-top: 1.2rem;
+}
+
+.jankx-order-admin .widefat th,
+.jankx-order-admin .widefat td {
+    padding: 8px 10px;
+    vertical-align: top;
+}
+
+.jankx-order-status-box select,
+.jankx-order-status-box textarea {
+    margin-top: 4px;
+}
+
+.jankx-order-history {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.jankx-order-history .jankx-history-entry {
+    position: relative;
+    padding: 12px 0 12px 40px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.jankx-order-history .jankx-history-entry:last-child {
+    border-bottom: none;
+}
+
+.jankx-order-history .jankx-history-entry::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 26px;
+    bottom: -12px;
+    width: 2px;
+    background: #e5e5e5;
+}
+
+.jankx-order-history .jankx-history-entry:last-child::before {
+    display: none;
+}
+
+.jankx-history-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.jankx-history-head img.avatar {
+    border-radius: 50%;
+    position: absolute;
+    left: 0;
+    top: 14px;
+}
+
+.jankx-history-user {
+    font-weight: 600;
+}
+
+.jankx-history-action {
+    color: #444;
+}
+
+.jankx-history-time {
+    color: #999;
+    font-size: 12px;
+    margin-left: auto;
+}
+
+.jankx-history-note {
+    margin-top: 6px;
+    padding: 8px 10px;
+    background: #f6f7f7;
+    border-left: 3px solid #b4b9be;
+    border-radius: 2px;
+    font-size: 13px;
+}
