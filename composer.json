@@ -7,6 +7,11 @@
             "Jankx\\Extensions\\Ecommerce\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Jankx\\Extensions\\Ecommerce\\Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "Puleeno Nguyen",
@@ -14,7 +19,14 @@
         }
     ],
     "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "brain/monkey": "^2.6",
+        "mockery/mockery": "^1.5"
+    },
     "config": {
-        "vendor-dir": "libs"
+        "allow-plugins": {
+            "php-http/discovery": false
+        }
     }
 }

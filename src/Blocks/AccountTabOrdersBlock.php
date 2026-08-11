@@ -4,7 +4,7 @@ namespace Jankx\Extensions\Ecommerce\Blocks;
 use Jankx\Extensions\Ecommerce\Block;
 use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
 use Jankx\Extensions\Ecommerce\Order\Order;
-use Jankx\Extensions\Ecommerce\Order\OrderPostType;
+use Jankx\Extensions\Ecommerce\Order\OrderModel;
 
 class AccountTabOrdersBlock extends Block
 {
@@ -45,8 +45,8 @@ class AccountTabOrdersBlock extends Block
                 . '</div>';
         } else {
             $output .= '<div class="jankx-orders-list">';
-            foreach ($orders as $orderPost) {
-                $output .= $this->renderOrderCard(new Order($orderPost->ID));
+            foreach ($orders as $order) {
+                $output .= $this->renderOrderCard($order);
             }
             $output .= '</div>';
         }
@@ -109,26 +109,16 @@ class AccountTabOrdersBlock extends Block
 
     protected function getUserOrders(int $userId): array
     {
-        if (!post_type_exists(OrderPostType::POST_TYPE)) {
-            return [];
-        }
-
-        $query = new \WP_Query([
-            'post_type'      => OrderPostType::POST_TYPE,
-            'post_status'    => 'any',
-            'posts_per_page' => 10,
-            'orderby'        => 'date',
-            'order'          => 'DESC',
-            'meta_query'     => [
-                [
-                    'key'   => '_customer_id',
-                    'value' => $userId,
-                    'compare' => '=',
-                ],
-            ],
+        $rows = OrderModel::query([
+            'customer_id' => $userId,
+            'per_page'    => 10,
+            'orderby'     => 'created_at',
+            'order'       => 'DESC',
         ]);
 
-        return $query->posts;
+        return array_map(function ($row) {
+            return new Order($row['id']);
+        }, $rows);
     }
 
     protected function formatPrice(float $price): string

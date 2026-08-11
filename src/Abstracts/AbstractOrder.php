@@ -2,17 +2,18 @@
 namespace Jankx\Extensions\Ecommerce\Abstracts;
 
 use Jankx\Extensions\Ecommerce\Contracts\OrderInterface;
+use Jankx\Extensions\Ecommerce\Order\OrderModel;
 
 abstract class AbstractOrder implements OrderInterface
 {
     protected $id;
-    protected $post;
+    protected $data;
 
     public function __construct($orderId = 0)
     {
         if ($orderId > 0) {
             $this->id = absint($orderId);
-            $this->post = get_post($this->id);
+            $this->data = OrderModel::findById($this->id);
         }
     }
 
@@ -23,12 +24,20 @@ abstract class AbstractOrder implements OrderInterface
 
     public function getOrderNumber(): string
     {
-        return $this->post ? get_post_meta($this->id, '_order_number', true) ?: (string) $this->id : '';
+        if (!$this->data) {
+            return '';
+        }
+        return $this->data['order_number'] ?: (string) $this->id;
     }
 
     public function getStatus(): string
     {
-        return $this->post ? $this->post->post_status : '';
+        return $this->data['status'] ?? '';
+    }
+
+    public function toArray(): array
+    {
+        return $this->data ?? [];
     }
 
     // Abstract methods to be implemented

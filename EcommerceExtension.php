@@ -12,7 +12,7 @@ use Jankx\Extensions\Ecommerce\Cart\Cart;
 use Jankx\Extensions\Ecommerce\Checkout\CheckoutManager;
 use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
 use Jankx\Extensions\Ecommerce\Order\Order;
-use Jankx\Extensions\Ecommerce\Order\OrderPostType;
+use Jankx\Extensions\Ecommerce\Order\OrderDatabaseInstaller;
 use Jankx\Extensions\Ecommerce\Admin\OrderAdmin;
 use Jankx\Extensions\Ecommerce\Admin\EcommerceSettingsPage;
 use Jankx\Extensions\Ecommerce\Payment\PaymentManager;
@@ -75,8 +75,8 @@ class EcommerceExtension extends AbstractExtension
 
     public function register_hooks(): void
     {
-        // Shared order post type on every request.
-        (new OrderPostType())->register();
+        // Install order database tables on first run.
+        (new OrderDatabaseInstaller())->register();
 
         // Professional Orders management screen (wp-admin).
         if (is_admin()) {
@@ -180,19 +180,15 @@ class EcommerceExtension extends AbstractExtension
             return;
         }
 
-        if (
-            $screen->post_type !== OrderPostType::POST_TYPE ||
-            !in_array($screen->base, ['edit', 'post'], true)
-        ) {
-            return;
+        // Enqueue on our custom orders page
+        if ($screen->id === 'admin_page_jankx-orders') {
+            wp_enqueue_style(
+                'jankx-ecommerce-admin',
+                $this->get_extension_url() . '/assets/admin.css',
+                [],
+                filemtime($this->get_extension_path() . '/assets/admin.css')
+            );
         }
-
-        wp_enqueue_style(
-            'jankx-ecommerce-admin',
-            $this->get_extension_url() . '/assets/admin.css',
-            [],
-            filemtime($this->get_extension_path() . '/assets/admin.css')
-        );
     }
 
     public function enqueue_frontend_assets(): void
