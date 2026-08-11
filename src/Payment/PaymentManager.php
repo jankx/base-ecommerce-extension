@@ -80,9 +80,20 @@ class PaymentManager
     protected function callGatewayPurchase(Order $order, string $gatewaySlug, int $transactionId, array $params): string
     {
         $gatewayManager = \Jankx\Extensions\PaymentSystem\Gateways\GatewayManager::getInstance();
+
+        // Debug: log registered gateways
+        $registered = $gatewayManager->getAll();
+        error_log(sprintf('[Jankx Payment] Registered gateways: %s', implode(', ', array_keys($registered))));
+
         $gateway = $gatewayManager->get($gatewaySlug);
 
         if (!$gateway) {
+            error_log(sprintf('[Jankx Payment] Gateway "%s" not found in GatewayManager.', $gatewaySlug));
+            return '';
+        }
+
+        if (!$gateway->isAvailable()) {
+            error_log(sprintf('[Jankx Payment] Gateway "%s" is not available (missing credentials).', $gatewaySlug));
             return '';
         }
 
@@ -102,9 +113,13 @@ class PaymentManager
             'customer_name'  => $order->getCustomerName(),
         ]);
 
+        error_log(sprintf('[Jankx Payment] Gateway "%s" purchase result: %s', $gatewaySlug, wp_json_encode($result)));
+
         if (!empty($result['redirectUrl'])) {
             return $result['redirectUrl'];
         }
+
+        error_log(sprintf('[Jankx Payment] Gateway "%s" purchase() returned no redirect URL.', $gatewaySlug));
 
         return '';
     }
