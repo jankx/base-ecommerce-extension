@@ -47,18 +47,18 @@ class CartItemBlock extends Block
         );
 
         wp_localize_script('jankx-mini-cart', 'jankxMiniCart', [
-            'restUrl'    => esc_url_raw(rest_url(EcommerceController::REST_NAMESPACE)),
-            'cartUrl'    => EcommerceExtension::get_cart_page_url(),
+            'restUrl' => esc_url_raw(rest_url(EcommerceController::REST_NAMESPACE)),
+            'cartUrl' => EcommerceExtension::get_cart_page_url(),
             'checkoutUrl' => EcommerceExtension::get_checkout_page_url(),
-            'i18n'       => [
-                'empty'       => __('Giỏ hàng của bạn đang trống.', 'jankx'),
-                'cart'        => __('Giỏ hàng', 'jankx'),
-                'viewCart'    => __('Xem giỏ hàng', 'jankx'),
-                'checkout'    => __('Thanh toán', 'jankx'),
-                'remove'      => __('Xóa', 'jankx'),
+            'i18n' => [
+                'empty' => __('Giỏ hàng của bạn đang trống.', 'jankx'),
+                'cart' => __('Giỏ hàng', 'jankx'),
+                'viewCart' => __('Xem giỏ hàng', 'jankx'),
+                'checkout' => __('Thanh toán', 'jankx'),
+                'remove' => __('Xóa', 'jankx'),
                 'removeError' => __('Không thể xóa sản phẩm.', 'jankx'),
-                'total'       => __('Tổng cộng', 'jankx'),
-                'fail'        => __('Không thể cập nhật giỏ hàng.', 'jankx'),
+                'total' => __('Tổng cộng', 'jankx'),
+                'fail' => __('Không thể cập nhật giỏ hàng.', 'jankx'),
             ],
         ]);
     }
@@ -106,21 +106,18 @@ class CartItemBlock extends Block
             . esc_attr__('Close cart', 'jankx') . '">&times;</button>'
             . '</div>';
 
+        $output .= '<div class="jankx-mini-cart-body" data-jankx-drawer-items>';
         if ($cart->isEmpty()) {
-            $output .= '<div class="jankx-mini-cart-body" data-jankx-drawer-items>'
-                . '<p class="jankx-mini-cart-empty">' . esc_html__('Giỏ hàng của bạn đang trống.', 'jankx') . '</p>'
-                . '</div>';
-            $output .= '<div class="jankx-mini-cart-foot" data-jankx-drawer-footer hidden></div>';
+            $output .= '<p class="jankx-mini-cart-empty">' . esc_html__('Giỏ hàng của bạn đang trống.', 'jankx') . '</p>';
         } else {
-            $output .= '<div class="jankx-mini-cart-body" data-jankx-drawer-items>';
             foreach ($cart->getItems() as $itemKey => $item) {
                 $productUrl = get_permalink($item->getProductId());
                 $output .= '<div class="jankx-mini-cart-row" data-item-key="' . esc_attr($itemKey) . '">';
                 $output .= '<div class="jankx-mini-cart-info">';
-                $output .= '<a class="jankx-mini-cart-name" href="' . esc_url($productUrl ?: '') . '">'
+                $output .= '<a class="jankx-mini-cart-name" href="' . esc_url($productUrl ?: '#') . '">'
                     . esc_html($item->getName()) . '</a>';
                 $output .= '<span class="jankx-mini-cart-meta">' . (int) $item->getQuantity()
-                    . ' x ' . esc_html($this->formatPrice($item->getUnitPrice())) . '</span>';
+                    . ' &times; ' . esc_html($this->formatPrice($item->getUnitPrice())) . '</span>';
                 $output .= '</div>';
                 $output .= '<div class="jankx-mini-cart-side">';
                 $output .= '<span class="jankx-mini-cart-price">' . esc_html($this->formatPrice($item->getSubtotal())) . '</span>';
@@ -129,24 +126,25 @@ class CartItemBlock extends Block
                 $output .= '</div>';
                 $output .= '</div>';
             }
-            $output .= '</div>';
-
-            $output .= '<div class="jankx-mini-cart-foot" data-jankx-drawer-footer>';
-            $output .= '<div class="jankx-mini-cart-total-row">'
-                . '<span>' . esc_html__('Tổng cộng', 'jankx') . '</span>'
-                . '<strong data-jankx-drawer-total>' . esc_html($this->formatPrice($cart->getTotal())) . '</strong>'
-                . '</div>';
-            $output .= '<div class="jankx-mini-cart-actions">';
-            if ($cartUrl) {
-                $output .= '<a class="jankx-btn jankx-btn-outline jankx-mini-cart-link" href="' . esc_url($cartUrl) . '">'
-                    . esc_html__('Xem giỏ hàng', 'jankx') . '</a>';
-            }
-            if ($checkoutUrl) {
-                $output .= '<a class="jankx-btn jankx-btn-primary jankx-mini-cart-link" href="' . esc_url($checkoutUrl) . '">'
-                    . esc_html__('Thanh toán', 'jankx') . '</a>';
-            }
-            $output .= '</div></div>';
         }
+        $output .= '</div>'; // End body
+
+        // ALWAYS render the footer structure, just hide it if cart is empty.
+        $output .= '<div class="jankx-mini-cart-foot" data-jankx-drawer-footer ' . ($cart->isEmpty() ? 'hidden' : '') . '>';
+        $output .= '<div class="jankx-mini-cart-total-row">'
+            . '<span>' . esc_html__('Tổng cộng', 'jankx') . '</span>'
+            . '<strong data-jankx-drawer-total>' . esc_html($this->formatPrice($cart->getTotal())) . '</strong>'
+            . '</div>';
+        $output .= '<div class="jankx-mini-cart-actions">';
+        if ($cartUrl) {
+            $output .= '<a class="jankx-btn jankx-btn-outline jankx-mini-cart-link" href="' . esc_url($cartUrl) . '">'
+                . esc_html__('Xem giỏ hàng', 'jankx') . '</a>';
+        }
+        if ($checkoutUrl) {
+            $output .= '<a class="jankx-btn jankx-btn-primary jankx-mini-cart-link" href="' . esc_url($checkoutUrl) . '">'
+                . esc_html__('Thanh toán', 'jankx') . '</a>';
+        }
+        $output .= '</div></div>';
 
         $output .= '</aside>';
 

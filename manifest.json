@@ -11,6 +11,9 @@
     "requirements": {
         "php": ">=7.4"
     },
+    "dependencies": [
+        "notification-system"
+    ],
     "context": [
         "frontend",
         "admin",

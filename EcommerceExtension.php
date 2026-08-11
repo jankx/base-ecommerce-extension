@@ -18,6 +18,7 @@ use Jankx\Extensions\Ecommerce\Admin\EcommerceSettingsPage;
 use Jankx\Extensions\Ecommerce\Payment\PaymentManager;
 use Jankx\Extensions\Ecommerce\Registry\ProductRegistry;
 use Jankx\Extensions\Ecommerce\Rest\EcommerceController;
+use Jankx\Extensions\NotificationSystem\NotificationService;
 
 /**
  * Base E-Commerce Extension for Jankx
@@ -109,6 +110,10 @@ class EcommerceExtension extends AbstractExtension
 
         // Inject the "Orders" sub-page into My Account.
         add_action('jankx/my_account/register_sub_pages', [$this, 'register_my_account_sub_pages']);
+
+        // Send notifications on order lifecycle events.
+        add_action('jankx/ecommerce/order/created', [$this, 'on_order_created'], 10, 2);
+        add_action('jankx/ecommerce/order/status_changed', [$this, 'on_order_status_changed'], 10, 4);
     }
 
     public function register_blocks(): void
@@ -458,5 +463,96 @@ class EcommerceExtension extends AbstractExtension
     public static function payment_manager(): PaymentManager
     {
         return PaymentManager::get_instance();
+    }
+
+    // ── Order notification hooks ───────────────────────────
+
+    /**
+     * Send a "order created" notification when a new order is placed.
+     */
+    public function on_order_created(Order $order, Cart $cart): void
+    {
+        $userId = $order->getCustomerId();
+        if (!$userId) {
+            return;
+        }
+
+        $labels = Order::getStatusLabels();
+        $total  = function_exists('jankx_currency_format')
+            ? jankx_currency_format($order->getTotal())
+            : number_format($order->getTotal(), 0, ',', '.') . ' ' . $order->getCurrency();
+
+        NotificationService::send(
+            $userId,
+            'order.created',
+            sprintf(__('Đơn hàng #%s đã được tạo', 'jankx'), $order->getOrderNumber()),
+            sprintf(
+                __('Đơn hàng của bạn với tổng %s đã được tiếp nhận và đang chờ xử lý.', 'jankx'),
+                $total
+            ),
+            [
+                'order_id'     => $order->getId(),
+                'order_number' => $order->getOrderNumber(),
+                'status'       => $order->getStatus(),
+                'total'        => $order->getTotal(),
+                'currency'     => $order->getCurrency(),
+                'action_url'   => $this->get_order_url($order),
+            ]
+        );
+    }
+
+    /**
+     * Send a "status changed" notification when an order moves to a new status.
+     */
+    public function on_order_status_changed(Order $order, string $newStatus, string $oldStatus, int $handlerId): void
+    {
+        $userId = $order->getCustomerId();
+        if (!$userId) {
+            return;
+        }
+
+        $labels = Order::getStatusLabels();
+        $newLabel = $labels[$newStatus] ?? ucfirst($newStatus);
+
+        $total = function_exists('jankx_currency_format')
+            ? jankx_currency_format($order->getTotal())
+            : number_format($order->getTotal(), 0, ',', '.') . ' ' . $order->getCurrency();
+
+        NotificationService::send(
+            $userId,
+            'order.status_changed',
+            sprintf(
+                __('Đơn hàng #%s: %s', 'jankx'),
+                $order->getOrderNumber(),
+                $newLabel
+            ),
+            sprintf(
+                __('Trạng thái đơn hàng #%s đã chuyển từ "%s" sang "%s".', 'jankx'),
+                $order->getOrderNumber(),
+                $labels[$oldStatus] ?? ucfirst($oldStatus),
+                $newLabel
+            ),
+            [
+                'order_id'     => $order->getId(),
+                'order_number' => $order->getOrderNumber(),
+                'old_status'   => $oldStatus,
+                'new_status'   => $newStatus,
+                'total'        => $order->getTotal(),
+                'currency'     => $order->getCurrency(),
+                'action_url'   => $this->get_order_url($order),
+            ]
+        );
+    }
+
+    /**
+     * Build the frontend URL for an order detail page.
+     */
+    private function get_order_url(Order $order): string
+    {
+        $accountUrl = function_exists('jankx_get_account_endpoint_url')
+            ? jankx_get_account_endpoint_url('orders')
+            : home_url('/my-account/orders/');
+
+        return add_query_arg('order', $order->getOrderNumber(), $accountUrl);
     }
 }

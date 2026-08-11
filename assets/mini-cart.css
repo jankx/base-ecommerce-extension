@@ -82,6 +82,12 @@
     box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
 }
 
+@media (min-width: 768px) {
+    .admin-bar .jankx-mini-cart-drawer {
+        height: calc(100vh - 30px);
+    }
+}
+
 .jankx-mini-cart-drawer.is-open {
     transform: translateX(0);
 }
