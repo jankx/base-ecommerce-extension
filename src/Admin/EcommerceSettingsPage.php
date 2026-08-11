@@ -366,6 +366,13 @@ class EcommerceSettingsPage
 
     protected function renderPaymentTab(): void
     {
+        // If a specific gateway is selected, show its settings form
+        $gatewaySlug = sanitize_text_field($_GET['gateway'] ?? '');
+        if ($gatewaySlug) {
+            $this->renderGatewaySettings($gatewaySlug);
+            return;
+        }
+
         settings_fields(self::OPTION_GROUP);
 
         $enabledGateways = get_option('jankx_payment_gateways', []);
@@ -444,6 +451,131 @@ class EcommerceSettingsPage
         </table>
 
         <?php submit_button(); ?>
+        <?php
+    }
+
+    /**
+     * Render the settings form for a specific gateway.
+     */
+    protected function renderGatewaySettings(string $gatewaySlug): void
+    {
+        if (!class_exists('\\Jankx\\Extensions\\PaymentSystem\\Gateways\\GatewayManager')) {
+            echo '<div class="wrap"><p>' . esc_html__('Payment System extension is not active.', 'jankx') . '</p></div>';
+            return;
+        }
+
+        $manager = \Jankx\Extensions\PaymentSystem\Gateways\GatewayManager::getInstance();
+        $gateway = $manager->get($gatewaySlug);
+
+        if (!$gateway) {
+            echo '<div class="wrap"><p>' . esc_html__('Gateway not found.', 'jankx') . '</p></div>';
+            return;
+        }
+
+        // Handle form save
+        if (isset($_POST['jankx_save_gateway_settings']) && check_admin_referer('jankx_gateway_settings_' . $gatewaySlug)) {
+            $saved = $manager->saveConfig($gatewaySlug, $_POST['gateway'] ?? []);
+            if ($saved) {
+                echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Settings saved.', 'jankx') . '</p></div>';
+                // Refresh gateway instance with new config
+                $gateway = $manager->get($gatewaySlug);
+            }
+        }
+
+        $config = $manager->getConfig($gatewaySlug);
+        $fields = $gateway->getSettingsFields();
+        ?>
+        <div class="wrap">
+            <h1>
+                <a href="<?php echo esc_url(admin_url('admin.php?page=' . self::PAGE_SLUG . '&tab=payment')); ?>"
+                   style="text-decoration:none;">&larr;</a>
+                <?php
+                printf(
+                    esc_html__('Cài đặt %s', 'jankx'),
+                    esc_html($gateway->getName())
+                );
+                ?>
+            </h1>
+
+            <form method="post" action="<?php echo esc_url(admin_url('admin.php?page=' . self::PAGE_SLUG . '&tab=payment&gateway=' . $gatewaySlug)); ?>">
+                <?php wp_nonce_field('jankx_gateway_settings_' . $gatewaySlug); ?>
+
+                <table class="form-table">
+                    <?php foreach ($fields as $key => $field): ?>
+                        <tr>
+                            <th scope="row">
+                                <label for="gateway_<?php echo esc_attr($key); ?>">
+                                    <?php echo esc_html($field['label'] ?? $key); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <?php
+                                $value = $config[$key] ?? ($field['default'] ?? '');
+                                $inputId = 'gateway_' . $key;
+
+                                switch ($field['type'] ?? 'text') {
+                                    case 'checkbox':
+                                        ?>
+                                        <label>
+                                            <input type="checkbox"
+                                                   id="<?php echo esc_attr($inputId); ?>"
+                                                   name="gateway[<?php echo esc_attr($key); ?>]"
+                                                   value="1"
+                                                   <?php checked(!empty($value)); ?>>
+                                            <?php echo esc_html($field['description'] ?? ''); ?>
+                                        </label>
+                                        <?php
+                                        break;
+
+                                    case 'select':
+                                        ?>
+                                        <select id="<?php echo esc_attr($inputId); ?>"
+                                                name="gateway[<?php echo esc_attr($key); ?>]">
+                                            <?php foreach (($field['options'] ?? []) as $optVal => $optLabel): ?>
+                                                <option value="<?php echo esc_attr($optVal); ?>"
+                                                    <?php selected($value, $optVal); ?>>
+                                                    <?php echo esc_html($optLabel); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <?php
+                                        break;
+
+                                    case 'password':
+                                        ?>
+                                        <input type="password"
+                                               id="<?php echo esc_attr($inputId); ?>"
+                                               name="gateway[<?php echo esc_attr($key); ?>]"
+                                               value="<?php echo esc_attr($value); ?>"
+                                               class="regular-text"
+                                               autocomplete="off">
+                                        <?php
+                                        break;
+
+                                    default:
+                                        ?>
+                                        <input type="text"
+                                               id="<?php echo esc_attr($inputId); ?>"
+                                               name="gateway[<?php echo esc_attr($key); ?>]"
+                                               value="<?php echo esc_attr($value); ?>"
+                                               class="regular-text">
+                                        <?php
+                                }
+
+                                if (!empty($field['description']) && ($field['type'] ?? 'text') !== 'checkbox'):
+                                    ?>
+                                    <p class="description"><?php echo esc_html($field['description']); ?></p>
+                                    <?php
+                                endif;
+                                ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </table>
+
+                <?php submit_button(__('Lưu cài đặt', 'jankx'), 'primary', 'jankx_save_gateway_settings'); ?>
+            </form>
+        </div>
         <?php
     }
 

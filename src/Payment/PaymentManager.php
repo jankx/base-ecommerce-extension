@@ -34,14 +34,15 @@ class PaymentManager
      */
     public function isPaymentSystemAvailable(): bool
     {
-        return class_exists('\\Jankx\\Extensions\\PaymentSystem\\Models\\Transaction');
+        return class_exists('\\Jankx\\Extensions\\PaymentSystem\\Models\\Transaction')
+            && class_exists('\\Jankx\\Extensions\\PaymentSystem\\Gateways\\GatewayManager');
     }
 
     /**
      * Start the payment for an order.
      *
      * @param Order  $order
-     * @param string $gateway Gateway slug (e.g. "momo", "vnpay", "bank_transfer").
+     * @param string $gateway Gateway slug (e.g. "onepay", "onepay_domestic", "momo").
      * @param array  $params  Gateway params (return_url, cancel_url, ...).
      * @return array Result: [success, transaction_id, payment, redirect_url]
      */
@@ -50,37 +51,62 @@ class PaymentManager
         $transactionId = 0;
         $redirectUrl = '';
 
-        if ($this->isPaymentSystemAvailable()) {
+        if ($this->isPaymentSystemAvailable() && $gateway !== '') {
             $transactionId = $this->createTransaction($order, $gateway, $params);
             if ($transactionId) {
                 $order->setPaymentTransactionId($transactionId);
             }
+
+            // Call the gateway's purchase() to get the redirect URL
+            $redirectUrl = $this->callGatewayPurchase($order, $gateway, $transactionId, $params);
         }
 
         $order->updateStatus(Order::STATUS_PENDING);
 
         do_action('jankx/ecommerce/payment/created', $order, $gateway, $params);
-        do_action('jankx/ecommerce/payment/process', $order, $gateway, $params);
-
-        $payment = apply_filters('jankx/ecommerce/payment/result', [
-            'status' => 'pending',
-        ], $order, $gateway);
-
-        // Capture redirect URL from gateway (e.g. OnePay, VNPay, MoMo)
-        if (!empty($payment['redirectUrl'])) {
-            $redirectUrl = $payment['redirectUrl'];
-        } elseif (!empty($payment['redirect_url'])) {
-            $redirectUrl = $payment['redirect_url'];
-        }
 
         return [
             'success'        => true,
             'transaction_id' => $transactionId,
             'order_id'       => $order->getId(),
             'order_number'   => $order->getOrderNumber(),
-            'payment'        => $payment,
             'redirect_url'   => $redirectUrl,
         ];
+    }
+
+    /**
+     * Call the gateway's purchase() method to get the redirect URL.
+     */
+    protected function callGatewayPurchase(Order $order, string $gatewaySlug, int $transactionId, array $params): string
+    {
+        $gatewayManager = \Jankx\Extensions\PaymentSystem\Gateways\GatewayManager::getInstance();
+        $gateway = $gatewayManager->get($gatewaySlug);
+
+        if (!$gateway) {
+            return '';
+        }
+
+        $accountUrl = function_exists('jankx_get_account_endpoint_url')
+            ? jankx_get_account_endpoint_url('orders')
+            : home_url('/my-account/orders/');
+
+        $result = $gateway->purchase([
+            'transactionId'  => $transactionId,
+            'amount'         => $order->getTotal(),
+            'currency'       => $order->getCurrency(),
+            'returnUrl'      => rest_url('jankx/v1/payment/' . $transactionId . '/process'),
+            'cancelUrl'      => add_query_arg('order', $order->getOrderNumber(), $accountUrl),
+            'description'    => sprintf('Order #%s', $order->getOrderNumber()),
+            'customer_email' => $order->getCustomerEmail(),
+            'customer_phone' => $order->getCustomerPhone(),
+            'customer_name'  => $order->getCustomerName(),
+        ]);
+
+        if (!empty($result['redirectUrl'])) {
+            return $result['redirectUrl'];
+        }
+
+        return '';
     }
 
     /**

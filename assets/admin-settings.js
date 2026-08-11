@@ -43,8 +43,14 @@
         $position.on('change', updatePreview);
 
         // Confirm before switching currency default if no currencies enabled
+        // Only validate on the currency tab (where currency checkboxes exist)
         $('form').on('submit', function () {
-            var enabled = $('input[name="jankx_enabled_currencies[]"]:checked').length;
+            var $enabledCurrencies = $('input[name="jankx_enabled_currencies[]"]');
+            if ($enabledCurrencies.length === 0) {
+                return true;
+            }
+
+            var enabled = $enabledCurrencies.filter(':checked').length;
             var defaultCurrency = $('input[name="jankx_default_currency"]:checked').val();
 
             if (enabled === 0) {
