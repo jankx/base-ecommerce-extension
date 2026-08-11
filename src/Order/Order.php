@@ -13,6 +13,7 @@ class Order extends AbstractOrder
 {
     const STATUS_PENDING = 'pending';
     const STATUS_PROCESSING = 'processing';
+    const STATUS_SHIPPING = 'shipping';
     const STATUS_COMPLETED = 'completed';
     const STATUS_FAILED = 'failed';
     const STATUS_CANCELLED = 'cancelled';
@@ -258,7 +259,8 @@ class Order extends AbstractOrder
     {
         $transitions = [
             self::STATUS_PENDING    => [self::STATUS_PROCESSING, self::STATUS_FAILED, self::STATUS_CANCELLED],
-            self::STATUS_PROCESSING => [self::STATUS_COMPLETED, self::STATUS_FAILED, self::STATUS_CANCELLED],
+            self::STATUS_PROCESSING => [self::STATUS_SHIPPING, self::STATUS_FAILED, self::STATUS_CANCELLED],
+            self::STATUS_SHIPPING   => [self::STATUS_COMPLETED, self::STATUS_FAILED, self::STATUS_CANCELLED],
             self::STATUS_COMPLETED  => [self::STATUS_REFUNDED],
             self::STATUS_FAILED     => [self::STATUS_PROCESSING, self::STATUS_CANCELLED],
             self::STATUS_CANCELLED  => [self::STATUS_PENDING],
@@ -276,6 +278,7 @@ class Order extends AbstractOrder
         $labels = [
             self::STATUS_PENDING    => __('Pending', 'jankx'),
             self::STATUS_PROCESSING => __('Processing', 'jankx'),
+            self::STATUS_SHIPPING   => __('Đang vận chuyển', 'jankx'),
             self::STATUS_COMPLETED  => __('Completed', 'jankx'),
             self::STATUS_FAILED     => __('Failed', 'jankx'),
             self::STATUS_CANCELLED  => __('Cancelled', 'jankx'),
@@ -300,6 +303,17 @@ class Order extends AbstractOrder
     {
         OrderModel::update($this->getId(), ['payment_transaction_id' => $transactionId]);
         $this->data['payment_transaction_id'] = $transactionId;
+    }
+
+    public function getTrackingNumber(): string
+    {
+        return (string) ($this->data['tracking_number'] ?? '');
+    }
+
+    public function setTrackingNumber(string $trackingNumber): void
+    {
+        OrderModel::update($this->getId(), ['tracking_number' => $trackingNumber]);
+        $this->data['tracking_number'] = $trackingNumber;
     }
 
     public function getDateCreated(): string
@@ -333,6 +347,7 @@ class Order extends AbstractOrder
             'total'           => $this->getTotal(),
             'currency'        => $this->getCurrency(),
             'payment_method'  => $this->getPaymentMethod(),
+            'tracking_number' => $this->getTrackingNumber(),
             'created_at'      => $this->getDateCreated(),
             'history'         => $this->getHistory(),
             'items'           => array_map(function (OrderItem $item) {

@@ -518,6 +518,32 @@ class EcommerceExtension extends AbstractExtension
             ? jankx_currency_format($order->getTotal())
             : number_format($order->getTotal(), 0, ',', '.') . ' ' . $order->getCurrency();
 
+        $message = sprintf(
+            __('Trạng thái đơn hàng #%s đã chuyển từ "%s" sang "%s".', 'jankx'),
+            $order->getOrderNumber(),
+            $labels[$oldStatus] ?? ucfirst($oldStatus),
+            $newLabel
+        );
+
+        // Include tracking number when order is being shipped
+        $data = [
+            'order_id'     => $order->getId(),
+            'order_number' => $order->getOrderNumber(),
+            'old_status'   => $oldStatus,
+            'new_status'   => $newStatus,
+            'total'        => $order->getTotal(),
+            'currency'     => $order->getCurrency(),
+            'action_url'   => $this->get_order_url($order),
+        ];
+
+        if ($newStatus === Order::STATUS_SHIPPING && $order->getTrackingNumber()) {
+            $message .= sprintf(
+                __(" Mã vận đơn: %s", 'jankx'),
+                $order->getTrackingNumber()
+            );
+            $data['tracking_number'] = $order->getTrackingNumber();
+        }
+
         NotificationService::send(
             $userId,
             'order.status_changed',
@@ -526,21 +552,8 @@ class EcommerceExtension extends AbstractExtension
                 $order->getOrderNumber(),
                 $newLabel
             ),
-            sprintf(
-                __('Trạng thái đơn hàng #%s đã chuyển từ "%s" sang "%s".', 'jankx'),
-                $order->getOrderNumber(),
-                $labels[$oldStatus] ?? ucfirst($oldStatus),
-                $newLabel
-            ),
-            [
-                'order_id'     => $order->getId(),
-                'order_number' => $order->getOrderNumber(),
-                'old_status'   => $oldStatus,
-                'new_status'   => $newStatus,
-                'total'        => $order->getTotal(),
-                'currency'     => $order->getCurrency(),
-                'action_url'   => $this->get_order_url($order),
-            ]
+            $message,
+            $data
         );
     }
 

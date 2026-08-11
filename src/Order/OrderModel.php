@@ -44,6 +44,7 @@ class OrderModel
             'currency'              => 'VND',
             'payment_method'        => '',
             'payment_transaction_id' => '',
+            'tracking_number'       => '',
             'handler_id'            => get_current_user_id(),
             'items'                 => '[]',
             'notes'                 => '[]',

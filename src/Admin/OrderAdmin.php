@@ -72,9 +72,15 @@ class OrderAdmin
 
         $newStatus = sanitize_text_field($_POST['order_status'] ?? '');
         $note = sanitize_textarea_field($_POST['order_note'] ?? '');
+        $trackingNumber = sanitize_text_field($_POST['tracking_number'] ?? '');
 
         if ($newStatus) {
             OrderModel::updateStatus($orderId, $newStatus, $note);
+        }
+
+        // Save tracking number if provided
+        if ($trackingNumber !== '') {
+            OrderModel::update($orderId, ['tracking_number' => $trackingNumber]);
         }
 
         wp_redirect(admin_url('admin.php?page=' . self::PAGE_SLUG . '&view=' . $orderId . '&updated=1'));
@@ -295,6 +301,14 @@ class OrderAdmin
                                             ?>
                                         </span>
                                     </div>
+                                    <?php if ($order->getTrackingNumber()): ?>
+                                        <div class="jankx-order-summary-bar__item">
+                                            <span class="jankx-order-summary-bar__label"><?php esc_html_e('TRACKING', 'jankx'); ?></span>
+                                            <span class="jankx-order-summary-bar__value jankx-order-summary-bar__value--highlight">
+                                                <?php echo esc_html($order->getTrackingNumber()); ?>
+                                            </span>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
 
                                 <!-- Customer Information -->
@@ -462,6 +476,19 @@ class OrderAdmin
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
+
+                                    <!-- Tracking Number (visible when current status is shipping or target is shipping/completed) -->
+                                    <?php
+                                    $showTracking = $order->getStatus() === Order::STATUS_SHIPPING
+                                        || in_array(Order::STATUS_SHIPPING, Order::getAllowedStatusTransitionsFor($order->getStatus()), true);
+                                    ?>
+                                    <div class="form-group" id="tracking-number-group" style="<?php echo $showTracking ? '' : 'display:none;'; ?>">
+                                        <label for="tracking_number"><?php esc_html_e('MÃ VẬN ĐƠN', 'jankx'); ?></label>
+                                        <input type="text" name="tracking_number" id="tracking_number"
+                                               value="<?php echo esc_attr($order->getTrackingNumber()); ?>"
+                                               placeholder="<?php esc_attr_e('Nhập mã vận đơn...', 'jankx'); ?>">
+                                    </div>
+
                                     <div class="form-group">
                                         <label for="order_note"><?php esc_html_e('NOTE', 'jankx'); ?></label>
                                         <textarea name="order_note" id="order_note" rows="4" placeholder="<?php esc_attr_e('Optional note...', 'jankx'); ?>"></textarea>
@@ -506,6 +533,19 @@ class OrderAdmin
                 </div>
             </div>
         </div>
+
+        <script>
+        (function(){
+            var statusSelect = document.getElementById('order_status');
+            var trackingGroup = document.getElementById('tracking-number-group');
+            if (!statusSelect || !trackingGroup) return;
+
+            var showStatuses = ['shipping'];
+            statusSelect.addEventListener('change', function(){
+                trackingGroup.style.display = showStatuses.indexOf(this.value) !== -1 ? '' : 'none';
+            });
+        })();
+        </script>
         <?php
     }
 

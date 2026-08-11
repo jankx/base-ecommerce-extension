@@ -25,7 +25,7 @@ class OrderDatabaseInstallerTest extends TestCase
         \Brain\Monkey\Functions\when('get_option')->justReturn('1.0.0');
 
         $installer = $this->getMockBuilder(OrderDatabaseInstaller::class)
-            ->setMethods(['tableExists', 'createTables'])
+            ->setMethods(['tableExists', 'createTables', 'migrate'])
             ->getMock();
 
         $installer->expects($this->exactly(2))
@@ -44,7 +44,7 @@ class OrderDatabaseInstallerTest extends TestCase
         \Brain\Monkey\Functions\when('update_option')->justReturn(true);
 
         $installer = $this->getMockBuilder(OrderDatabaseInstaller::class)
-            ->setMethods(['tableExists', 'createTables'])
+            ->setMethods(['tableExists', 'createTables', 'migrate'])
             ->getMock();
 
         // First table doesn't exist -> short-circuits, second not checked
@@ -74,7 +74,7 @@ class OrderDatabaseInstallerTest extends TestCase
             });
 
         $installer = $this->getMockBuilder(OrderDatabaseInstaller::class)
-            ->setMethods(['tableExists', 'createTables'])
+            ->setMethods(['tableExists', 'createTables', 'migrate'])
             ->getMock();
 
         $installer->method('tableExists')->willReturn(false);
@@ -100,7 +100,7 @@ class OrderDatabaseInstallerTest extends TestCase
             });
 
         $installer = $this->getMockBuilder(OrderDatabaseInstaller::class)
-            ->setMethods(['tableExists', 'createTables'])
+            ->setMethods(['tableExists', 'createTables', 'migrate'])
             ->getMock();
 
         $installer->method('tableExists')->willReturn(true);

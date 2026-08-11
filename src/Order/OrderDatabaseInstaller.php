@@ -18,6 +18,8 @@ class OrderDatabaseInstaller
 
         // Check if tables already exist
         if ($this->tableExists($ordersTable) && $this->tableExists($orderPostsTable)) {
+            // Run migrations for existing tables
+            $this->migrate($ordersTable);
             // Update version if needed
             if (get_option('jankx_order_db_version') === false) {
                 update_option('jankx_order_db_version', '1.0.0');
@@ -59,6 +61,7 @@ class OrderDatabaseInstaller
             currency varchar(10) NOT NULL DEFAULT 'VND',
             payment_method varchar(50) NOT NULL DEFAULT '',
             payment_transaction_id varchar(100) NOT NULL DEFAULT '',
+            tracking_number varchar(100) NOT NULL DEFAULT '',
             handler_id bigint(20) UNSIGNED NOT NULL DEFAULT 0,
             items longtext NOT NULL,
             notes longtext NOT NULL,
@@ -88,5 +91,19 @@ class OrderDatabaseInstaller
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sqlOrders);
         dbDelta($sqlOrderPosts);
+    }
+
+    /**
+     * Add missing columns to the orders table for existing installations.
+     */
+    protected function migrate(string $ordersTable): void
+    {
+        global $wpdb;
+
+        $columns = $wpdb->get_col("DESCRIBE {$ordersTable}", 0);
+
+        if (!in_array('tracking_number', $columns, true)) {
+            $wpdb->query("ALTER TABLE {$ordersTable} ADD COLUMN tracking_number varchar(100) NOT NULL DEFAULT '' AFTER payment_transaction_id");
+        }
     }
 }
