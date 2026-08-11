@@ -142,9 +142,17 @@ class OrderModel
             }
         }
 
-        if (!empty($args['customer_id'])) {
-            $where[] = 'customer_id = %d';
-            $values[] = (int) $args['customer_id'];
+        if (!empty($args['customer_id']) || !empty($args['customer_email'])) {
+            $customerClauses = [];
+            if (!empty($args['customer_id'])) {
+                $customerClauses[] = 'customer_id = %d';
+                $values[] = (int) $args['customer_id'];
+            }
+            if (!empty($args['customer_email'])) {
+                $customerClauses[] = 'customer_email = %s';
+                $values[] = $args['customer_email'];
+            }
+            $where[] = '(' . implode(' OR ', $customerClauses) . ')';
         }
 
         if (!empty($args['order_number'])) {
@@ -214,9 +222,17 @@ class OrderModel
             }
         }
 
-        if (!empty($args['customer_id'])) {
-            $where[] = 'customer_id = %d';
-            $values[] = (int) $args['customer_id'];
+        if (!empty($args['customer_id']) || !empty($args['customer_email'])) {
+            $customerClauses = [];
+            if (!empty($args['customer_id'])) {
+                $customerClauses[] = 'customer_id = %d';
+                $values[] = (int) $args['customer_id'];
+            }
+            if (!empty($args['customer_email'])) {
+                $customerClauses[] = 'customer_email = %s';
+                $values[] = $args['customer_email'];
+            }
+            $where[] = '(' . implode(' OR ', $customerClauses) . ')';
         }
 
         $whereClause = implode(' AND ', $where);

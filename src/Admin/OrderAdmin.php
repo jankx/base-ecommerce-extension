@@ -41,17 +41,12 @@ class OrderAdmin
             return;
         }
 
-        // Find the extension directory
         $extensionDir = dirname(__DIR__, 2);
         $cssFile = $extensionDir . '/assets/admin.css';
 
         if (file_exists($cssFile)) {
-            wp_enqueue_style(
-                'jankx-ecommerce-admin',
-                plugins_url('assets/admin.css', $extensionDir . '/EcommerceExtension.php'),
-                [],
-                filemtime($cssFile)
-            );
+            $cssUrl = get_stylesheet_directory_uri() . '/extensions/base-ecommerce/assets/admin.css';
+            wp_enqueue_style('jankx-ecommerce-admin', $cssUrl, [], filemtime($cssFile));
         }
     }
 
@@ -255,10 +250,10 @@ class OrderAdmin
             <?php endif; ?>
 
             <div id="poststuff">
-                <div id="post-body" class="metabox-holder columns-2">
+                <div class="jankx-order-layout">
 
                     <!-- Main content -->
-                    <div id="postbox-container-1" class="postbox-container" style="width: calc(100% - 300px); float: left;">
+                    <div class="jankx-order-main">
 
                         <!-- Order Details Meta Box -->
                         <div id="jankx_order_details" class="postbox">
@@ -443,7 +438,7 @@ class OrderAdmin
                     </div>
 
                     <!-- Sidebar -->
-                    <div id="postbox-container-2" class="postbox-container" style="width: 300px; float: right;">
+                    <div class="jankx-order-sidebar">
 
                         <!-- Update Status Meta Box -->
                         <div id="jankx_order_status" class="postbox">
@@ -508,8 +503,6 @@ class OrderAdmin
                         </div>
 
                     </div>
-
-                    <div style="clear: both;"></div>
                 </div>
             </div>
         </div>

@@ -1,31 +1,101 @@
 /* =========================================================
-   Orders management screen (wp-admin)
+   Order Management Dashboard - Premium Vibe
    ========================================================= */
 
-/* ── Meta-box full-bleed ───────────────────────────────── */
+/* Typography & Base Variables */
+.toplevel_page_jankx-orders #wpcontent {
+    background: #f1f5f9;
+}
+
+.toplevel_page_jankx-orders .wrap {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    margin-top: 20px;
+}
+
+.toplevel_page_jankx-orders .wrap h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 24px;
+    letter-spacing: -0.02em;
+}
+
+/* ── Layout & Responsive Columns ── */
+.jankx-order-layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.jankx-order-main {
+    flex: 1;
+    min-width: 0;
+    /* Prevent flex blowout */
+}
+
+.jankx-order-sidebar {
+    width: 320px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 960px) {
+    .jankx-order-layout {
+        flex-direction: column;
+    }
+
+    .jankx-order-sidebar {
+        width: 100%;
+    }
+}
+
+/* ── Meta-box Overrides (Creating modern flat cards) ── */
+.toplevel_page_jankx-orders #poststuff .postbox {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -2px rgba(0, 0, 0, 0.03), inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+    background: #ffffff;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.toplevel_page_jankx-orders #poststuff h2.hndle {
+    font-size: 14px;
+    font-weight: 700;
+    color: #334155;
+    padding: 18px 24px;
+    background: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
+    border-radius: 12px 12px 0 0;
+}
+
+.toplevel_page_jankx-orders #poststuff h2.hndle span {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 13px;
+    color: #475569;
+}
+
 #jankx_order_details .inside,
-#jankx_order_history .inside {
+#jankx_order_history .inside,
+#jankx_order_status .inside {
     padding: 0 !important;
     margin: 0 !important;
 }
 
-#jankx_order_details,
-#jankx_order_history {
-    overflow: hidden;
-}
 
-/* ── Status badges ─────────────────────────────────────── */
+/* ── Status Badges (Vibrant Pastels) ── */
 .jankx-order-badge {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 4px 12px;
-    border-radius: 999px;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 9999px;
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    line-height: 1.5;
+    letter-spacing: 0.05em;
+    line-height: 1;
 }
 
 .jankx-order-badge::before {
@@ -35,62 +105,51 @@
     height: 6px;
     border-radius: 50%;
     background: currentColor;
-    opacity: 0.7;
+    flex-shrink: 0;
 }
 
 .jankx-order-badge--pending {
-    background: #fef9e7;
-    color: #b7950b;
-    border: 1px solid #f5e6a8;
+    background: #fef3c7;
+    color: #d97706;
 }
 
 .jankx-order-badge--processing {
-    background: #eaf2f8;
-    color: #2980b9;
-    border: 1px solid #c5dff0;
+    background: #e0f2fe;
+    color: #0284c7;
 }
 
 .jankx-order-badge--completed {
-    background: #eafaf1;
-    color: #1e8449;
-    border: 1px solid #a9dfbf;
+    background: #dcfce7;
+    color: #16a34a;
 }
 
 .jankx-order-badge--failed,
 .jankx-order-badge--cancelled {
-    background: #fdecea;
-    color: #c0392b;
-    border: 1px solid #f5c2bd;
+    background: #fee2e2;
+    color: #dc2626;
 }
 
 .jankx-order-badge--refunded {
-    background: #f4f6f7;
-    color: #7f8c8d;
-    border: 1px solid #d5d8dc;
+    background: #f1f5f9;
+    color: #64748b;
 }
 
 
-/* ── Summary bar ───────────────────────────────────────── */
+/* ── Order Summary Header Bar ── */
 .jankx-order-summary-bar {
     display: flex;
-    align-items: stretch;
     flex-wrap: wrap;
-    background: #fff;
-    border-bottom: 1px solid #e2e4e7;
-    box-sizing: border-box;
-    width: 100%;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .jankx-order-summary-bar__item {
     flex: 1 1 140px;
+    padding: 24px;
+    border-right: 1px solid #e2e8f0;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
     justify-content: center;
-    padding: 14px 18px;
-    border-right: 1px solid #f0f0f0;
-    border-bottom: 1px solid #f0f0f0;
-    min-width: 0;
 }
 
 .jankx-order-summary-bar__item:last-child {
@@ -98,81 +157,79 @@
 }
 
 .jankx-order-summary-bar__label {
-    font-size: 10px;
-    color: #8c8f94;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
+    font-size: 11px;
+    color: #64748b;
     font-weight: 600;
-    margin-bottom: 4px;
-    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
 }
 
 .jankx-order-summary-bar__value {
-    font-size: 14px;
-    font-weight: 700;
-    color: #1d2327;
-    word-break: break-word;
-    line-height: 1.3;
+    font-size: 15px;
+    font-weight: 600;
+    color: #0f172a;
+    line-height: 1.4;
 }
 
 .jankx-order-summary-bar__value--highlight {
-    color: #2271b1;
-    font-size: 15px;
+    color: #2563eb;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
 }
 
 
-/* ── Card wrapper ──────────────────────────────────────── */
+/* ── Inner Soft Cards ── */
 .jankx-order-card {
-    background: #fff;
-    border: 1px solid #e2e4e7;
-    border-radius: 4px;
-    margin: 12px;
-    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    margin: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .jankx-order-card__header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    border-bottom: 1px solid #e2e4e7;
-    background: #f8f9fa;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #ffffff;
+    border-radius: 12px 12px 0 0;
 }
 
 .jankx-order-card__header-icon {
-    font-size: 15px;
+    font-size: 18px;
     line-height: 1;
-    opacity: 0.65;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .jankx-order-card__title {
-    font-size: 12px;
-    font-weight: 700;
-    color: #50575e;
-    margin: 0;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    color: #475569 !important;
+    margin: 0 !important;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.jankx-order-card__body {
-    padding: 0;
+    letter-spacing: 0.05em;
 }
 
 
-/* ── Customer 2-column grid ────────────────────────────── */
+/* ── Customer Information Grid ── */
 .jankx-customer-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    background: #fafbfc;
+    border-radius: 0 0 12px 12px;
 }
 
 .jankx-customer-grid__item {
-    padding: 12px 14px;
-    border-bottom: 1px solid #f0f0f0;
-    border-right: 1px solid #f0f0f0;
-    box-sizing: border-box;
+    padding: 20px;
+    border-bottom: 1px solid #e2e8f0;
+    border-right: 1px solid #e2e8f0;
 }
 
-.jankx-customer-grid__item:nth-child(even) {
+.jankx-customer-grid__item:nth-child(2n) {
     border-right: none;
 }
 
@@ -182,23 +239,24 @@
 
 .jankx-customer-grid__label {
     font-size: 10px;
-    color: #8c8f94;
+    color: #64748b;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 600;
-    margin-bottom: 3px;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    margin-bottom: 6px;
 }
 
 .jankx-customer-grid__value {
-    font-size: 13px;
-    color: #1d2327;
+    font-size: 14px;
+    color: #1e293b;
     font-weight: 500;
-    word-break: break-word;
+    line-height: 1.5;
 }
 
 .jankx-customer-grid__value a {
-    color: #2271b1;
+    color: #2563eb;
     text-decoration: none;
+    font-weight: 600;
 }
 
 .jankx-customer-grid__value a:hover {
@@ -206,28 +264,29 @@
 }
 
 .jankx-customer-grid__value--empty {
-    color: #c3c4c7;
+    color: #94a3b8;
     font-style: italic;
     font-weight: 400;
 }
 
 
-/* ── Items table ───────────────────────────────────────── */
+/* ── Order Items Table ── */
 .jankx-order-items-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    background: #ffffff;
+    border-radius: 0 0 12px 12px;
 }
 
 .jankx-order-items-table thead th {
-    background: #f8f9fa;
-    color: #50575e;
-    font-size: 11px;
+    background: #fafbfc;
+    color: #64748b;
+    font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.4px;
-    padding: 9px 14px;
-    border-bottom: 1px solid #e2e4e7;
+    letter-spacing: 0.05em;
+    padding: 14px 20px;
+    border-bottom: 1px solid #e2e8f0;
     text-align: left;
 }
 
@@ -236,21 +295,23 @@
 }
 
 .jankx-order-items-table tbody tr {
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.2s;
+}
+
+.jankx-order-items-table tbody tr:hover {
+    background: #f8fafc;
 }
 
 .jankx-order-items-table tbody tr:last-child {
     border-bottom: none;
 }
 
-.jankx-order-items-table tbody tr:hover {
-    background: #fafbfc;
-}
-
 .jankx-order-items-table tbody td {
-    padding: 11px 14px;
+    padding: 16px 20px;
     vertical-align: middle;
-    color: #1d2327;
+    color: #334155;
+    font-size: 14px;
 }
 
 .jankx-order-items-table tbody td:not(:first-child) {
@@ -259,209 +320,175 @@
 
 .jankx-order-items-table .item-name {
     font-weight: 600;
+    color: #0f172a;
+    font-size: 15px;
+    margin-bottom: 4px;
+    display: block;
 }
 
 .jankx-order-items-table .item-meta {
-    margin-top: 3px;
     font-size: 12px;
-    color: #757575;
-    line-height: 1.5;
+    color: #64748b;
 }
 
 .jankx-order-items-table .qty-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #e2e4e7;
-    color: #3c434a;
+    background: #f1f5f9;
+    color: #334155;
     font-weight: 700;
-    font-size: 12px;
-    min-width: 26px;
-    height: 22px;
-    border-radius: 4px;
-    padding: 0 5px;
+    font-size: 13px;
+    min-width: 32px;
+    height: 32px;
+    border-radius: 8px;
 }
 
 .jankx-order-items-table .unit-price {
-    color: #757575;
+    color: #64748b;
+    font-weight: 500;
 }
 
 .jankx-order-items-table .item-total {
     font-weight: 700;
-    color: #1d2327;
+    color: #0f172a;
 }
 
 .jankx-order-items-table tfoot tr {
-    background: #f8f9fa;
-    border-top: 2px solid #e2e4e7;
+    background: #f8fafc;
+    border-top: 2px solid #e2e8f0;
 }
 
 .jankx-order-items-table tfoot td {
-    padding: 11px 14px;
-    font-weight: 700;
+    padding: 16px 20px;
 }
 
 .jankx-order-items-table tfoot .total-label {
     text-align: right;
-    color: #50575e;
+    color: #64748b;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.05em;
     font-size: 11px;
 }
 
 .jankx-order-items-table tfoot .total-value {
     text-align: right;
-    color: #2271b1;
-    font-size: 15px;
+    color: #2563eb;
+    font-size: 18px;
+    font-weight: 800;
 }
 
 
-/* ── Status sidebar box ────────────────────────────────── */
-#jankx_order_status .inside {
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
+/* ── Sidebar Status Form ── */
 .jankx-status-current {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 14px;
-    background: #f8f9fa;
-    border-bottom: 1px solid #e2e4e7;
+    padding: 16px 24px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .jankx-status-current__label {
     font-size: 11px;
-    color: #8c8f94;
-    font-weight: 600;
+    color: #64748b;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.05em;
 }
 
 .jankx-status-form {
-    padding: 12px 14px;
+    padding: 24px;
 }
 
 .jankx-status-form label {
     display: block;
     font-size: 11px;
     font-weight: 700;
-    color: #50575e;
+    color: #475569;
     text-transform: uppercase;
-    letter-spacing: 0.4px;
-    margin-bottom: 5px;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
 }
 
 .jankx-status-form select,
 .jankx-status-form textarea {
     width: 100%;
-    border: 1px solid #c3c4c7;
-    border-radius: 4px;
-    padding: 7px 10px;
-    font-size: 13px;
-    color: #1d2327;
-    background: #fff;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-    transition: border-color 0.15s, box-shadow 0.15s;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #1e293b;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    transition: all 0.2s ease;
     box-sizing: border-box;
 }
 
 .jankx-status-form select:focus,
 .jankx-status-form textarea:focus {
-    border-color: #2271b1;
-    box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.12);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     outline: none;
 }
 
 .jankx-status-form .form-group {
-    margin-bottom: 12px;
-}
-
-.jankx-status-form .form-group:last-child {
-    margin-bottom: 0;
+    margin-bottom: 20px;
 }
 
 .jankx-status-form .button-update {
     display: block;
     width: 100%;
-    padding: 9px 12px;
-    background: #2271b1;
-    color: #fff;
+    padding: 12px;
+    background: #0f172a;
+    color: #ffffff;
     border: none;
-    border-radius: 4px;
-    font-size: 13px;
+    border-radius: 8px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     text-align: center;
-    transition: background 0.15s, box-shadow 0.15s;
-    letter-spacing: 0.2px;
+    transition: all 0.2s ease;
 }
 
 .jankx-status-form .button-update:hover {
-    background: #135e96;
-    box-shadow: 0 2px 6px rgba(19, 94, 150, 0.25);
+    background: #1e293b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
 }
 
 .jankx-status-form .button-update:active {
-    background: #0a4b78;
+    transform: translateY(0);
     box-shadow: none;
 }
 
-.jankx-status-no-transition {
-    padding: 14px;
-    font-size: 13px;
-    color: #8c8f94;
-    font-style: italic;
-    text-align: center;
-}
 
-.jankx-handler-info {
-    padding: 9px 14px;
-    border-top: 1px solid #f0f0f0;
-    font-size: 12px;
-    color: #8c8f94;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.jankx-handler-info img.avatar {
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.jankx-handler-info strong {
-    color: #3c434a;
-}
-
-
-/* ── Order History timeline ────────────────────────────── */
+/* ── Order History Timeline ── */
 .jankx-order-history {
     margin: 0;
-    padding: 14px 14px 4px;
+    padding: 24px;
     list-style: none;
-    box-sizing: border-box;
-    width: 100%;
 }
 
 .jankx-history-entry {
     position: relative;
-    padding: 0 0 18px 42px;
+    padding: 0 0 24px 34px;
 }
 
 .jankx-history-entry:last-child {
-    padding-bottom: 4px;
+    padding-bottom: 0;
 }
 
 .jankx-history-entry::before {
     content: '';
     position: absolute;
-    left: 13px;
-    top: 28px;
-    bottom: 0;
+    left: 11px;
+    /* Centers with a 24px avatar */
+    top: 24px;
+    bottom: -8px;
     width: 2px;
-    background: #e2e4e7;
+    background: #e2e8f0;
+    z-index: 1;
 }
 
 .jankx-history-entry:last-child::before {
@@ -471,53 +498,50 @@
 .jankx-history-head {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     flex-wrap: wrap;
-    min-height: 28px;
+    position: relative;
+    z-index: 2;
 }
 
 .jankx-history-head img.avatar {
     border-radius: 50%;
     position: absolute;
-    left: 0;
-    top: 0;
-    border: 2px solid #fff;
-    box-shadow: 0 0 0 2px #e2e4e7;
+    left: -34px;
+    /* Move back left */
+    top: -2px;
+    width: 24px;
+    height: 24px;
+    border: 3px solid #ffffff;
+    /* White cutout effect */
+    background: #ffffff;
+    box-shadow: 0 0 0 1px #e2e8f0;
 }
 
 .jankx-history-user {
-    font-weight: 700;
-    color: #1d2327;
-    font-size: 13px;
+    font-weight: 600;
+    color: #0f172a;
+    font-size: 14px;
 }
 
 .jankx-history-action {
-    color: #50575e;
-    font-size: 13px;
+    color: #475569;
+    font-size: 14px;
 }
 
 .jankx-history-time {
-    color: #a7aaad;
-    font-size: 11px;
+    color: #94a3b8;
+    font-size: 12px;
     margin-left: auto;
-    white-space: nowrap;
 }
 
 .jankx-history-note {
-    margin-top: 7px;
-    padding: 8px 12px;
-    background: #f6f7f7;
-    border-left: 3px solid #c3c4c7;
-    border-radius: 0 3px 3px 0;
-    font-size: 13px;
-    color: #3c434a;
-    line-height: 1.6;
-}
-
-.jankx-history-empty {
-    padding: 20px 14px;
-    text-align: center;
-    color: #a7aaad;
-    font-style: italic;
-    font-size: 13px;
+    margin-top: 10px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-left: 3px solid #3b82f6;
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+    color: #334155;
+    line-height: 1.5;
 }

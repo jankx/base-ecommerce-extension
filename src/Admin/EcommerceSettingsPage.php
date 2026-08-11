@@ -23,9 +23,23 @@ class EcommerceSettingsPage
             'manage_options',
             self::PAGE_SLUG,
             [$this, 'renderPage'],
-            'dashicons-cart',
+            $this->getMenuIcon(),
             30
         );
+    }
+
+    protected function getMenuIcon(): string
+    {
+        $svg = '<svg width="21" height="17" viewBox="0 0 21 17" fill="none" xmlns="http://www.w3.org/2000/svg">'
+            . '<path d="M0.526259 7.27514L1.91087 1.27514C2.01558 0.821409 2.41961 0.5 2.88527 0.5H5.03867C5.66481 0.5 6.13693 1.06888 6.02154 1.68429L4.89654 7.68429C4.80786 8.15726 4.39489 8.5 3.91367 8.5H1.50065C0.857565 8.5 0.381655 7.90176 0.526259 7.27514Z" stroke="#46b450" stroke-linecap="round" stroke-linejoin="round"/>'
+            . '<path d="M19.9609 7.27514L18.5763 1.27514C18.4716 0.821409 18.0676 0.5 17.6019 0.5H15.4485C14.8224 0.5 14.3503 1.06888 14.4657 1.68429L15.5907 7.68429C15.6793 8.15726 16.0923 8.5 16.5735 8.5H18.9865C19.6296 8.5 20.1055 7.90176 19.9609 7.27514Z" stroke="#46b450" stroke-linecap="round" stroke-linejoin="round"/>'
+            . '<path d="M4.99708 7.29427L6.25844 1.29427C6.35575 0.831393 6.76405 0.5 7.23705 0.5H9.2436C9.79588 0.5 10.2436 0.947715 10.2436 1.5V7.5C10.2436 8.05228 9.79588 8.5 9.2436 8.5H5.97569C5.34063 8.5 4.86643 7.91574 4.99708 7.29427Z" stroke="#46b450" stroke-linecap="round" stroke-linejoin="round"/>'
+            . '<path d="M15.4901 7.29427L14.2288 1.29427C14.1314 0.831393 13.7231 0.5 13.2501 0.5H11.2436C10.6913 0.5 10.2436 0.947715 10.2436 1.5V7.5C10.2436 8.05228 10.6913 8.5 11.2436 8.5H14.5115C15.1466 8.5 15.6208 7.91574 15.4901 7.29427Z" stroke="#46b450" stroke-linecap="round" stroke-linejoin="round"/>'
+            . '<path d="M3.2436 8.5V15.5C3.2436 16.0523 3.69131 16.5 4.2436 16.5H16.2436C16.7959 16.5 17.2436 16.0523 17.2436 15.5V8.5" stroke="#46b450" stroke-linecap="round" stroke-linejoin="round"/>'
+            . '<path d="M8.2436 16V13.5C8.2436 12.9477 8.69131 12.5 9.2436 12.5H11.2436C11.7959 12.5 12.2436 12.9477 12.2436 13.5V16" stroke="#46b450" stroke-linecap="round" stroke-linejoin="round"/>'
+            . '</svg>';
+
+        return 'data:image/svg+xml;base64,' . base64_encode($svg);
     }
 
     public function enqueueAssets(string $hook): void

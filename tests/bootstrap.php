@@ -100,6 +100,9 @@ function stub_wp_ecommerce_functions()
     Monkey\Functions\when('current_time')->justReturn('2026-08-11 12:00:00');
     Monkey\Functions\when('get_current_user_id')->justReturn(1);
     Monkey\Functions\when('is_user_logged_in')->justReturn(true);
+    Monkey\Functions\when('wp_get_current_user')->alias(function () {
+        return (object) ['ID' => get_current_user_id(), 'user_email' => 'test@example.com'];
+    });
     Monkey\Functions\when('get_user_meta')->justReturn('');
     Monkey\Functions\when('update_user_meta')->justReturn(true);
     Monkey\Functions\when('get_userdata')->alias(function ($userId) {
@@ -117,6 +120,13 @@ function stub_wp_ecommerce_functions()
     Monkey\Functions\when('esc_html')->returnArg();
     Monkey\Functions\when('esc_html__')->returnArg();
     Monkey\Functions\when('esc_attr')->returnArg();
+    Monkey\Functions\when('home_url')->alias(function ($path = '', $scheme = null) {
+        return 'http://example.com' . $path;
+    });
+    Monkey\Functions\when('get_permalink')->alias(function ($post) {
+        $id = is_object($post) ? $post->ID : $post;
+        return 'http://example.com/?p=' . $id;
+    });
     Monkey\Functions\when('get_block_wrapper_attributes')->alias(function ($attrs = []) {
         $pairs = [];
         foreach ($attrs as $key => $value) {
