@@ -184,10 +184,32 @@
         openDrawer();
     });
 
+    /**
+     * Move the drawer and overlay to document.body so that `position: fixed`
+     * is always relative to the viewport, not a Gutenberg layout container
+     * (.is-layout-constrained) which acts as a new containing block and
+     * constrains the drawer width/position.
+     */
+    function teleportToBody() {
+        var overlay = document.querySelector('.jankx-mini-cart-overlay');
+        var drawer = document.querySelector('.jankx-mini-cart-drawer');
+
+        if (overlay && overlay.parentElement !== document.body) {
+            document.body.appendChild(overlay);
+        }
+        if (drawer && drawer.parentElement !== document.body) {
+            document.body.appendChild(drawer);
+        }
+    }
+
     // Initial sync on load.
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', refreshCart);
+        document.addEventListener('DOMContentLoaded', function () {
+            teleportToBody();
+            refreshCart();
+        });
     } else {
+        teleportToBody();
         refreshCart();
     }
 })();
