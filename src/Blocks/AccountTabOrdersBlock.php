@@ -78,80 +78,100 @@ class AccountTabOrdersBlock extends Block
     {
         $status = $order->getStatus();
         $dateCreated = date_i18n(get_option('date_format'), strtotime($order->getDateCreated()));
+        $timeCreated = date_i18n('H:i', strtotime($order->getDateCreated()));
+        $items = $order->getItems();
+        $subtotal = 0.0;
+        foreach ($items as $item) {
+            $subtotal += $item->getTotal();
+        }
 
         $output = '<div class="jankx-tab-panel jankx-tab-orders">';
-        $output .= '<div class="jankx-order-detail">';
+        $output .= '<div class="jankx-od">';
 
         // Back link
-        $output .= '<div class="jankx-order-detail-nav">'
-            . '<a href="' . esc_url($this->getOrdersUrl()) . '" class="jankx-order-back-link">'
-            . '&larr; ' . esc_html__('Back to orders', 'jankx')
+        $output .= '<div class="jankx-od-nav">'
+            . '<a href="' . esc_url($this->getOrdersUrl()) . '" class="jankx-od-back">'
+            . '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>'
+            . esc_html__('Back to orders', 'jankx')
             . '</a>'
             . '</div>';
 
-        // Hero header card
-        $output .= '<div class="jankx-order-hero jankx-order-hero--' . esc_attr($status) . '">';
-        $output .= '<div class="jankx-order-hero-top">';
-        $output .= '<div class="jankx-order-hero-id">';
-        $output .= '<span class="jankx-order-hero-label">' . esc_html__('Order', 'jankx') . '</span>';
-        $output .= '<strong class="jankx-order-hero-number">' . esc_html($order->getOrderNumber()) . '</strong>';
+        // Hero header
+        $output .= '<div class="jankx-od-hero jankx-od-hero--' . esc_attr($status) . '">';
+        $output .= '<div class="jankx-od-hero-bg">';
+        $output .= '<svg class="jankx-od-hero-wave" viewBox="0 0 600 120" preserveAspectRatio="none"><path d="M0 60 Q150 0 300 60 T600 60 V120 H0Z" fill="rgba(255,255,255,0.06)"/></svg>';
+        $output .= '<div class="jankx-od-hero-circle jankx-od-hero-circle--1"></div>';
+        $output .= '<div class="jankx-od-hero-circle jankx-od-hero-circle--2"></div>';
         $output .= '</div>';
-        $output .= '<span class="jankx-order-status-pill jankx-order-status-pill--' . esc_attr($status) . '">'
-            . esc_html($this->getStatusLabel($status)) . '</span>';
+        $output .= '<div class="jankx-od-hero-content">';
+        $output .= '<div class="jankx-od-hero-row">';
+        $output .= '<div class="jankx-od-hero-left">';
+        $output .= '<span class="jankx-od-hero-label">' . esc_html__('Order', 'jankx') . '</span>';
+        $output .= '<h1 class="jankx-od-hero-num">' . esc_html($order->getOrderNumber()) . '</h1>';
+        $output .= '<span class="jankx-od-hero-date">'
+            . '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'
+            . esc_html($dateCreated) . ' &middot; ' . esc_html($timeCreated)
+            . '</span>';
         $output .= '</div>';
-        $output .= '<div class="jankx-order-hero-foot">';
-        $output .= '<div class="jankx-order-hero-date">'
-            . '<span class="jankx-order-hero-label">' . esc_html__('Placed on', 'jankx') . '</span>'
-            . '<strong>' . esc_html($dateCreated) . '</strong>'
-            . '</div>';
-        $output .= '<div class="jankx-order-hero-total">'
-            . '<span class="jankx-order-hero-label">' . esc_html__('Total', 'jankx') . '</span>'
-            . '<strong>' . esc_html($this->formatPrice($order->getTotal())) . '</strong>'
-            . '</div>';
+        $output .= '<div class="jankx-od-hero-right">';
+        $output .= '<div class="jankx-od-hero-total-label">' . esc_html__('Total', 'jankx') . '</div>';
+        $output .= '<div class="jankx-od-hero-total">' . esc_html($this->formatPrice($order->getTotal())) . '</div>';
+        $output .= '<span class="jankx-od-pill jankx-od-pill--' . esc_attr($status) . '">'
+            . $this->getStatusIcon($status)
+            . esc_html($this->getStatusLabel($status))
+            . '</span>';
+        $output .= '</div>';
+        $output .= '</div>';
         $output .= '</div>';
         $output .= '</div>';
 
         // Status progress stepper
         $output .= $this->renderOrderProgress($status);
 
-        // Two-column layout: items (main) + facts (sidebar)
-        $output .= '<div class="jankx-order-detail-grid">';
-        $output .= '<div class="jankx-order-detail-main">';
+        // Two-column layout
+        $output .= '<div class="jankx-od-grid">';
+
+        // ── Main column ──
+        $output .= '<div class="jankx-od-main">';
 
         // Items panel
-        $output .= '<div class="jankx-order-panel">';
-        $output .= '<h3 class="jankx-order-panel-title">' . esc_html__('Order items', 'jankx') . '</h3>';
-        $items = $order->getItems();
+        $output .= '<div class="jankx-od-card">';
+        $output .= '<div class="jankx-od-card-head">';
+        $output .= '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>';
+        $output .= '<h3 class="jankx-od-card-title">' . esc_html__('Order items', 'jankx') . '</h3>';
+        $output .= '<span class="jankx-od-card-badge">' . count($items) . '</span>';
+        $output .= '</div>';
+
         if (empty($items)) {
-            $output .= '<p class="text-muted">' . esc_html__('No items.', 'jankx') . '</p>';
+            $output .= '<p class="jankx-od-empty">' . esc_html__('No items.', 'jankx') . '</p>';
         } else {
-            $subtotal = 0.0;
-            $output .= '<div class="jankx-order-items">';
-            foreach ($items as $item) {
-                $subtotal += $item->getTotal();
-                $output .= '<div class="jankx-order-item">';
+            $output .= '<div class="jankx-od-items">';
+            foreach ($items as $idx => $item) {
+                $output .= '<div class="jankx-od-item">';
+                $output .= '<span class="jankx-od-item-idx">' . ($idx + 1) . '</span>';
                 $output .= $this->getItemThumbnail($item);
-                $output .= '<div class="jankx-order-item-info">';
-                $output .= '<span class="jankx-order-item-name">' . esc_html($item->getName()) . '</span>';
-                $output .= '<span class="jankx-order-item-qty">&times; ' . esc_html($item->getQuantity()) . '</span>';
+                $output .= '<div class="jankx-od-item-body">';
+                $output .= '<span class="jankx-od-item-name">' . esc_html($item->getName()) . '</span>';
+                $output .= '<span class="jankx-od-item-meta">' . esc_html__('Qty', 'jankx') . ': ' . esc_html($item->getQuantity()) . '</span>';
                 $output .= '</div>';
-                $output .= '<div class="jankx-order-item-price">' . esc_html($this->formatPrice($item->getTotal())) . '</div>';
+                $output .= '<div class="jankx-od-item-price">' . esc_html($this->formatPrice($item->getTotal())) . '</div>';
                 $output .= '</div>';
             }
             $output .= '</div>';
 
-            $output .= '<div class="jankx-order-totals">';
-            $output .= '<div class="jankx-order-totals-row">'
+            // Totals
+            $output .= '<div class="jankx-od-totals">';
+            $output .= '<div class="jankx-od-totals-row">'
                 . '<span>' . esc_html__('Subtotal', 'jankx') . '</span>'
                 . '<strong>' . esc_html($this->formatPrice($subtotal)) . '</strong>'
                 . '</div>';
             if (abs($subtotal - $order->getTotal()) > 0.01) {
-                $output .= '<div class="jankx-order-totals-row">'
+                $output .= '<div class="jankx-od-totals-row">'
                     . '<span>' . esc_html__('Shipping & handling', 'jankx') . '</span>'
                     . '<strong>' . esc_html($this->formatPrice($order->getTotal() - $subtotal)) . '</strong>'
                     . '</div>';
             }
-            $output .= '<div class="jankx-order-totals-row jankx-order-totals-grand">'
+            $output .= '<div class="jankx-od-totals-row jankx-od-totals-grand">'
                 . '<span>' . esc_html__('Total', 'jankx') . '</span>'
                 . '<strong>' . esc_html($this->formatPrice($order->getTotal())) . '</strong>'
                 . '</div>';
@@ -159,95 +179,157 @@ class AccountTabOrdersBlock extends Block
         }
         $output .= '</div>';
 
-        // Customer notes panel
+        // Notes
         $notes = $order->getNotes(true);
         if (!empty($notes)) {
-            $output .= '<div class="jankx-order-panel">';
-            $output .= '<h3 class="jankx-order-panel-title">' . esc_html__('Notes', 'jankx') . '</h3>';
-            $output .= '<ul class="jankx-order-notes">';
+            $output .= '<div class="jankx-od-card">';
+            $output .= '<div class="jankx-od-card-head">';
+            $output .= '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+            $output .= '<h3 class="jankx-od-card-title">' . esc_html__('Notes', 'jankx') . '</h3>';
+            $output .= '</div>';
+            $output .= '<div class="jankx-od-notes">';
             foreach ($notes as $note) {
-                $output .= '<li>'
-                    . '<p>' . esc_html($note['content'] ?? '') . '</p>'
-                    . '<span class="jankx-order-note-date">'
-                    . esc_html(date_i18n(get_option('date_format') . ' H:i', strtotime($note['date'] ?? '')))
-                    . '</span>'
-                    . '</li>';
+                $output .= '<div class="jankx-od-note">';
+                $output .= '<p>' . esc_html($note['content'] ?? $note['note'] ?? '') . '</p>';
+                $output .= '<time>' . esc_html(date_i18n(get_option('date_format') . ' H:i', strtotime($note['date'] ?? $note['created_at'] ?? ''))) . '</time>';
+                $output .= '</div>';
             }
-            $output .= '</ul>';
+            $output .= '</div>';
             $output .= '</div>';
         }
 
         $output .= '</div>'; // end main
 
-        // Sidebar facts
-        $output .= '<div class="jankx-order-detail-aside">';
+        // ── Sidebar ──
+        $output .= '<div class="jankx-od-aside">';
 
-        $output .= '<div class="jankx-order-panel">';
-        $output .= '<h3 class="jankx-order-panel-title">' . esc_html__('Customer', 'jankx') . '</h3>';
-        $output .= '<ul class="jankx-order-facts">';
-        $output .= '<li><span>' . esc_html__('Name', 'jankx') . '</span><strong>' . esc_html($order->getCustomerName()) . '</strong></li>';
-        $output .= '<li><span>' . esc_html__('Email', 'jankx') . '</span><strong>' . esc_html($order->getCustomerEmail()) . '</strong></li>';
+        // Customer card
+        $output .= '<div class="jankx-od-card jankx-od-card--accent">';
+        $output .= '<div class="jankx-od-card-head">';
+        $output .= '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+        $output .= '<h3 class="jankx-od-card-title">' . esc_html__('Customer', 'jankx') . '</h3>';
+        $output .= '</div>';
+        $output .= '<div class="jankx-od-facts">';
+        $output .= $this->renderFactRow('user', esc_html__('Name', 'jankx'), $order->getCustomerName());
+        $output .= $this->renderFactRow('mail', esc_html__('Email', 'jankx'), $order->getCustomerEmail());
         if ($order->getCustomerPhone()) {
-            $output .= '<li><span>' . esc_html__('Phone', 'jankx') . '</span><strong>' . esc_html($order->getCustomerPhone()) . '</strong></li>';
+            $output .= $this->renderFactRow('phone', esc_html__('Phone', 'jankx'), $order->getCustomerPhone());
         }
         if ($order->getCustomerAddress()) {
-            $output .= '<li><span>' . esc_html__('Address', 'jankx') . '</span><strong>' . esc_html($order->getCustomerAddress()) . '</strong></li>';
+            $output .= $this->renderFactRow('pin', esc_html__('Address', 'jankx'), $order->getCustomerAddress());
         }
-        $output .= '</ul>';
+        $output .= '</div>';
         $output .= '</div>';
 
-        $output .= '<div class="jankx-order-panel">';
-        $output .= '<h3 class="jankx-order-panel-title">' . esc_html__('Payment', 'jankx') . '</h3>';
-        $output .= '<ul class="jankx-order-facts">';
-        $output .= '<li><span>' . esc_html__('Method', 'jankx') . '</span><strong>' . esc_html($this->getPaymentMethodLabel($order->getPaymentMethod())) . '</strong></li>';
-        $output .= '<li><span>' . esc_html__('Status', 'jankx') . '</span>'
-            . '<strong class="jankx-order-status-text jankx-order-status-text--' . esc_attr($status) . '">'
-            . esc_html($this->getStatusLabel($status)) . '</strong></li>';
-        $output .= '</ul>';
+        // Payment card
+        $output .= '<div class="jankx-od-card">';
+        $output .= '<div class="jankx-od-card-head">';
+        $output .= '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
+        $output .= '<h3 class="jankx-od-card-title">' . esc_html__('Payment', 'jankx') . '</h3>';
+        $output .= '</div>';
+        $output .= '<div class="jankx-od-facts">';
+        $output .= '<div class="jankx-od-fact">';
+        $output .= '<span class="jankx-od-fact-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>';
+        $output .= '<div class="jankx-od-fact-body">';
+        $output .= '<span class="jankx-od-fact-label">' . esc_html__('Method', 'jankx') . '</span>';
+        $output .= '<strong class="jankx-od-fact-value">' . esc_html($this->getPaymentMethodLabel($order->getPaymentMethod())) . '</strong>';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '<div class="jankx-od-fact">';
+        $output .= '<span class="jankx-od-fact-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>';
+        $output .= '<div class="jankx-od-fact-body">';
+        $output .= '<span class="jankx-od-fact-label">' . esc_html__('Status', 'jankx') . '</span>';
+        $output .= '<strong class="jankx-od-fact-value jankx-od-status--' . esc_attr($status) . '">'
+            . $this->getStatusIcon($status)
+            . esc_html($this->getStatusLabel($status))
+            . '</strong>';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '</div>';
+        $output .= '</div>';
+
+        // Help card
+        $output .= '<div class="jankx-od-card jankx-od-card--help">';
+        $output .= '<div class="jankx-od-help-inner">';
+        $output .= '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+        $output .= '<p>' . esc_html__('Need help with this order?', 'jankx') . '</p>';
+        $output .= '<a href="mailto:support@nibitour.vn" class="jankx-od-help-link">' . esc_html__('Contact support', 'jankx') . '</a>';
+        $output .= '</div>';
         $output .= '</div>';
 
         $output .= '</div>'; // end aside
         $output .= '</div>'; // end grid
 
-        $output .= '</div>';
-        $output .= '</div>';
+        $output .= '</div>'; // end jankx-od
+        $output .= '</div>'; // end jankx-tab-panel
 
         return $output;
+    }
+
+    protected function renderFactRow(string $icon, string $label, string $value): string
+    {
+        $icons = [
+            'user'  => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+            'mail'  => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
+            'phone' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+            'pin'   => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+        ];
+
+        return '<div class="jankx-od-fact">'
+            . '<span class="jankx-od-fact-icon">' . ($icons[$icon] ?? '') . '</span>'
+            . '<div class="jankx-od-fact-body">'
+            . '<span class="jankx-od-fact-label">' . $label . '</span>'
+            . '<strong class="jankx-od-fact-value">' . $value . '</strong>'
+            . '</div>'
+            . '</div>';
+    }
+
+    protected function getStatusIcon(string $status): string
+    {
+        $icons = [
+            Order::STATUS_PENDING    => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+            Order::STATUS_PROCESSING => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>',
+            Order::STATUS_COMPLETED  => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+            Order::STATUS_FAILED     => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+            Order::STATUS_CANCELLED  => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+            Order::STATUS_REFUNDED   => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>',
+        ];
+
+        return $icons[$status] ?? '';
     }
 
     protected function renderOrderProgress(string $status): string
     {
         $steps = [
-            Order::STATUS_PENDING    => __('Placed', 'jankx'),
-            Order::STATUS_PROCESSING => __('Processing', 'jankx'),
-            Order::STATUS_COMPLETED  => __('Completed', 'jankx'),
+            Order::STATUS_PENDING    => ['label' => __('Placed', 'jankx'),    'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'],
+            Order::STATUS_PROCESSING => ['label' => __('Processing', 'jankx'), 'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>'],
+            Order::STATUS_COMPLETED  => ['label' => __('Completed', 'jankx'),  'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'],
         ];
 
         $isTerminal = in_array($status, [Order::STATUS_FAILED, Order::STATUS_CANCELLED, Order::STATUS_REFUNDED], true);
-
         $currentIndex = array_search($status, array_keys($steps), true);
         if ($currentIndex === false) {
             $currentIndex = 0;
         }
 
-        $output = '<div class="jankx-order-progress">';
+        $output = '<div class="jankx-od-progress">';
         if ($isTerminal) {
-            $output .= '<div class="jankx-order-step jankx-order-step--terminal jankx-order-step--done">'
-                . '<span class="jankx-order-step-dot"></span>'
-                . '<span class="jankx-order-step-label">' . esc_html($this->getStatusLabel($status)) . '</span>'
+            $output .= '<div class="jankx-od-step jankx-od-step--terminal jankx-od-step--done">'
+                . '<span class="jankx-od-step-dot">' . $this->getStatusIcon($status) . '</span>'
+                . '<span class="jankx-od-step-label">' . esc_html($this->getStatusLabel($status)) . '</span>'
                 . '</div>';
         } else {
-            foreach ($steps as $stepStatus => $label) {
+            foreach ($steps as $stepStatus => $stepData) {
                 $state = '';
                 $stepIndex = array_search($stepStatus, array_keys($steps), true);
                 if ($stepIndex < $currentIndex) {
-                    $state = ' jankx-order-step--done';
+                    $state = ' jankx-od-step--done';
                 } elseif ($stepIndex === $currentIndex) {
-                    $state = ' jankx-order-step--active';
+                    $state = ' jankx-od-step--active';
                 }
-                $output .= '<div class="jankx-order-step' . $state . '">'
-                    . '<span class="jankx-order-step-dot"></span>'
-                    . '<span class="jankx-order-step-label">' . esc_html($label) . '</span>'
+                $output .= '<div class="jankx-od-step' . $state . '">'
+                    . '<span class="jankx-od-step-dot">' . $stepData['icon'] . '</span>'
+                    . '<span class="jankx-od-step-label">' . esc_html($stepData['label']) . '</span>'
                     . '</div>';
             }
         }
@@ -259,13 +341,12 @@ class AccountTabOrdersBlock extends Block
     protected function getItemThumbnail(OrderItem $item): string
     {
         $url = get_the_post_thumbnail_url($item->getProductId(), 'thumbnail');
-        $class = 'jankx-order-item-thumb';
 
         if ($url) {
-            return '<span class="' . $class . '"><img src="' . esc_url($url) . '" alt="' . esc_attr($item->getName()) . '" loading="lazy"></span>';
+            return '<span class="jankx-od-item-thumb"><img src="' . esc_url($url) . '" alt="' . esc_attr($item->getName()) . '" loading="lazy"></span>';
         }
 
-        return '<span class="' . $class . ' jankx-order-item-thumb--placeholder">'
+        return '<span class="jankx-od-item-thumb jankx-od-item-thumb--ph">'
             . esc_html(mb_substr($item->getName(), 0, 1, 'UTF-8'))
             . '</span>';
     }
@@ -283,13 +364,16 @@ class AccountTabOrdersBlock extends Block
     protected function renderOrderNotFound(): string
     {
         $output = '<div class="jankx-tab-panel jankx-tab-orders">';
-        $output .= '<div class="jankx-empty-state">'
-            . '<span class="jankx-empty-icon" aria-hidden="true">&#128203;</span>'
-            . '<p>' . esc_html__('Order not found or you do not have permission to view it.', 'jankx') . '</p>'
-            . '<a href="' . esc_url($this->getOrdersUrl()) . '" class="jankx-btn jankx-btn-outline">'
+        $output .= '<div class="jankx-od-empty">';
+        $output .= '<div class="jankx-od-empty-icon">';
+        $output .= '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>';
+        $output .= '</div>';
+        $output .= '<h3>' . esc_html__('Order not found', 'jankx') . '</h3>';
+        $output .= '<p>' . esc_html__('We couldn\'t find this order or you don\'t have permission to view it.', 'jankx') . '</p>';
+        $output .= '<a href="' . esc_url($this->getOrdersUrl()) . '" class="jankx-od-btn">'
             . esc_html__('Back to orders', 'jankx')
-            . '</a>'
-            . '</div>';
+            . '</a>';
+        $output .= '</div>';
         $output .= '</div>';
 
         return $output;

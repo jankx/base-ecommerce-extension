@@ -120,6 +120,7 @@ function stub_wp_ecommerce_functions()
     Monkey\Functions\when('esc_html')->returnArg();
     Monkey\Functions\when('esc_html__')->returnArg();
     Monkey\Functions\when('esc_attr')->returnArg();
+    Monkey\Functions\when('esc_url')->returnArg();
     Monkey\Functions\when('home_url')->alias(function ($path = '', $scheme = null) {
         return 'http://example.com' . $path;
     });
