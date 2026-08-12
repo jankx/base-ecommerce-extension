@@ -131,6 +131,9 @@ class AccountTabOrdersBlock extends Block
         // Pay now button for unpaid orders
         $output .= $this->renderPayNowButton($order);
 
+        // Allow other extensions to add content after payment info (e.g. VietQR)
+        $output .= apply_filters('jankx/ecommerce/order_detail/after_payment_info', '', $order);
+
         // Two-column layout
         $output .= '<div class="jankx-od-grid">';
 
