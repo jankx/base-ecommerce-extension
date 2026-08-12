@@ -11,6 +11,7 @@ class EcommerceSettingsPage
     public function register(): void
     {
         add_action('admin_menu', [$this, 'addMenuPage']);
+        add_action('admin_menu', [$this, 'addSubmenuPages'], 99);
         add_action('admin_init', [$this, 'registerSettings']);
         add_action('admin_enqueue_scripts', [$this, 'enqueueAssets']);
     }
@@ -28,6 +29,23 @@ class EcommerceSettingsPage
         );
     }
 
+    public function addSubmenuPages(): void
+    {
+        $parent = self::PAGE_SLUG;
+
+        add_submenu_page($parent, __('Cài đặt chung', 'jankx'), __('Cài đặt chung', 'jankx'), 'manage_options', 'jankx-ecommerce-general', [$this, 'renderGeneralPage']);
+        add_submenu_page($parent, __('Tiền tệ', 'jankx'), __('Tiền tệ', 'jankx'), 'manage_options', 'jankx-ecommerce-currency', [$this, 'renderCurrencyPage']);
+        add_submenu_page($parent, __('Phương thức thanh toán', 'jankx'), __('Thanh toán', 'jankx'), 'manage_options', 'jankx-ecommerce-payment', [$this, 'renderPaymentPage']);
+        add_submenu_page($parent, __('Mã giảm giá', 'jankx'), __('Mã giảm giá', 'jankx'), 'manage_options', 'jankx-ecommerce-coupons', [$this, 'renderCouponsPage']);
+
+        remove_submenu_page($parent, $parent);
+    }
+
+    public function renderGeneralPage(): void { $_GET['tab'] = 'general'; $this->renderPage(); }
+    public function renderCurrencyPage(): void { $_GET['tab'] = 'currency'; $this->renderPage(); }
+    public function renderPaymentPage(): void { $_GET['tab'] = 'payment'; $this->renderPage(); }
+    public function renderCouponsPage(): void { $_GET['tab'] = 'coupons'; $this->renderPage(); }
+
     protected function getMenuIcon(): string
     {
         $svg = '<svg width="21" height="17" viewBox="0 0 21 17" fill="none" xmlns="http://www.w3.org/2000/svg">'
@@ -44,7 +62,15 @@ class EcommerceSettingsPage
 
     public function enqueueAssets(string $hook): void
     {
-        if (strpos($hook, self::PAGE_SLUG) === false) {
+        $allowed = [
+            'toplevel_page_' . self::PAGE_SLUG,
+            'jankx_page_jankx-ecommerce-general',
+            'jankx_page_jankx-ecommerce-currency',
+            'jankx_page_jankx-ecommerce-payment',
+            'jankx_page_jankx-ecommerce-coupons',
+        ];
+
+        if (!in_array($hook, $allowed)) {
             return;
         }
 
@@ -498,10 +524,25 @@ class EcommerceSettingsPage
 
         // Handle form save
         if (isset($_POST['jankx_save_gateway_settings']) && check_admin_referer('jankx_gateway_settings_' . $gatewaySlug)) {
-            $saved = $manager->saveConfig($gatewaySlug, $_POST['gateway'] ?? []);
+            $newConfig = $_POST['gateway'] ?? [];
+            $oldConfig = $manager->getConfig($gatewaySlug);
+
+            // Build field list from gateway
+            $fields = $gateway->getSettingsFields();
+
+            // For checkboxes: unchecked fields are missing from POST, set them to ''
+            foreach ($fields as $key => $field) {
+                if (($field['type'] ?? 'text') === 'checkbox' && !isset($newConfig[$key])) {
+                    $newConfig[$key] = '';
+                }
+            }
+
+            // Merge: saved values override defaults, but unchecked checkboxes clear old values
+            $merged = array_merge($oldConfig, $newConfig);
+
+            $saved = $manager->saveConfig($gatewaySlug, $merged);
             if ($saved) {
                 echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Settings saved.', 'jankx') . '</p></div>';
-                // Refresh gateway instance with new config
                 $gateway = $manager->get($gatewaySlug);
             }
         }
