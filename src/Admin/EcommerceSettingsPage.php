@@ -406,17 +406,24 @@ class EcommerceSettingsPage
             <tbody>
                 <?php
                 // Built-in gateways (fallback if payment-system not active)
+                $codConfig = get_option('jankx_built_in_gateway_cod', []);
+                $bankConfig = get_option('jankx_built_in_gateway_bank_transfer', []);
+
                 $builtInGateways = [
                     'cod' => [
                         'name' => __('Thanh toán khi nhận hàng (COD)', 'jankx'),
                         'description' => __('Khách hàng thanh toán bằng tiền mặt khi nhận hàng.', 'jankx'),
                         'icon' => '💵',
+                        'available' => true,
+                        'sandbox_mode' => false,
                         'settings_url' => admin_url('admin.php?page=jankx-ecommerce-settings&tab=payment&gateway=cod'),
                     ],
                     'bank_transfer' => [
                         'name' => __('Chuyển khoản ngân hàng', 'jankx'),
                         'description' => __('Khách hàng chuyển khoản trực tiếp vào tài khoản ngân hàng.', 'jankx'),
                         'icon' => '🏦',
+                        'available' => !empty($bankConfig['bank_name']) && !empty($bankConfig['account_number']),
+                        'sandbox_mode' => false,
                         'settings_url' => admin_url('admin.php?page=jankx-ecommerce-settings&tab=payment&gateway=bank_transfer'),
                     ],
                 ];
