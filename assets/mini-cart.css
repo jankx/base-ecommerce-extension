@@ -245,3 +245,8 @@
 body.jankx-mini-cart-open {
     overflow: hidden;
 }
+
+/* Fix: header's will-change:transform creates containing block for position:fixed descendants */
+body.jankx-mini-cart-open header {
+    will-change: auto;
+}

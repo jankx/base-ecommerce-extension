@@ -128,6 +128,9 @@ class AccountTabOrdersBlock extends Block
         // Status progress stepper
         $output .= $this->renderOrderProgress($status);
 
+        // Pay now button for unpaid orders
+        $output .= $this->renderPayNowButton($order);
+
         // Two-column layout
         $output .= '<div class="jankx-od-grid">';
 
@@ -333,6 +336,95 @@ class AccountTabOrdersBlock extends Block
                     . '</div>';
             }
         }
+        $output .= '</div>';
+
+        return $output;
+    }
+
+    /**
+     * Render the "Pay Now" button for unpaid orders.
+     */
+    protected function renderPayNowButton(Order $order): string
+    {
+        $status = $order->getStatus();
+        if (!in_array($status, [Order::STATUS_PENDING, Order::STATUS_PROCESSING], true)) {
+            return '';
+        }
+
+        $gateway = $order->getPaymentMethod();
+        if ($gateway === 'cod' || $gateway === 'bank_transfer') {
+            // For COD and bank transfer, show info instead of pay button
+            return $this->renderOfflinePaymentInfo($order, $gateway);
+        }
+
+        // Online payment: show pay button
+        $restUrl = rest_url('jankx/ecommerce/v1/orders/' . $order->getOrderNumber() . '/pay');
+        $nonce = wp_create_nonce('wp_rest');
+
+        $output = '<div class="jankx-od-card jankx-od-card--action">';
+        $output .= '<div class="jankx-od-pay-inner">';
+        $output .= '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
+        $output .= '<p>' . esc_html__('Chưa thanh toán. Nhấn nút bên dưới để hoàn tất thanh toán.', 'jankx') . '</p>';
+        $output .= '<button class="jankx-od-btn jankx-od-btn--pay" '
+            . 'data-rest-url="' . esc_attr($restUrl) . '" '
+            . 'data-nonce="' . esc_attr($nonce) . '" '
+            . 'data-order="' . esc_attr($order->getOrderNumber()) . '" '
+            . 'onclick="jankxPayOrder(this)">'
+            . '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>'
+            . esc_html__('Thanh toán ngay', 'jankx')
+            . '</button>';
+        $output .= '</div>';
+        $output .= '</div>';
+
+        return $output;
+    }
+
+    /**
+     * Render offline payment info (COD / bank transfer).
+     */
+    protected function renderOfflinePaymentInfo(Order $order, string $gateway): string
+    {
+        $output = '<div class="jankx-od-card jankx-od-card--info">';
+        $output .= '<div class="jankx-od-info-inner">';
+
+        if ($gateway === 'bank_transfer') {
+            $bankConfig = get_option('jankx_built_in_gateway_bank_transfer', []);
+            $bankName = $bankConfig['bank_name'] ?? '';
+            $accountNumber = $bankConfig['account_number'] ?? '';
+            $accountHolder = $bankConfig['account_holder'] ?? '';
+            $transferContent = $bankConfig['transfer_content'] ?? __('Vui lòng ghi đúng nội dung chuyển khoản để chúng tôi xác nhận đơn hàng sớm nhất.', 'jankx');
+            $instructions = $bankConfig['instructions'] ?? '';
+
+            $output .= '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>';
+            $output .= '<h4>' . esc_html__('Thông tin chuyển khoản', 'jankx') . '</h4>';
+            $output .= '<div class="jankx-od-bank-info">';
+            if ($bankName) {
+                $output .= '<p><strong>' . esc_html__('Ngân hàng:', 'jankx') . '</strong> ' . esc_html($bankName) . '</p>';
+            }
+            if ($accountNumber) {
+                $output .= '<p><strong>' . esc_html__('Số TK:', 'jankx') . '</strong> ' . esc_html($accountNumber) . '</p>';
+            }
+            if ($accountHolder) {
+                $output .= '<p><strong>' . esc_html__('Chủ TK:', 'jankx') . '</strong> ' . esc_html($accountHolder) . '</p>';
+            }
+            $output .= '<p><strong>' . esc_html__('Nội dung CK:', 'jankx') . '</strong> <code>' . esc_html($order->getOrderNumber()) . '</code></p>';
+            if ($transferContent) {
+                $output .= '<p class="description">' . esc_html($transferContent) . '</p>';
+            }
+            if ($instructions) {
+                $output .= '<p class="description">' . nl2br(esc_html($instructions)) . '</p>';
+            }
+            $output .= '</div>';
+        } else {
+            $codConfig = get_option('jankx_built_in_gateway_cod', []);
+            $codDescription = $codConfig['description'] ?? __('Đơn hàng COD sẽ được xác nhận bởi nhân viên. Vui lòng đặt cọc nếu được yêu cầu.', 'jankx');
+
+            $output .= '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
+            $output .= '<h4>' . esc_html__('Thanh toán khi nhận hàng (COD)', 'jankx') . '</h4>';
+            $output .= '<p>' . esc_html($codDescription) . '</p>';
+        }
+
+        $output .= '</div>';
         $output .= '</div>';
 
         return $output;

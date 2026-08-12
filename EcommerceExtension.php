@@ -200,11 +200,13 @@ class EcommerceExtension extends AbstractExtension
     {
         $productTypes = self::get_supported_product_types();
         $isProductPage = !empty($productTypes) && is_singular($productTypes);
+        $isMyAccount = is_page(get_option('jankx_my_account_page_id', 0));
 
         if (
             !is_page(self::get_cart_page_id()) &&
             !is_page(self::get_checkout_page_id()) &&
-            !$isProductPage
+            !$isProductPage &&
+            !$isMyAccount
         ) {
             return;
         }

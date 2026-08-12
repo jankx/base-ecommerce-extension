@@ -170,4 +170,53 @@
             });
         });
     }
+
+    // Expose pay order function globally for inline onclick
+    window.jankxPayOrder = function (button) {
+        var restUrl = button.getAttribute('data-rest-url');
+        var nonce = button.getAttribute('data-nonce');
+        var orderNumber = button.getAttribute('data-order');
+
+        button.disabled = true;
+        button.textContent = '...';
+
+        fetch(restUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-WP-Nonce': nonce
+            }
+        })
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            if (!data.success) {
+                alert(data.message || 'Thanh toán thất bại.');
+                button.disabled = false;
+                button.textContent = 'Thanh toán ngay';
+                return;
+            }
+
+            // Online payment: redirect
+            if (data.type === 'online' && data.redirect_url) {
+                window.location.href = data.redirect_url;
+                return;
+            }
+
+            // Bank transfer or COD: show message
+            if (data.message) {
+                var card = button.closest('.jankx-od-card');
+                if (card) {
+                    card.innerHTML = '<div class="jankx-od-info-inner">'
+                        + '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+                        + '<p>' + data.message.replace(/\n/g, '<br>') + '</p>'
+                        + '</div>';
+                }
+            }
+        })
+        .catch(function (error) {
+            alert('Lỗi: ' + (error.message || 'Vui lòng thử lại.'));
+            button.disabled = false;
+            button.textContent = 'Thanh toán ngay';
+        });
+    };
 })();

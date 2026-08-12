@@ -158,17 +158,35 @@ class CheckoutBlock extends Block
     protected function getPaymentMethods(): array
     {
         $methods = [];
+        $enabledGateways = get_option('jankx_payment_gateways', []);
 
+        // Built-in gateways
+        $builtIn = [
+            'bank_transfer' => __('Chuyển khoản ngân hàng', 'jankx'),
+            'cod'           => __('Thanh toán khi nhận hàng (COD)', 'jankx'),
+        ];
+
+        // Online gateways from payment-system extension
+        $onlineGateways = [];
         if (class_exists('\Jankx\Extensions\PaymentSystem\Gateways\GatewayManager')) {
             $manager = \Jankx\Extensions\PaymentSystem\Gateways\GatewayManager::getInstance();
             foreach ($manager->getAvailable() as $slug => $gateway) {
-                $methods[$slug] = $gateway->getName();
+                $onlineGateways[$slug] = $gateway->getName();
             }
         }
 
-        if (empty($methods)) {
-            $methods['bank_transfer'] = __('Bank transfer', 'jankx');
-            $methods['cod'] = __('Cash on delivery', 'jankx');
+        $allGateways = array_merge($builtIn, $onlineGateways);
+
+        // Filter by enabled gateways from admin settings
+        if (!empty($enabledGateways)) {
+            foreach ($enabledGateways as $slug) {
+                if (isset($allGateways[$slug])) {
+                    $methods[$slug] = $allGateways[$slug];
+                }
+            }
+        } else {
+            // No settings saved yet: show all available
+            $methods = $allGateways;
         }
 
         return (array) apply_filters('jankx/ecommerce/checkout/payment_methods', $methods);

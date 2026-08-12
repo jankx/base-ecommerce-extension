@@ -216,8 +216,9 @@ class EcommerceSettingsPage
 
     protected function renderGeneralTab(): void
     {
-        settings_fields(self::OPTION_GROUP);
         ?>
+        <form method="post" action="options.php">
+        <?php settings_fields(self::OPTION_GROUP); ?>
         <table class="form-table">
             <tr>
                 <th scope="row"><label for="jankx_store_name"><?php esc_html_e('Tên cửa hàng', 'jankx'); ?></label></th>
@@ -254,13 +255,15 @@ class EcommerceSettingsPage
         </table>
         <?php
         submit_button();
+        ?>
+        </form>
+        <?php
     }
 
     // ── CURRENCY TAB ─────────────────────────────────────────────────
 
     protected function renderCurrencyTab(): void
     {
-        settings_fields(self::OPTION_GROUP);
 
         $allCurrencies = CurrencyManager::getAllCurrencies();
         $enabled = CurrencyManager::getEnabledCurrencies();
@@ -275,6 +278,9 @@ class EcommerceSettingsPage
         ?>
         <h2><?php esc_html_e('Quản lý tiền tệ', 'jankx'); ?></h2>
         <p class="description"><?php esc_html_e('Chọn các loại tiền tệ muốn hiển thị trên trang web. Đánh dấu vào ô bên cạnh để bật/tắt.', 'jankx'); ?></p>
+
+        <form method="post" action="options.php">
+        <?php settings_fields(self::OPTION_GROUP); ?>
 
         <table class="widefat striped jankx-currency-table" style="margin-top: 16px;">
             <thead>
@@ -359,6 +365,7 @@ class EcommerceSettingsPage
         </div>
 
         <?php submit_button(); ?>
+        </form>
         <?php
     }
 
@@ -373,8 +380,6 @@ class EcommerceSettingsPage
             return;
         }
 
-        settings_fields(self::OPTION_GROUP);
-
         $enabledGateways = get_option('jankx_payment_gateways', []);
 
         // Get registered gateways from payment-system extension
@@ -382,6 +387,9 @@ class EcommerceSettingsPage
         ?>
         <h2><?php esc_html_e('Phương thức thanh toán', 'jankx'); ?></h2>
         <p class="description"><?php esc_html_e('Kích hoạt và cấu hình các phương thức thanh toán từ các extension.', 'jankx'); ?></p>
+
+        <form method="post" action="options.php">
+        <?php settings_fields(self::OPTION_GROUP); ?>
 
         <table class="widefat striped" style="margin-top: 16px;">
             <thead>
@@ -403,11 +411,13 @@ class EcommerceSettingsPage
                         'name' => __('Thanh toán khi nhận hàng (COD)', 'jankx'),
                         'description' => __('Khách hàng thanh toán bằng tiền mặt khi nhận hàng.', 'jankx'),
                         'icon' => '💵',
+                        'settings_url' => admin_url('admin.php?page=jankx-ecommerce-settings&tab=payment&gateway=cod'),
                     ],
                     'bank_transfer' => [
                         'name' => __('Chuyển khoản ngân hàng', 'jankx'),
                         'description' => __('Khách hàng chuyển khoản trực tiếp vào tài khoản ngân hàng.', 'jankx'),
                         'icon' => '🏦',
+                        'settings_url' => admin_url('admin.php?page=jankx-ecommerce-settings&tab=payment&gateway=bank_transfer'),
                     ],
                 ];
 
@@ -451,6 +461,7 @@ class EcommerceSettingsPage
         </table>
 
         <?php submit_button(); ?>
+        </form>
         <?php
     }
 
@@ -459,6 +470,12 @@ class EcommerceSettingsPage
      */
     protected function renderGatewaySettings(string $gatewaySlug): void
     {
+        // Handle built-in gateways (cod, bank_transfer)
+        if (in_array($gatewaySlug, ['cod', 'bank_transfer'])) {
+            $this->renderBuiltInGatewaySettings($gatewaySlug);
+            return;
+        }
+
         if (!class_exists('\\Jankx\\Extensions\\PaymentSystem\\Gateways\\GatewayManager')) {
             echo '<div class="wrap"><p>' . esc_html__('Payment System extension is not active.', 'jankx') . '</p></div>';
             return;
@@ -579,6 +596,141 @@ class EcommerceSettingsPage
         <?php
     }
 
+    protected function renderBuiltInGatewaySettings(string $gatewaySlug): void
+    {
+        $optionKey = 'jankx_built_in_gateway_' . $gatewaySlug;
+
+        // Handle form save
+        if (isset($_POST['jankx_save_gateway_settings']) && check_admin_referer('jankx_gateway_settings_' . $gatewaySlug)) {
+            update_option($optionKey, $_POST['gateway'] ?? []);
+            echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Settings saved.', 'jankx') . '</p></div>';
+        }
+
+        $config = get_option($optionKey, []);
+        $fields = $this->getBuiltInGatewayFields($gatewaySlug);
+        $gatewayName = $gatewaySlug === 'cod'
+            ? __('Thanh toán khi nhận hàng (COD)', 'jankx')
+            : __('Chuyển khoản ngân hàng', 'jankx');
+        ?>
+        <div class="wrap">
+            <h1>
+                <a href="<?php echo esc_url(admin_url('admin.php?page=' . self::PAGE_SLUG . '&tab=payment')); ?>"
+                   style="text-decoration:none;">&larr;</a>
+                <?php printf(esc_html__('Cài đặt %s', 'jankx'), esc_html($gatewayName)); ?>
+            </h1>
+
+            <form method="post" action="<?php echo esc_url(admin_url('admin.php?page=' . self::PAGE_SLUG . '&tab=payment&gateway=' . $gatewaySlug)); ?>">
+                <?php wp_nonce_field('jankx_gateway_settings_' . $gatewaySlug); ?>
+
+                <table class="form-table">
+                    <?php foreach ($fields as $key => $field): ?>
+                        <tr>
+                            <th scope="row">
+                                <label for="gateway_<?php echo esc_attr($key); ?>">
+                                    <?php echo esc_html($field['label']); ?>
+                                </label>
+                            </th>
+                            <td>
+                                <?php
+                                $value = $config[$key] ?? ($field['default'] ?? '');
+                                $inputId = 'gateway_' . $key;
+
+                                if (($field['type'] ?? 'text') === 'textarea'):
+                                ?>
+                                    <textarea id="<?php echo esc_attr($inputId); ?>"
+                                              name="gateway[<?php echo esc_attr($key); ?>]"
+                                              rows="4" cols="50"
+                                              class="large-text"><?php echo esc_textarea($value); ?></textarea>
+                                <?php else: ?>
+                                    <input type="<?php echo esc_attr($field['type'] ?? 'text'); ?>"
+                                           id="<?php echo esc_attr($inputId); ?>"
+                                           name="gateway[<?php echo esc_attr($key); ?>]"
+                                           value="<?php echo esc_attr($value); ?>"
+                                           class="regular-text">
+                                <?php endif; ?>
+
+                                <?php if (!empty($field['description'])): ?>
+                                    <p class="description"><?php echo esc_html($field['description']); ?></p>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </table>
+
+                <?php submit_button(__('Lưu cài đặt', 'jankx'), 'primary', 'jankx_save_gateway_settings'); ?>
+            </form>
+        </div>
+        <?php
+    }
+
+    protected function getBuiltInGatewayFields(string $gatewaySlug): array
+    {
+        if ($gatewaySlug === 'cod') {
+            return [
+                'description' => [
+                    'label'       => __('Mô tả cho khách hàng', 'jankx'),
+                    'type'        => 'textarea',
+                    'default'     => __('Thanh toán bằng tiền mặt khi nhận hàng. Vui lòng chuẩn bị đúng số tiền.', 'jankx'),
+                    'description' => __('Hiển thị trên trang thanh toán và email xác nhận.', 'jankx'),
+                ],
+                'extra_fee' => [
+                    'label'       => __('Phí COD (₫)', 'jankx'),
+                    'type'        => 'text',
+                    'default'     => '0',
+                    'description' => __('Phụ phí nếu có (0 = không phụ phí).', 'jankx'),
+                ],
+                'min_amount' => [
+                    'label'       => __('Giá trị tối thiểu (₫)', 'jankx'),
+                    'type'        => 'text',
+                    'default'     => '0',
+                    'description' => __('Không hiển thị COD nếu đơn hàng thấp hơn giá trị này (0 = luôn hiển thị).', 'jankx'),
+                ],
+                'max_amount' => [
+                    'label'       => __('Giá trị tối đa (₫)', 'jankx'),
+                    'type'        => 'text',
+                    'default'     => '0',
+                    'description' => __('Không hiển thị COD nếu đơn hàng cao hơn giá trị này (0 = không giới hạn).', 'jankx'),
+                ],
+            ];
+        }
+
+        // bank_transfer
+        return [
+            'bank_name' => [
+                'label'   => __('Tên ngân hàng', 'jankx'),
+                'type'    => 'text',
+                'default' => '',
+            ],
+            'account_number' => [
+                'label'   => __('Số tài khoản', 'jankx'),
+                'type'    => 'text',
+                'default' => '',
+            ],
+            'account_holder' => [
+                'label'   => __('Chủ tài khoản', 'jankx'),
+                'type'    => 'text',
+                'default' => '',
+            ],
+            'branch' => [
+                'label'   => __('Chi nhánh', 'jankx'),
+                'type'    => 'text',
+                'default' => '',
+            ],
+            'transfer_content' => [
+                'label'       => __('Nội dung chuyển khoản', 'jankx'),
+                'type'        => 'textarea',
+                'default'     => __('Vui lòng ghi đúng nội dung chuyển khoản để chúng tôi xác nhận đơn hàng sớm nhất.', 'jankx'),
+                'description' => __('Hướng dẫn khách hàng điền nội dung CK.', 'jankx'),
+            ],
+            'instructions' => [
+                'label'       => __('Hướng dẫn chuyển khoản', 'jankx'),
+                'type'        => 'textarea',
+                'default'     => '',
+                'description' => __('Thông tin bổ sung hiển thị cho khách hàng (ví dụ: thông tin chuyển khoản nhanh 24/7, QR code...).', 'jankx'),
+            ],
+        ];
+    }
+
     /**
      * Get registered gateways from payment-system extension
      */
@@ -646,10 +798,12 @@ class EcommerceSettingsPage
 
     protected function renderCouponsTab(): void
     {
-        settings_fields(self::OPTION_GROUP);
         $enabled = get_option('jankx_coupons_enabled', true);
         ?>
         <h2><?php esc_html_e('Mã giảm giá', 'jankx'); ?></h2>
+
+        <form method="post" action="options.php">
+        <?php settings_fields(self::OPTION_GROUP); ?>
 
         <table class="form-table">
             <tr>
@@ -672,6 +826,7 @@ class EcommerceSettingsPage
         <?php endif; ?>
 
         <?php submit_button(); ?>
+        </form>
         <?php
     }
 
