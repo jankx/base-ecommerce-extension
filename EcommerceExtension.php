@@ -95,8 +95,10 @@ class EcommerceExtension extends AbstractExtension
         // Core ecommerce hooks shared across models.
         add_action('init', [$this, 'init_ecommerce_core']);
 
-        // Gutenberg blocks for cart, checkout and account orders.
-        $this->register_blocks();
+        // Gutenberg blocks for cart, checkout and account orders. Registered
+        // on init because register_block_type_from_metadata() calls wp_script_is()
+        // which is not allowed before that hook.
+        add_action('init', [$this, 'register_blocks']);
 
         // Editor integration for the blocks.
         add_action('enqueue_block_editor_assets', [$this, 'enqueue_block_editor_assets']);
