@@ -7,7 +7,10 @@
     "icon": "cart",
     "description": "Add the current product/tour to the cart. Place it on single product or tour pages.",
     "textdomain": "jankx",
-    "usesContext": ["postId", "postType"],
+    "usesContext": [
+        "postId",
+        "postType"
+    ],
     "attributes": {
         "title": {
             "type": "string",
@@ -21,18 +24,37 @@
             "type": "boolean",
             "default": false
         },
-        "jankxHideOnUltrawide": { "type": "boolean", "default": false },
-        "jankxHideOnPc": { "type": "boolean", "default": false },
-        "jankxHideOnTablet": { "type": "boolean", "default": false },
-        "jankxHideOnMobile": { "type": "boolean", "default": false },
-        "jankxFlexGrow": { "type": "boolean", "default": false }
+        "jankxHideOnUltrawide": {
+            "type": "boolean",
+            "default": false
+        },
+        "jankxHideOnPc": {
+            "type": "boolean",
+            "default": false
+        },
+        "jankxHideOnTablet": {
+            "type": "boolean",
+            "default": false
+        },
+        "jankxHideOnMobile": {
+            "type": "boolean",
+            "default": false
+        },
+        "jankxFlexGrow": {
+            "type": "boolean",
+            "default": false
+        }
     },
     "supports": {
         "html": false,
-        "align": ["wide", "full"],
+        "align": [
+            "wide",
+            "full"
+        ],
         "spacing": {
             "margin": true,
             "padding": true
         }
-    }
+    },
+    "editorScript": "file:./build/index.js"
 }

@@ -7,7 +7,10 @@
     "icon": "money-alt",
     "description": "Hiển thị bộ chuyển đổi tiền tệ cho khách hàng.",
     "supports": {
-        "align": ["wide", "full"],
+        "align": [
+            "wide",
+            "full"
+        ],
         "color": {
             "background": true,
             "text": true
@@ -48,6 +51,6 @@
         }
     },
     "textdomain": "jankx",
-    "editorScript": "jankx-ecommerce-blocks-editor",
+    "editorScript": "file:./build/index.js",
     "style": []
 }
