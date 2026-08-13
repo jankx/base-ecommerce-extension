@@ -5,39 +5,47 @@
  * Gutenberg blocks inside this extension. Each block gets its own
  * output chunk so WordPress can `register_block_type()` them individually.
  *
- * Build:  wp-scripts build --webpack-src-dir=. --config=webpack.config.js
- *   (or use the npm scripts defined in the root theme's package.json)
+ * Build:  npm run build:base-ecommerce
+ *   (defined in the root theme's package.json)
  */
 
 const defaultConfig = require('@wordpress/scripts/config/webpack.config');
 const path = require('path');
 
+// Base directory of this extension (the folder containing this config file).
+const EXTENSION_DIR = __dirname;
+
+// Filter out plugins that either target a different src root or cause
+// double-nesting when the output path differs from the default.
+const filteredPlugins = (defaultConfig.plugins || []).filter((plugin) => {
+    const name = plugin.constructor?.name ?? '';
+    // Remove CopyWebpackPlugin — block.json files are already in their
+    // final location next to the compiled output; no copy needed.
+    // Remove CleanWebpackPlugin — we manage the output path ourselves.
+    return name !== 'CopyPlugin' && name !== 'CleanWebpackPlugin';
+});
+
 module.exports = {
     ...defaultConfig,
+    context: EXTENSION_DIR,
 
     /**
-     * Multiple entry points — one per block.
-     * Output will be placed in each block's own `build/` directory via
-     * the custom `output.filename` + `output.chunkFilename` pattern below.
-     *
-     * The key names are used as the [name] token in `output.filename`.
+     * One entry per block.
      */
     entry: {
-        'cart/build/index': path.resolve(__dirname, 'blocks/cart/src/index.tsx'),
-        'cart-item/build/index': path.resolve(__dirname, 'blocks/cart-item/src/index.tsx'),
-        'checkout/build/index': path.resolve(__dirname, 'blocks/checkout/src/index.tsx'),
-        'account-tab-orders/build/index': path.resolve(__dirname, 'blocks/account-tab-orders/src/index.tsx'),
-        'add-to-cart/build/index': path.resolve(__dirname, 'blocks/add-to-cart/src/index.tsx'),
-        'currency-switcher/build/index': path.resolve(__dirname, 'blocks/currency-switcher/src/index.tsx'),
+        'blocks/cart/build/index': './blocks/cart/src/index.tsx',
+        'blocks/cart-item/build/index': './blocks/cart-item/src/index.tsx',
+        'blocks/checkout/build/index': './blocks/checkout/src/index.tsx',
+        'blocks/account-tab-orders/build/index': './blocks/account-tab-orders/src/index.tsx',
+        'blocks/add-to-cart/build/index': './blocks/add-to-cart/src/index.tsx',
+        'blocks/currency-switcher/build/index': './blocks/currency-switcher/src/index.tsx',
     },
 
     output: {
         ...defaultConfig.output,
-        /**
-         * Place each bundle directly into its block's build/ folder.
-         * e.g. blocks/cart/build/index.js
-         */
-        path: path.resolve(__dirname, 'blocks'),
+        path: EXTENSION_DIR,
         filename: '[name].js',
     },
+
+    plugins: filteredPlugins,
 };
