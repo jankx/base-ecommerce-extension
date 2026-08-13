@@ -1,0 +1,11 @@
+/*
+ * Editor preview styles for the E-Commerce blocks.
+ *
+ * The Mini Cart (jankx/cart-item) is a slide-out drawer that opens via JS.
+ * In the editor, hide the overlay + drawer so the toggle icon renders cleanly
+ * without breaking the header layout.
+ */
+.editor-styles-wrapper .wp-block-jankx-cart-item .jankx-mini-cart-overlay,
+.editor-styles-wrapper .wp-block-jankx-cart-item .jankx-mini-cart-drawer {
+    display: none;
+}

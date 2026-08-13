@@ -175,6 +175,20 @@ class EcommerceExtension extends AbstractExtension
             }
         }
         wp_localize_script('jankx-ecommerce-blocks-editor', 'jankxEcommerceBlockMetadata', $blockMetadata);
+
+        wp_enqueue_style(
+            'jankx-ecommerce-blocks-editor',
+            $this->get_extension_url() . '/assets/blocks-editor.css',
+            ['jankx-mini-cart'],
+            filemtime($this->get_extension_path() . '/assets/blocks-editor.css')
+        );
+
+        wp_enqueue_style(
+            'jankx-mini-cart',
+            $this->get_extension_url() . '/assets/mini-cart.css',
+            [],
+            filemtime($this->get_extension_path() . '/assets/mini-cart.css')
+        );
     }
 
     /**
