@@ -72,20 +72,25 @@ class CartItemBlock extends Block
         ]);
 
         $output = sprintf('<div %s>', $wrapperAttrs);
-        $output .= $this->renderToggle($cart);
+        $output .= $this->renderToggle($cart, $content);
         $output .= $this->renderDrawer($cart);
         $output .= '</div>';
 
         return $output;
     }
 
-    protected function renderToggle(Cart $cart): string
+    protected function renderToggle(Cart $cart, string $innerBlocksContent = ''): string
     {
         $count = $cart->getItemCount();
 
+        // Use inner block content (custom icon) if provided, otherwise fallback to default cart icon
+        $iconHtml = !empty($innerBlocksContent)
+            ? '<span class="jankx-mini-cart-icon jankx-mini-cart-icon--custom" aria-hidden="true">' . $innerBlocksContent . '</span>'
+            : '<span class="jankx-mini-cart-icon" aria-hidden="true">' . $this->cartIcon() . '</span>';
+
         return '<button type="button" class="jankx-mini-cart-toggle" aria-expanded="false" '
             . 'aria-controls="jankx-mini-cart-drawer" aria-label="' . esc_attr__('Open cart', 'jankx') . '">'
-            . '<span class="jankx-mini-cart-icon" aria-hidden="true">' . $this->cartIcon() . '</span>'
+            . $iconHtml
             . '<span class="jankx-mini-cart-count' . ($count ? '' : ' is-empty') . '" data-jankx-cart-count>'
             . (int) $count . '</span>'
             . '</button>';

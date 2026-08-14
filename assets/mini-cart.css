@@ -29,6 +29,18 @@
     line-height: 1;
 }
 
+.jankx-mini-cart-icon--custom {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.jankx-mini-cart-icon--custom img,
+.jankx-mini-cart-icon--custom svg {
+    width: 20px;
+    height: 20px;
+}
+
 .jankx-mini-cart-count {
     position: absolute;
     top: -4px;

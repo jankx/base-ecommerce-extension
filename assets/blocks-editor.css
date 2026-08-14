@@ -9,3 +9,26 @@
 .editor-styles-wrapper .wp-block-jankx-cart-item .jankx-mini-cart-drawer {
     display: none;
 }
+
+/* Mini Cart - icon customization area */
+.editor-styles-wrapper .wp-block-jankx-cart-item .jankx-mini-cart-editor-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    border: 1px dashed rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    min-width: 40px;
+    min-height: 40px;
+}
+
+.editor-styles-wrapper .wp-block-jankx-cart-item .jankx-mini-cart-editor-icon .block-editor-inserter-with-shortcuts,
+.editor-styles-wrapper .wp-block-jankx-cart-item .jankx-mini-cart-editor-icon .block-list-appender {
+    margin: 0;
+}
+
+.editor-styles-wrapper .wp-block-jankx-cart-item .jankx-mini-cart-editor-icon .wp-block {
+    margin: 0;
+    padding: 0;
+}
