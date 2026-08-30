@@ -24,7 +24,7 @@ class AddToCartBlock extends Block
     public function render($attributes, $content = '', $block = null)
     {
         $postId = $this->resolvePostId($block);
-        $postType = $this->resolvePostType($block, $postId);
+        $productType = $this->resolvePostType($block, $postId);
 
         if (!$postId || !EcommerceExtension::is_product($postId)) {
             return '';
@@ -57,7 +57,7 @@ class AddToCartBlock extends Block
         $formBody = '';
 
         $showDeparture = !empty($attributes['show_departure'])
-            || ($postType === 'tour' && !empty(get_post_meta($postId, '_tour_departures', true)));
+            || ($productType === 'tour' && !empty(get_post_meta($postId, '_tour_departures', true)));
 
         if ($showDeparture) {
             $formBody .= '<div class="jankx-add-to-cart__field">'
