@@ -61,8 +61,34 @@
             quantity: quantityInput ? parseInt(quantityInput.value, 10) || 1 : 1
         };
 
+        var args = {};
         if (departureInput && departureInput.value) {
-            body.args = { departure_date: departureInput.value };
+            args.departure_date = departureInput.value;
+        }
+
+        // Group-wise quantities (e.g. date-based tour pricing): read every
+        // input named group_qty[<group_id>] and pack them into args.group_qty.
+        var groupQtyInputs = form.querySelectorAll('input[name^="group_qty["]');
+        if (groupQtyInputs.length) {
+            var groupQty = {};
+            var totalGuests = 0;
+            groupQtyInputs.forEach(function (input) {
+                var match = input.name.match(/^group_qty\[([^\]]+)\]/);
+                if (!match) {
+                    return;
+                }
+                var qty = parseInt(input.value, 10) || 0;
+                groupQty[match[1]] = Math.max(0, qty);
+                totalGuests += Math.max(0, qty);
+            });
+            args.group_qty = groupQty;
+            if (!quantityInput) {
+                body.quantity = totalGuests || 1;
+            }
+        }
+
+        if (Object.keys(args).length) {
+            body.args = args;
         }
 
         if (statusBox) {

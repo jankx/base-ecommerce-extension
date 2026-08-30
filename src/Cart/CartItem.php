@@ -81,7 +81,9 @@ class CartItem
 
     public function getSubtotal(): float
     {
-        return (float) round($this->getUnitPrice() * $this->quantity, 2);
+        $subtotal = (float) round($this->getUnitPrice() * $this->quantity, 2);
+
+        return (float) apply_filters('jankx/ecommerce/cart/item/subtotal', $subtotal, $this);
     }
 
     public function toArray(): array

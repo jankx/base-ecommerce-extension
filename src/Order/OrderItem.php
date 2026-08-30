@@ -68,7 +68,9 @@ class OrderItem
 
     public function getTotal(): float
     {
-        return (float) round($this->unitPrice * $this->quantity, 2);
+        $total = (float) round($this->unitPrice * $this->quantity, 2);
+
+        return (float) apply_filters('jankx/ecommerce/order/item_total', $total, $this);
     }
 
     public function toArray(): array

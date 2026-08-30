@@ -31,14 +31,14 @@ class Order extends AbstractOrder
         $items = [];
         foreach ($cart->getItems() as $cartItem) {
             $product = $cartItem->getProduct();
-            $items[] = [
+            $items[] = apply_filters('jankx/ecommerce/order/item_data', [
                 'product_id'   => $cartItem->getProductId(),
                 'name'         => $cartItem->getName(),
                 'product_type' => $product ? $product->getProductType() : '',
                 'quantity'     => $cartItem->getQuantity(),
                 'unit_price'   => $cartItem->getUnitPrice(),
                 'meta'         => $cartItem->getArgs(),
-            ];
+            ], $cartItem, $product);
         }
 
         $total = $cart->getTotal();

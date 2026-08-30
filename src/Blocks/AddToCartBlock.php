@@ -54,11 +54,13 @@ class AddToCartBlock extends Block
         $output .= '<form class="jankx-add-to-cart-form">';
         $output .= '<input type="hidden" name="product_id" value="' . esc_attr($postId) . '">';
 
+        $formBody = '';
+
         $showDeparture = !empty($attributes['show_departure'])
             || ($postType === 'tour' && !empty(get_post_meta($postId, '_tour_departures', true)));
 
         if ($showDeparture) {
-            $output .= '<div class="jankx-add-to-cart__field">'
+            $formBody .= '<div class="jankx-add-to-cart__field">'
                 . '<label for="jankx-departure-' . esc_attr($postId) . '">'
                 . esc_html__('Ngày khởi hành', 'jankx') . '</label>'
                 . '<input type="date" id="jankx-departure-' . esc_attr($postId)
@@ -66,19 +68,32 @@ class AddToCartBlock extends Block
                 . '</div>';
         }
 
-        $output .= '<div class="jankx-add-to-cart__row">';
+        $formBody .= '<div class="jankx-add-to-cart__row">';
 
-        $output .= '<span class="jankx-add-to-cart__price">' . esc_html($this->formatPrice($product->getPrice())) . '</span>';
+        $formBody .= '<span class="jankx-add-to-cart__price">' . esc_html($this->formatPrice($product->getPrice())) . '</span>';
 
         if (!isset($attributes['show_quantity']) || !empty($attributes['show_quantity'])) {
-            $output .= '<input type="number" name="quantity" value="1" min="1" class="jankx-input jankx-add-to-cart__qty"'
+            $formBody .= '<input type="number" name="quantity" value="1" min="1" class="jankx-input jankx-add-to-cart__qty"'
                 . ' aria-label="' . esc_attr__('Số lượng', 'jankx') . '">';
         }
 
-        $output .= '<button type="submit" class="jankx-btn jankx-btn-primary jankx-add-to-cart__btn">'
+        $formBody .= '<button type="submit" class="jankx-btn jankx-btn-primary jankx-add-to-cart__btn">'
             . esc_html__('Thêm vào giỏ hàng', 'jankx') . '</button>';
 
-        $output .= '</div>';
+        $formBody .= '</div>';
+
+        // Allow business extensions (e.g. date-based tour pricing) to replace
+        // the whole field set with their own inputs while keeping the shared
+        // submit/status plumbing from base-ecommerce.
+        $output .= apply_filters(
+            'jankx/ecommerce/add_to_cart/form',
+            $formBody,
+            $product,
+            $postId,
+            $productType,
+            $attributes
+        );
+
         $output .= '<p class="jankx-add-to-cart__status" role="status"></p>';
         $output .= '</form>';
         $output .= '</div>';

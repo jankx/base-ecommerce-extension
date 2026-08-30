@@ -108,7 +108,7 @@ class EcommerceController
     public function addCartItem(\WP_REST_Request $request): \WP_REST_Response
     {
         $args = $request->get_param('args');
-        $args = is_array($args) ? array_map('sanitize_text_field', $args) : [];
+        $args = is_array($args) ? $this->sanitizeArgs($args) : [];
 
         $added = Cart::get_instance()->addItem(
             (int) $request->get_param('product_id'),
@@ -127,6 +127,24 @@ class EcommerceController
             'success' => true,
             'cart'    => Cart::get_instance()->toArray(),
         ]);
+    }
+
+    /**
+     * Recursively sanitize cart item args so nested maps (e.g. group_qty)
+     * survive the request without being flattened.
+     */
+    protected function sanitizeArgs(array $args): array
+    {
+        $clean = [];
+        foreach ($args as $key => $value) {
+            if (is_array($value)) {
+                $clean[sanitize_key((string) $key)] = $this->sanitizeArgs($value);
+            } else {
+                $clean[sanitize_key((string) $key)] = sanitize_text_field((string) $value);
+            }
+        }
+
+        return $clean;
     }
 
     public function removeCartItem(\WP_REST_Request $request): \WP_REST_Response
