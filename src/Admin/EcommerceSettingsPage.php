@@ -121,7 +121,7 @@ class EcommerceSettingsPage
 
         register_setting(self::OPTION_GROUP, 'jankx_store_email', [
             'type' => 'string',
-            'sanitize_callback' => 'sanitize_email',
+            'sanitize_callback' => [$this, 'sanitizeStoreEmail'],
             'default' => get_option('admin_email'),
         ]);
 
@@ -209,6 +209,15 @@ class EcommerceSettingsPage
             return [];
         }
         return array_map('sanitize_text_field', $value);
+    }
+
+    public function sanitizeStoreEmail($value): string
+    {
+        // Handle null values - return the existing value or admin email
+        if ($value === null || $value === '') {
+            return get_option('admin_email', '');
+        }
+        return sanitize_email($value);
     }
 
     public function renderPage(): void
