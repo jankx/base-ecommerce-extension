@@ -12,6 +12,7 @@ use Jankx\Extensions\Ecommerce\Cart\Cart;
 use Jankx\Extensions\Ecommerce\Checkout\CheckoutManager;
 use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
 use Jankx\Extensions\Ecommerce\Currency\Converters\CurrencyConverterManager;
+use Jankx\Extensions\Ecommerce\Currency\Converters\AutoConfigConverter;
 use Jankx\Extensions\Ecommerce\Order\Order;
 use Jankx\Extensions\Ecommerce\Order\OrderDatabaseInstaller;
 use Jankx\Extensions\Ecommerce\Admin\OrderAdmin;
@@ -396,6 +397,10 @@ class EcommerceExtension extends AbstractExtension
 
     public function init_ecommerce_core(): void
     {
+        // Auto-detect and configure converter from environment/constants
+        // (before getting manager instance)
+        AutoConfigConverter::autoDetectAndConfigure();
+
         // Initialize currency conversion system - ensure it's loaded before any price formatting
         CurrencyConverterManager::getInstance();
 

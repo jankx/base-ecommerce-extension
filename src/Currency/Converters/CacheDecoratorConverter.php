@@ -11,15 +11,23 @@ namespace Jankx\Extensions\Ecommerce\Currency\Converters;
  */
 class CacheDecoratorConverter implements CurrencyConverterInterface
 {
-    private const CACHE_TTL = 86400; // 24 hours
+    // Cache TTL in seconds
+    // Exchange rates: 10 minutes (600s) - rates change frequently
+    // Conversions: 1 hour (3600s) - same day prices usually stable
+    private const RATE_CACHE_TTL = 600;      // 10 minutes
+    private const CONVERSION_CACHE_TTL = 3600; // 1 hour
 
     private $converter;
     private $cacheEnabled;
+    private $rateCacheTTL;
+    private $conversionCacheTTL;
 
     public function __construct(CurrencyConverterInterface $converter, bool $cacheEnabled = true)
     {
         $this->converter = $converter;
         $this->cacheEnabled = $cacheEnabled;
+        $this->rateCacheTTL = self::RATE_CACHE_TTL;
+        $this->conversionCacheTTL = self::CONVERSION_CACHE_TTL;
     }
 
     public function convert(float $amount, string $fromCode, string $toCode): ?float
@@ -38,7 +46,7 @@ class CacheDecoratorConverter implements CurrencyConverterInterface
         $result = $this->converter->convert($amount, $fromCode, $toCode);
 
         if ($result !== null) {
-            wp_cache_set($cacheKey, $result, '', self::CACHE_TTL);
+            wp_cache_set($cacheKey, $result, '', $this->conversionCacheTTL);
         }
 
         return $result;
@@ -60,7 +68,7 @@ class CacheDecoratorConverter implements CurrencyConverterInterface
         $result = $this->converter->getRate($fromCode, $toCode);
 
         if ($result !== null) {
-            wp_cache_set($cacheKey, $result, '', self::CACHE_TTL);
+            wp_cache_set($cacheKey, $result, '', $this->rateCacheTTL);
         }
 
         return $result;
@@ -110,6 +118,48 @@ class CacheDecoratorConverter implements CurrencyConverterInterface
     public function clearCache(): void
     {
         wp_cache_flush();
+    }
+
+    /**
+     * Set custom TTL for rate cache.
+     *
+     * @param int $ttl TTL in seconds
+     * @return void
+     */
+    public function setRateCacheTTL(int $ttl): void
+    {
+        $this->rateCacheTTL = max(1, $ttl); // Minimum 1 second
+    }
+
+    /**
+     * Set custom TTL for conversion result cache.
+     *
+     * @param int $ttl TTL in seconds
+     * @return void
+     */
+    public function setConversionCacheTTL(int $ttl): void
+    {
+        $this->conversionCacheTTL = max(1, $ttl); // Minimum 1 second
+    }
+
+    /**
+     * Get current rate cache TTL.
+     *
+     * @return int TTL in seconds
+     */
+    public function getRateCacheTTL(): int
+    {
+        return $this->rateCacheTTL;
+    }
+
+    /**
+     * Get current conversion cache TTL.
+     *
+     * @return int TTL in seconds
+     */
+    public function getConversionCacheTTL(): int
+    {
+        return $this->conversionCacheTTL;
     }
 
     /**
