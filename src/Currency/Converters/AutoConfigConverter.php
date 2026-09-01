@@ -20,6 +20,11 @@ class AutoConfigConverter
      * - OPENEXCHANGERATES_API_KEY or JANKX_OPENEXCHANGERATES_API_KEY
      * - FIXERIO_API_KEY or JANKX_FIXERIO_API_KEY
      *
+     * Fallback strategy:
+     * 1. If API key found: Use paid API + FreeExchangeRate as fallback
+     * 2. If no API key: Use FreeExchangeRate directly
+     * 3. Wrap everything with cache decorator
+     *
      * @return void
      */
     public static function autoDetectAndConfigure(): void
@@ -30,7 +35,10 @@ class AutoConfigConverter
         $apiKey = self::getOpenExchangeRatesApiKey();
         if ($apiKey) {
             OpenExchangeRatesConverter::setApiKey($apiKey);
-            $manager->setActiveConverter('openexchangerates');
+            $primary = new OpenExchangeRatesConverter();
+            $fallback = new FreeExchangeRateConverter();
+            $converter = new FallbackConverterDecorator($primary, $fallback);
+            $manager->setActiveConverterInstance($converter);
             return;
         }
 
@@ -38,11 +46,15 @@ class AutoConfigConverter
         $apiKey = self::getFixerIOApiKey();
         if ($apiKey) {
             FixerIOConverter::setApiKey($apiKey);
-            $manager->setActiveConverter('fixerio');
+            $primary = new FixerIOConverter();
+            $fallback = new FreeExchangeRateConverter();
+            $converter = new FallbackConverterDecorator($primary, $fallback);
+            $manager->setActiveConverterInstance($converter);
             return;
         }
 
-        // No API key found, stay with NoOp
+        // No API key found, use free converter directly
+        $manager->setActiveConverter('free');
     }
 
     /**

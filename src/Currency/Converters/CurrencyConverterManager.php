@@ -47,6 +47,7 @@ class CurrencyConverterManager
         $this->register('noop', NoOpConverter::class);
         $this->register('openexchangerates', OpenExchangeRatesConverter::class);
         $this->register('fixerio', FixerIOConverter::class);
+        $this->register('free', FreeExchangeRateConverter::class); // Public API, no key needed
 
         // Allow plugins/extensions to register their own converters
         do_action('jankx/ecommerce/currency/register_converters', $this);
@@ -113,6 +114,27 @@ class CurrencyConverterManager
         do_action('jankx/ecommerce/currency/converter_changed', $converterType, $this->converter);
 
         return true;
+    }
+
+    /**
+     * Set the active converter instance directly.
+     *
+     * Useful for complex setups like fallback decorators.
+     * Automatically wraps with cache decorator if needed.
+     *
+     * @param CurrencyConverterInterface $converter
+     * @return void
+     */
+    public function setActiveConverterInstance(CurrencyConverterInterface $converter): void
+    {
+        // Wrap with cache decorator if not already cached
+        if (!($converter instanceof CacheDecoratorConverter)) {
+            $converter = new CacheDecoratorConverter($converter, true);
+        }
+
+        $this->converter = $converter;
+
+        do_action('jankx/ecommerce/currency/converter_changed', 'custom', $this->converter);
     }
 
     /**
