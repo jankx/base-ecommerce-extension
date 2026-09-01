@@ -220,7 +220,25 @@ class EcommerceSettingsPage
                         $this->renderCouponsTab();
                         break;
                     default:
-                        $this->renderGeneralTab();
+                        $coreHandled = in_array($currentTab, ['general', 'currency', 'payment', 'coupons'], true);
+
+                        if (!$coreHandled) {
+                            /**
+                             * Action fired when the active tab is not a core tab.
+                             *
+                             * Third-party extensions render their tab content here:
+                             *
+                             *   add_action('jankx/ecommerce/settings/render_tab', function (string $tab) {
+                             *       if ($tab !== 'my-tab') return;
+                             *       // render HTML
+                             *   });
+                             *
+                             * @param string $currentTab Active tab slug.
+                             */
+                            do_action('jankx/ecommerce/settings/render_tab', $currentTab);
+                        } else {
+                            $this->renderGeneralTab();
+                        }
                 }
                 ?>
             </div>
@@ -230,12 +248,26 @@ class EcommerceSettingsPage
 
     protected function getTabs(): array
     {
-        return [
+        $tabs = [
             'general'  => __('Chung', 'jankx'),
             'currency' => __('Tiền tệ', 'jankx'),
             'payment'  => __('Thanh toán', 'jankx'),
             'coupons'  => __('Mã giảm giá', 'jankx'),
         ];
+
+        /**
+         * Filter the list of tabs shown on the Ecommerce Settings page.
+         *
+         * Third-party extensions can append their own tab by hooking here:
+         *
+         *   add_filter('jankx/ecommerce/settings/tabs', function (array $tabs) {
+         *       $tabs['my-tab'] = __('My Tab', 'jankx');
+         *       return $tabs;
+         *   });
+         *
+         * @param array $tabs Associative array of slug => label.
+         */
+        return (array) apply_filters('jankx/ecommerce/settings/tabs', $tabs);
     }
 
     // ── GENERAL TAB ──────────────────────────────────────────────────
