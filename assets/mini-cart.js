@@ -62,14 +62,17 @@
         }
 
         var rows = cart.items.map(function (item) {
+            var unitPriceDisplay = item.formatted_unit_price || formatPrice(item.unit_price);
+            var subtotalDisplay = item.formatted_subtotal || formatPrice(item.subtotal);
+            
             return '<div class="jankx-mini-cart-row" data-item-key="' + escapeHtml(item.item_key) + '">'
                 + '<div class="jankx-mini-cart-info">'
                 + '<span class="jankx-mini-cart-name">' + escapeHtml(item.name) + '</span>'
                 + '<span class="jankx-mini-cart-meta">' + (Number(item.quantity) || 0) + ' &times; '
-                + escapeHtml(formatPrice(item.unit_price)) + '</span>'
+                + escapeHtml(unitPriceDisplay) + '</span>'
                 + '</div>'
                 + '<div class="jankx-mini-cart-side">'
-                + '<span class="jankx-mini-cart-price">' + escapeHtml(formatPrice(item.subtotal)) + '</span>'
+                + '<span class="jankx-mini-cart-price">' + escapeHtml(subtotalDisplay) + '</span>'
                 + '<button type="button" class="jankx-mini-cart-remove" data-item-key="'
                 + escapeHtml(item.item_key) + '" aria-label="' + escapeHtml(CONFIG.i18n.remove) + '">&times;</button>'
                 + '</div>'
@@ -80,7 +83,7 @@
 
         var totalEl = drawer.querySelector('[data-jankx-drawer-total]');
         if (totalEl) {
-            totalEl.textContent = formatPrice(cart.total);
+            totalEl.textContent = cart.formatted_total || formatPrice(cart.total);
         }
         if (footEl) {
             footEl.hidden = false;

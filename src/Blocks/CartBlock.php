@@ -167,6 +167,7 @@ class CartBlock extends Block
 
     protected function formatPrice(float $price): string
     {
-        return CurrencyManager::formatPrice($price);
+        $converterManager = \Jankx\Extensions\Ecommerce\Currency\Converters\CurrencyConverterManager::getInstance();
+        return $converterManager->formatPriceWithConversion($price);
     }
 }

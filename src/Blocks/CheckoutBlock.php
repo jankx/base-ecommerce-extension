@@ -163,7 +163,7 @@ class CheckoutBlock extends Block
         // Built-in gateways
         $builtIn = [
             'bank_transfer' => __('Chuyển khoản ngân hàng', 'jankx'),
-            'cod'           => __('Thanh toán khi nhận hàng (COD)', 'jankx'),
+            'cod' => __('Thanh toán khi nhận hàng (COD)', 'jankx'),
         ];
 
         // Online gateways from payment-system extension
@@ -194,6 +194,7 @@ class CheckoutBlock extends Block
 
     protected function formatPrice(float $price): string
     {
-        return CurrencyManager::formatPrice($price);
+        $converterManager = \Jankx\Extensions\Ecommerce\Currency\Converters\CurrencyConverterManager::getInstance();
+        return $converterManager->formatPriceWithConversion($price);
     }
 }

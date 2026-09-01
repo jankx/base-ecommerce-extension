@@ -88,14 +88,18 @@ class CartItem
 
     public function toArray(): array
     {
+        $converterManager = \Jankx\Extensions\Ecommerce\Currency\Converters\CurrencyConverterManager::getInstance();
+
         return [
-            'item_key'   => $this->itemKey,
+            'item_key' => $this->itemKey,
             'product_id' => $this->productId,
-            'name'       => $this->getName(),
-            'quantity'   => $this->quantity,
+            'name' => $this->getName(),
+            'quantity' => $this->quantity,
             'unit_price' => $this->getUnitPrice(),
-            'subtotal'   => $this->getSubtotal(),
-            'args'       => $this->args,
+            'subtotal' => $this->getSubtotal(),
+            'formatted_unit_price' => $converterManager->formatPriceWithConversion($this->getUnitPrice()),
+            'formatted_subtotal' => $converterManager->formatPriceWithConversion($this->getSubtotal()),
+            'args' => $this->args,
         ];
     }
 }

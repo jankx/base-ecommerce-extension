@@ -247,6 +247,8 @@ class Cart implements CartInterface
 
     public function toArray(): array
     {
+        $converterManager = \Jankx\Extensions\Ecommerce\Currency\Converters\CurrencyConverterManager::getInstance();
+
         return [
             'cart_key' => $this->getCartKey(),
             'items' => array_map(function (CartItem $item) {
@@ -257,6 +259,9 @@ class Cart implements CartInterface
             'tax_amount' => $this->getTaxAmount(),
             'tax_details' => $this->getTaxTotals(),
             'total' => $this->getTotal(),
+            'formatted_subtotal' => $converterManager->formatPriceWithConversion($this->getSubtotal()),
+            'formatted_discount' => $converterManager->formatPriceWithConversion($this->getDiscount()),
+            'formatted_total' => $converterManager->formatPriceWithConversion($this->getTotal()),
             'count' => $this->getItemCount(),
         ];
     }
