@@ -14,6 +14,11 @@ class EcommerceSettingsPage
         add_action('admin_menu', [$this, 'addSubmenuPages'], 99);
         add_action('admin_init', [$this, 'registerSettings']);
         add_action('admin_enqueue_scripts', [$this, 'enqueueAssets']);
+
+        // Đăng ký các field mặc định cho tab Thuế (SSR). Cấu trúc giúp dễ dàng `remove_action` và custom field.
+        add_action('jankx/ecommerce/settings/tax/render_fields', [$this, 'renderTaxFieldEnable'], 10);
+        add_action('jankx/ecommerce/settings/tax/render_fields', [$this, 'renderTaxFieldStrategy'], 20);
+        add_action('jankx/ecommerce/settings/tax/render_fields', [$this, 'renderTaxFieldRates'], 30);
     }
 
     public function addMenuPage(): void
@@ -938,61 +943,102 @@ class EcommerceSettingsPage
 
     protected function renderTaxTab(): void
     {
-        $enabled = get_option('jankx_tax_enabled', false);
-        $strategy = get_option('jankx_tax_strategy', 'inclusive');
-        $ratesRaw = get_option('jankx_tax_rates_raw', "VAT | 10 | 10");
         ?>
         <h2><?php esc_html_e('Cấu hình Thuế', 'jankx'); ?></h2>
         <p class="description"><?php esc_html_e('Định cấu hình cách tính thuế cho giỏ hàng và thanh toán.', 'jankx'); ?></p>
 
+        <?php do_action('jankx/ecommerce/settings/tax/before_form'); ?>
+
+        <?php
+        /**
+         * Filter cho phép các extensions (ví dụ React App) đè toàn bộ form.
+         * Nếu Filter trả về true, ta sẽ render form từ custom action thay vì form SSR mặc định.
+         */
+        if (apply_filters('jankx/ecommerce/settings/tax/override_render', false)) {
+            do_action('jankx/ecommerce/settings/tax/custom_render');
+            do_action('jankx/ecommerce/settings/tax/after_form');
+            return;
+        }
+        ?>
+
         <form method="post" action="options.php">
-        <?php settings_fields(self::OPTION_GROUP); ?>
-
-        <table class="form-table">
-            <tr>
-                <th scope="row"><?php esc_html_e('Kích hoạt tính thuế', 'jankx'); ?></th>
-                <td>
-                    <label>
-                        <input type="checkbox" name="jankx_tax_enabled" value="1" <?php checked($enabled, true); ?>>
-                        <?php esc_html_e('Bật việc tính toán thuế ở giỏ hàng và trang thanh toán', 'jankx'); ?>
-                    </label>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row"><?php esc_html_e('Chiến lược tính thuế', 'jankx'); ?></th>
-                <td>
-                    <label style="display:block; margin-bottom:10px;">
-                        <input type="radio" name="jankx_tax_strategy" value="inclusive" <?php checked($strategy, 'inclusive'); ?>>
-                        <strong><?php esc_html_e('Đã bao gồm trong giá (Inclusive - Mặc định)', 'jankx'); ?></strong>
-                        <p class="description" style="margin-top:2px;">
-                            <?php esc_html_e('Giá hiển thị và giá khách phải trả là giá cuối cùng. Hệ thống sẽ tự bóc tách ngược ra số tiền thuế từ giá gốc (Khuyên dùng để tránh làm rối người mua).', 'jankx'); ?>
-                        </p>
-                    </label>
-                    <label style="display:block;">
-                        <input type="radio" name="jankx_tax_strategy" value="exclusive" <?php checked($strategy, 'exclusive'); ?>>
-                        <strong><?php esc_html_e('Cộng thêm vào tổng đơn (Exclusive)', 'jankx'); ?></strong>
-                        <p class="description" style="margin-top:2px;">
-                            <?php esc_html_e('Tính thuế đè thêm vào giá các mặt hàng trên giỏ. Tổng thanh toán = Tổng giá món hàng + Thuế.', 'jankx'); ?>
-                        </p>
-                    </label>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row">
-                    <label for="jankx_tax_rates_raw"><?php esc_html_e('Các loại thuế áp dụng', 'jankx'); ?></label>
-                </th>
-                <td>
-                    <textarea name="jankx_tax_rates_raw" id="jankx_tax_rates_raw" rows="5" class="large-text code"><?php echo esc_textarea($ratesRaw); ?></textarea>
-                    <p class="description">
-                        <?php esc_html_e('Nhập mỗi loại thuế nằm trên 1 dòng theo cú pháp: ', 'jankx'); ?> <code>Tên thuế | Tỉ lệ phần trăm | Độ ưu tiên tính</code><br>
-                        <?php esc_html_e('Ví dụ: ', 'jankx'); ?> <code>VAT | 10 | 10</code> <?php esc_html_e('(Nghĩa là thuế VAT 10% với priority 10)', 'jankx'); ?>
-                    </p>
-                </td>
-            </tr>
-        </table>
-
-        <?php submit_button(); ?>
+            <?php settings_fields(self::OPTION_GROUP); ?>
+            <table class="form-table">
+                <tbody>
+                    <?php
+                    /**
+                     * Render từng field một cách cơ động.
+                     * Dễ dàng gỡ bỏ: `remove_action('jankx/ecommerce/settings/tax/render_fields', [$admin, 'renderTaxFieldRates'], 30)` 
+                     */
+                    do_action('jankx/ecommerce/settings/tax/render_fields');
+                    ?>
+                </tbody>
+            </table>
+            <?php submit_button(); ?>
         </form>
+
+        <?php do_action('jankx/ecommerce/settings/tax/after_form'); ?>
+        <?php
+    }
+
+    public function renderTaxFieldEnable(): void
+    {
+        $enabled = get_option('jankx_tax_enabled', false);
+        ?>
+        <tr>
+            <th scope="row"><?php esc_html_e('Kích hoạt tính thuế', 'jankx'); ?></th>
+            <td>
+                <label>
+                    <input type="checkbox" name="jankx_tax_enabled" value="1" <?php checked($enabled, true); ?>>
+                    <?php esc_html_e('Bật việc tính toán thuế ở giỏ hàng và trang thanh toán', 'jankx'); ?>
+                </label>
+            </td>
+        </tr>
+        <?php
+    }
+
+    public function renderTaxFieldStrategy(): void
+    {
+        $strategy = get_option('jankx_tax_strategy', 'inclusive');
+        ?>
+        <tr>
+            <th scope="row"><?php esc_html_e('Chiến lược tính thuế', 'jankx'); ?></th>
+            <td>
+                <label style="display:block; margin-bottom:10px;">
+                    <input type="radio" name="jankx_tax_strategy" value="inclusive" <?php checked($strategy, 'inclusive'); ?>>
+                    <strong><?php esc_html_e('Đã bao gồm trong giá (Inclusive - Mặc định)', 'jankx'); ?></strong>
+                    <p class="description" style="margin-top:2px;">
+                        <?php esc_html_e('Giá hiển thị và giá khách phải trả là giá cuối cùng. Hệ thống tự tách số tiền thuế (Khuyên dùng để tránh làm khách hàng sợ vì tổng giá trị thanh toán cao lên).', 'jankx'); ?>
+                    </p>
+                </label>
+                <label style="display:block;">
+                    <input type="radio" name="jankx_tax_strategy" value="exclusive" <?php checked($strategy, 'exclusive'); ?>>
+                    <strong><?php esc_html_e('Cộng thêm vào tổng đơn (Exclusive)', 'jankx'); ?></strong>
+                    <p class="description" style="margin-top:2px;">
+                        <?php esc_html_e('Tính thuế đè thêm vào giá các mặt hàng. Tổng thanh toán = Tổng giá trị món hàng + Từng loại Thuế.', 'jankx'); ?>
+                    </p>
+                </label>
+            </td>
+        </tr>
+        <?php
+    }
+
+    public function renderTaxFieldRates(): void
+    {
+        $ratesRaw = get_option('jankx_tax_rates_raw', "VAT | 10 | 10");
+        ?>
+        <tr>
+            <th scope="row">
+                <label for="jankx_tax_rates_raw"><?php esc_html_e('Các loại thuế áp dụng', 'jankx'); ?></label>
+            </th>
+            <td>
+                <textarea name="jankx_tax_rates_raw" id="jankx_tax_rates_raw" rows="5" class="large-text code"><?php echo esc_textarea($ratesRaw); ?></textarea>
+                <p class="description">
+                    <?php esc_html_e('Nhập mỗi loại thuế nằm trên 1 dòng theo cú pháp (SSR Fallback): ', 'jankx'); ?> <code>Tên thuế | Tỉ lệ phần trăm | Độ ưu tiên tính</code><br>
+                    <?php esc_html_e('Ví dụ: ', 'jankx'); ?> <code>VAT | 10 | 10</code> <?php esc_html_e('(Nghĩa là thuế VAT 10% với priority 10)', 'jankx'); ?>
+                </p>
+            </td>
+        </tr>
         <?php
     }
 
