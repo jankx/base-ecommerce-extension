@@ -37,6 +37,7 @@ class EcommerceSettingsPage
         add_submenu_page($parent, __('Tiền tệ', 'jankx'), __('Tiền tệ', 'jankx'), 'manage_options', 'jankx-ecommerce-currency', [$this, 'renderCurrencyPage']);
         add_submenu_page($parent, __('Phương thức thanh toán', 'jankx'), __('Thanh toán', 'jankx'), 'manage_options', 'jankx-ecommerce-payment', [$this, 'renderPaymentPage']);
         add_submenu_page($parent, __('Mã giảm giá', 'jankx'), __('Mã giảm giá', 'jankx'), 'manage_options', 'jankx-ecommerce-coupons', [$this, 'renderCouponsPage']);
+        add_submenu_page($parent, __('Thuế', 'jankx'), __('Thuế', 'jankx'), 'manage_options', 'jankx-ecommerce-tax', [$this, 'renderTaxPage']);
 
         remove_submenu_page($parent, $parent);
     }
@@ -45,6 +46,7 @@ class EcommerceSettingsPage
     public function renderCurrencyPage(): void { $_GET['tab'] = 'currency'; $this->renderPage(); }
     public function renderPaymentPage(): void { $_GET['tab'] = 'payment'; $this->renderPage(); }
     public function renderCouponsPage(): void { $_GET['tab'] = 'coupons'; $this->renderPage(); }
+    public function renderTaxPage(): void { $_GET['tab'] = 'tax'; $this->renderPage(); }
 
     protected function getMenuIcon(): string
     {
@@ -68,6 +70,7 @@ class EcommerceSettingsPage
             'jankx_page_jankx-ecommerce-currency',
             'jankx_page_jankx-ecommerce-payment',
             'jankx_page_jankx-ecommerce-coupons',
+            'jankx_page_jankx-ecommerce-tax',
         ];
 
         if (!in_array($hook, $allowed)) {
@@ -167,6 +170,23 @@ class EcommerceSettingsPage
             'sanitize_callback' => 'rest_sanitize_boolean',
             'default' => true,
         ]);
+
+        // Taxes
+        register_setting(self::OPTION_GROUP, 'jankx_tax_enabled', [
+            'type' => 'boolean',
+            'sanitize_callback' => 'rest_sanitize_boolean',
+            'default' => false,
+        ]);
+        register_setting(self::OPTION_GROUP, 'jankx_tax_strategy', [
+            'type' => 'string',
+            'sanitize_callback' => 'sanitize_text_field',
+            'default' => 'inclusive',
+        ]);
+        register_setting(self::OPTION_GROUP, 'jankx_tax_rates_raw', [
+            'type' => 'string',
+            'sanitize_callback' => 'sanitize_textarea_field',
+            'default' => "VAT | 10 | 10",
+        ]);
     }
 
     public function sanitizeEnabledCurrencies($value): array
@@ -219,8 +239,11 @@ class EcommerceSettingsPage
                     case 'coupons':
                         $this->renderCouponsTab();
                         break;
+                    case 'tax':
+                        $this->renderTaxTab();
+                        break;
                     default:
-                        $coreHandled = in_array($currentTab, ['general', 'currency', 'payment', 'coupons'], true);
+                        $coreHandled = in_array($currentTab, ['general', 'currency', 'payment', 'coupons', 'tax'], true);
 
                         if (!$coreHandled) {
                             /**
@@ -253,6 +276,7 @@ class EcommerceSettingsPage
             'currency' => __('Tiền tệ', 'jankx'),
             'payment'  => __('Thanh toán', 'jankx'),
             'coupons'  => __('Mã giảm giá', 'jankx'),
+            'tax'      => __('Thuế', 'jankx'),
         ];
 
         /**
@@ -904,6 +928,68 @@ class EcommerceSettingsPage
                 </a>
             </p>
         <?php endif; ?>
+
+        <?php submit_button(); ?>
+        </form>
+        <?php
+    }
+
+    // ── TAX TAB ──────────────────────────────────────────────────────
+
+    protected function renderTaxTab(): void
+    {
+        $enabled = get_option('jankx_tax_enabled', false);
+        $strategy = get_option('jankx_tax_strategy', 'inclusive');
+        $ratesRaw = get_option('jankx_tax_rates_raw', "VAT | 10 | 10");
+        ?>
+        <h2><?php esc_html_e('Cấu hình Thuế', 'jankx'); ?></h2>
+        <p class="description"><?php esc_html_e('Định cấu hình cách tính thuế cho giỏ hàng và thanh toán.', 'jankx'); ?></p>
+
+        <form method="post" action="options.php">
+        <?php settings_fields(self::OPTION_GROUP); ?>
+
+        <table class="form-table">
+            <tr>
+                <th scope="row"><?php esc_html_e('Kích hoạt tính thuế', 'jankx'); ?></th>
+                <td>
+                    <label>
+                        <input type="checkbox" name="jankx_tax_enabled" value="1" <?php checked($enabled, true); ?>>
+                        <?php esc_html_e('Bật việc tính toán thuế ở giỏ hàng và trang thanh toán', 'jankx'); ?>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row"><?php esc_html_e('Chiến lược tính thuế', 'jankx'); ?></th>
+                <td>
+                    <label style="display:block; margin-bottom:10px;">
+                        <input type="radio" name="jankx_tax_strategy" value="inclusive" <?php checked($strategy, 'inclusive'); ?>>
+                        <strong><?php esc_html_e('Đã bao gồm trong giá (Inclusive - Mặc định)', 'jankx'); ?></strong>
+                        <p class="description" style="margin-top:2px;">
+                            <?php esc_html_e('Giá hiển thị và giá khách phải trả là giá cuối cùng. Hệ thống sẽ tự bóc tách ngược ra số tiền thuế từ giá gốc (Khuyên dùng để tránh làm rối người mua).', 'jankx'); ?>
+                        </p>
+                    </label>
+                    <label style="display:block;">
+                        <input type="radio" name="jankx_tax_strategy" value="exclusive" <?php checked($strategy, 'exclusive'); ?>>
+                        <strong><?php esc_html_e('Cộng thêm vào tổng đơn (Exclusive)', 'jankx'); ?></strong>
+                        <p class="description" style="margin-top:2px;">
+                            <?php esc_html_e('Tính thuế đè thêm vào giá các mặt hàng trên giỏ. Tổng thanh toán = Tổng giá món hàng + Thuế.', 'jankx'); ?>
+                        </p>
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    <label for="jankx_tax_rates_raw"><?php esc_html_e('Các loại thuế áp dụng', 'jankx'); ?></label>
+                </th>
+                <td>
+                    <textarea name="jankx_tax_rates_raw" id="jankx_tax_rates_raw" rows="5" class="large-text code"><?php echo esc_textarea($ratesRaw); ?></textarea>
+                    <p class="description">
+                        <?php esc_html_e('Nhập mỗi loại thuế nằm trên 1 dòng theo cú pháp: ', 'jankx'); ?> <code>Tên thuế | Tỉ lệ phần trăm | Độ ưu tiên tính</code><br>
+                        <?php esc_html_e('Ví dụ: ', 'jankx'); ?> <code>VAT | 10 | 10</code> <?php esc_html_e('(Nghĩa là thuế VAT 10% với priority 10)', 'jankx'); ?>
+                    </p>
+                </td>
+            </tr>
+        </table>
 
         <?php submit_button(); ?>
         </form>

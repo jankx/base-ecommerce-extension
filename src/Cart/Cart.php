@@ -3,6 +3,7 @@ namespace Jankx\Extensions\Ecommerce\Cart;
 
 use Jankx\Extensions\Ecommerce\Contracts\CartInterface;
 use Jankx\Extensions\Ecommerce\Registry\ProductRegistry;
+use Jankx\Extensions\Ecommerce\Tax\TaxManager;
 
 /**
  * Session based cart.
@@ -113,8 +114,8 @@ class Cart implements CartInterface
         } else {
             $this->items[$itemKey] = [
                 'product_id' => $productId,
-                'quantity'   => $quantity,
-                'args'       => $args,
+                'quantity' => $quantity,
+                'args' => $args,
             ];
         }
 
@@ -216,9 +217,29 @@ class Cart implements CartInterface
         return (float) apply_filters('jankx/ecommerce/cart/discount', 0.0, $this);
     }
 
+    public function getTaxTotals(): array
+    {
+        $amountForTax = $this->getSubtotal() - $this->getDiscount();
+        return TaxManager::get_instance()->calculateTaxes(max(0, $amountForTax));
+    }
+
+    public function getTaxAmount(): float
+    {
+        $amountForTax = $this->getSubtotal() - $this->getDiscount();
+        return TaxManager::get_instance()->getTaxTotalAmount(max(0, $amountForTax));
+    }
+
     public function getTotal(): float
     {
+        $taxManager = TaxManager::get_instance();
+
         $total = $this->getSubtotal() - $this->getDiscount();
+
+        // Nếu thuế hệ thống được cấu hình Exclusive (Không bao gồm trong giá), ta cần + tổng thuế vô
+        if ($taxManager->getStrategy()->isExclusive()) {
+            $total += $this->getTaxAmount();
+        }
+
         $total = apply_filters('jankx/ecommerce/cart/total', $total, $this);
 
         return (float) round($total, 2);
@@ -228,13 +249,15 @@ class Cart implements CartInterface
     {
         return [
             'cart_key' => $this->getCartKey(),
-            'items'    => array_map(function (CartItem $item) {
+            'items' => array_map(function (CartItem $item) {
                 return $item->toArray();
             }, array_values($this->getItems())),
             'subtotal' => $this->getSubtotal(),
             'discount' => $this->getDiscount(),
-            'total'    => $this->getTotal(),
-            'count'    => $this->getItemCount(),
+            'tax_amount' => $this->getTaxAmount(),
+            'tax_details' => $this->getTaxTotals(),
+            'total' => $this->getTotal(),
+            'count' => $this->getItemCount(),
         ];
     }
 }
