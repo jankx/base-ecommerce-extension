@@ -1,6 +1,8 @@
 <?php
 namespace Jankx\Extensions\Ecommerce\Currency\Converters;
 
+use Jankx\Facades\Log;
+
 /**
  * Free Exchange Rate Converter using exchangerate.host API
  *
@@ -19,8 +21,8 @@ namespace Jankx\Extensions\Ecommerce\Currency\Converters;
  */
 class FreeExchangeRateConverter implements CurrencyConverterInterface
 {
-    private const API_BASE = 'https://api.exchangerate.host';
-    private const API_LATEST = self::API_BASE . '/latest';
+    private const API_BASE = 'https://open.er-api.com/v6/latest';
+    private const API_LATEST = self::API_BASE;
 
     /**
      * Convert amount from one currency to another.
@@ -103,7 +105,9 @@ class FreeExchangeRateConverter implements CurrencyConverterInterface
      */
     private function fetchRates(string $baseCurrency): ?array
     {
-        $url = add_query_arg('base', $baseCurrency, self::API_LATEST);
+        $url = self::API_LATEST . '/' . rawurlencode($baseCurrency);
+
+        Log::info('[FreeExchangeRateConverter] Fetching rates', ['url' => $url, 'base' => $baseCurrency]);
 
         $response = wp_remote_get($url, [
             'timeout' => 5,
@@ -111,13 +115,15 @@ class FreeExchangeRateConverter implements CurrencyConverterInterface
         ]);
 
         if (is_wp_error($response)) {
-            do_action('jankx/ecommerce/currency/converter/error', 'FreeExchangeRateConverter', $response->get_error_message());
+            Log::error('[FreeExchangeRateConverter] WP_Error: ' . $response->get_error_message(), [
+                'url' => $url,
+            ]);
             return null;
         }
 
         $statusCode = (int) wp_remote_retrieve_response_code($response);
         if ($statusCode !== 200) {
-            do_action('jankx/ecommerce/currency/converter/error', 'FreeExchangeRateConverter', "HTTP $statusCode");
+            Log::error("[FreeExchangeRateConverter] HTTP $statusCode", ['url' => $url]);
             return null;
         }
 
@@ -125,14 +131,25 @@ class FreeExchangeRateConverter implements CurrencyConverterInterface
         $data = json_decode($body, true);
 
         if (!is_array($data) || !isset($data['rates'])) {
-            do_action('jankx/ecommerce/currency/converter/error', 'FreeExchangeRateConverter', 'Invalid response format');
+            Log::error('[FreeExchangeRateConverter] Invalid response format', [
+                'url' => $url,
+                'body' => substr($body, 0, 500),
+            ]);
             return null;
         }
 
-        if (!empty($data['error'])) {
-            do_action('jankx/ecommerce/currency/converter/error', 'FreeExchangeRateConverter', $data['error'] ?? 'Unknown error');
+        if (!empty($data['result']) && $data['result'] !== 'success') {
+            Log::error('[FreeExchangeRateConverter] API result not success', [
+                'result' => $data['result'],
+                'error_type' => $data['error-type'] ?? 'unknown',
+            ]);
             return null;
         }
+
+        Log::info('[FreeExchangeRateConverter] Rates fetched OK', [
+            'base' => $baseCurrency,
+            'rates_count' => count($data['rates']),
+        ]);
 
         return $data;
     }
