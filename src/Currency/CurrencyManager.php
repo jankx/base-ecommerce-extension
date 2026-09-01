@@ -200,6 +200,68 @@ class CurrencyManager
         return $list;
     }
 
+    /**
+     * Format a price with automatic currency conversion.
+     *
+     * Prices are typically stored in the default/base currency (e.g., USD).
+     * This method converts the price to the current user's currency and formats it.
+     *
+     * Example: Stored price 100 USD, user views in VND, displays as "2,400,000₫"
+     *
+     * @param float  $price           Raw price in base currency
+     * @param string $sourceCurrency  Currency the price is stored in (default: base currency)
+     * @param string $targetCurrency  Currency to display in (default: current user currency)
+     * @return string Formatted price with symbol
+     */
+    public static function formatPriceWithConversion(
+        float $price,
+        ?string $sourceCurrency = null,
+        ?string $targetCurrency = null
+    ): string {
+        // Use default/base currency if not specified
+        if ($sourceCurrency === null) {
+            $sourceCurrency = self::getDefaultCurrency();
+        }
+
+        // Use current user currency if not specified
+        if ($targetCurrency === null) {
+            $targetCurrency = self::getCurrentCurrency();
+        }
+
+        // Get the converter manager
+        $converterClass = 'Jankx\Extensions\Ecommerce\Currency\Converters\CurrencyConverterManager';
+        if (!class_exists($converterClass)) {
+            // Fallback if converter not loaded - just format without conversion
+            return self::formatPrice($price, $sourceCurrency);
+        }
+
+        $manager = $converterClass::getInstance();
+        return $manager->formatPriceWithConversion($price, $sourceCurrency, $targetCurrency);
+    }
+
+    /**
+     * Convert a price between two currencies.
+     *
+     * @param float  $price    Amount to convert
+     * @param string $fromCode Source currency code
+     * @param string $toCode   Target currency code
+     * @return float Converted amount, or original if conversion unavailable
+     */
+    public static function convertPrice(float $price, string $fromCode, string $toCode): float
+    {
+        if ($fromCode === $toCode) {
+            return $price;
+        }
+
+        $converterClass = 'Jankx\Extensions\Ecommerce\Currency\Converters\CurrencyConverterManager';
+        if (!class_exists($converterClass)) {
+            return $price;
+        }
+
+        $manager = $converterClass::getInstance();
+        return $manager->convert($price, $fromCode, $toCode);
+    }
+
     protected static function getOption(string $key, $default = '')
     {
         return get_option($key, $default);

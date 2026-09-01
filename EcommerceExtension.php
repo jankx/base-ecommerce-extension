@@ -11,10 +11,12 @@ use Jankx\Extensions\Ecommerce\Blocks\CurrencySwitcherBlock;
 use Jankx\Extensions\Ecommerce\Cart\Cart;
 use Jankx\Extensions\Ecommerce\Checkout\CheckoutManager;
 use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
+use Jankx\Extensions\Ecommerce\Currency\Converters\CurrencyConverterManager;
 use Jankx\Extensions\Ecommerce\Order\Order;
 use Jankx\Extensions\Ecommerce\Order\OrderDatabaseInstaller;
 use Jankx\Extensions\Ecommerce\Admin\OrderAdmin;
 use Jankx\Extensions\Ecommerce\Admin\EcommerceSettingsPage;
+use Jankx\Extensions\Ecommerce\Admin\CurrencyDebugPage;
 use Jankx\Extensions\Ecommerce\Payment\PaymentManager;
 use Jankx\Extensions\Ecommerce\Registry\ProductRegistry;
 use Jankx\Extensions\Ecommerce\Rest\EcommerceController;
@@ -83,6 +85,7 @@ class EcommerceExtension extends AbstractExtension
         if (is_admin()) {
             (new OrderAdmin())->register();
             (new EcommerceSettingsPage())->register();
+            (new CurrencyDebugPage())->register();
             add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
         }
 
@@ -393,6 +396,9 @@ class EcommerceExtension extends AbstractExtension
 
     public function init_ecommerce_core(): void
     {
+        // Initialize currency conversion system - ensure it's loaded before any price formatting
+        CurrencyConverterManager::getInstance();
+
         // Initialize currency manager
         add_filter('jankx/ecommerce/currency', function ($currency) {
             return CurrencyManager::getCurrentCurrency();
