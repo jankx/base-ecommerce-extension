@@ -2,6 +2,7 @@
 namespace Jankx\Extensions\Ecommerce\Currency\Converters;
 
 use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
+use Jankx\Extensions\Ecommerce\Currency\Converters\ManualRateConverter;
 
 /**
  * Manages currency converters with singleton pattern.
@@ -45,6 +46,7 @@ class CurrencyConverterManager
     private function registerDefaultConverters(): void
     {
         $this->register('noop', NoOpConverter::class);
+        $this->register('manual', ManualRateConverter::class);
         $this->register('openexchangerates', OpenExchangeRatesConverter::class);
         $this->register('fixerio', FixerIOConverter::class);
         $this->register('free', FreeExchangeRateConverter::class); // Public API, no key needed

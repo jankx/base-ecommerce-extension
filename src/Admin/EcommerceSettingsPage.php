@@ -517,14 +517,17 @@ class EcommerceSettingsPage
         </table>
 
         <h3><?php esc_html_e('Xem trước', 'jankx'); ?></h3>
+        <p class="description"><?php esc_html_e('Minh hoạ hiển thị số tiền "1.000.000" của đồng tiền mặc định (Base) sau khi áp dụng Format và Tỷ giá (nếu có cấu hình Converter).', 'jankx'); ?></p>
         <div class="jankx-price-preview" style="padding:16px; background:#f9f9f9; border:1px solid #ddd; border-radius:4px;">
-            <?php foreach ($enabled as $previewCode):
+            <?php 
+            $managerConverer = \Jankx\Extensions\Ecommerce\Currency\Converters\CurrencyConverterManager::getInstance();
+            foreach ($enabled as $previewCode):
                 $previewCurrency = CurrencyManager::getCurrency($previewCode);
                 if (!$previewCurrency) continue;
             ?>
             <p>
                 <strong><?php echo esc_html($previewCode); ?>:</strong>
-                <?php echo esc_html(CurrencyManager::formatPrice(1234567.89, $previewCode)); ?>
+                <?php echo esc_html($managerConverer->formatPriceWithConversion(1000000, $default, $previewCode)); ?>
             </p>
             <?php endforeach; ?>
         </div>

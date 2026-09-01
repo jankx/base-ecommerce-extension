@@ -3,6 +3,7 @@ namespace Jankx\Extensions\Ecommerce\Currency\Admin;
 
 use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
 use Jankx\Extensions\Ecommerce\Currency\Converters\CurrencyConverterManager;
+use Jankx\Extensions\Ecommerce\Currency\Converters\ManualRateConverter;
 use Jankx\Extensions\Ecommerce\Currency\Converters\OpenExchangeRatesConverter;
 use Jankx\Extensions\Ecommerce\Currency\Converters\FixerIOConverter;
 
@@ -42,7 +43,7 @@ class ConverterSettingsPage
         ?>
         <div class="converter-settings-section">
             <h3><?php esc_html_e('Exchange Rate Converter', 'jankx'); ?></h3>
-            
+
             <p class="description">
                 <?php esc_html_e('Configure how currency conversion works on your site. Prices are stored in the default currency and converted to the user\'s selected currency for display.', 'jankx'); ?>
             </p>
@@ -54,11 +55,10 @@ class ConverterSettingsPage
                     </th>
                     <td>
                         <select id="converter_type" name="jankx_currency_converter_type" class="regular-text">
-                            <?php foreach ($available as $key => $info) : ?>
-                                <option value="<?php echo esc_attr($key); ?>" 
-                                    <?php selected($key, $activeType); ?>>
+                            <?php foreach ($available as $key => $info): ?>
+                                <option value="<?php echo esc_attr($key); ?>" <?php selected($key, $activeType); ?>>
                                     <?php echo esc_html($info['name']); ?>
-                                    <?php if (!$info['is_ready'] && $key !== 'noop') : ?>
+                                    <?php if (!$info['is_ready'] && $key !== 'noop'): ?>
                                         (<?php esc_html_e('Not configured', 'jankx'); ?>)
                                     <?php endif; ?>
                                 </option>
@@ -83,7 +83,7 @@ class ConverterSettingsPage
         <hr />
 
         <?php $this->renderConverterStatus(); ?>
-        <?php
+    <?php
     }
 
     /**
@@ -96,14 +96,78 @@ class ConverterSettingsPage
         }
 
         echo '<table class="form-table">';
-        
+
         if ($activeType === 'openexchangerates') {
             $this->renderOpenExchangeRatesConfig($config);
         } elseif ($activeType === 'fixerio') {
             $this->renderFixerIOConfig($config);
+        } elseif ($activeType === 'manual') {
+            $this->renderManualRateConfig($config);
         }
 
         echo '</table>';
+    }
+
+    /**
+     * Render Manual configuration.
+     */
+    private function renderManualRateConfig(array $config): void
+    {
+        $baseCurrency = get_option(ManualRateConverter::OPTION_BASE, CurrencyManager::getDefaultCurrency());
+        $rates = ManualRateConverter::getRatesMap();
+        $enabled = CurrencyManager::getEnabledCurrencies();
+        $all = CurrencyManager::getAllCurrencies();
+        ?>
+        <tr>
+            <th scope="row">
+                <label for="manual_base_currency"><?php esc_html_e('Đồng tiền cơ sở (Base Currency)', 'jankx'); ?></label>
+            </th>
+            <td>
+                <select id="manual_base_currency" name="manual_base_currency">
+                    <?php foreach ($enabled as $code): ?>
+                        <option value="<?php echo esc_attr($code); ?>" <?php selected($baseCurrency, $code); ?>>
+                            <?php echo esc_html($code . ' - ' . ($all[$code]['name'] ?? '')); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <p class="description">
+                    <?php esc_html_e('Tỷ giá của các đồng tiền khác sẽ được tính quy đổi qua đồng tiền cơ sở này (Base = 1).', 'jankx'); ?>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label><?php esc_html_e('Tỷ giá (Exchange Rates)', 'jankx'); ?></label>
+            </th>
+            <td>
+                <table class="widefat striped" style="max-width: 400px; margin-top: 5px;">
+                    <thead>
+                        <tr>
+                            <th><?php esc_html_e('Đồng tiền', 'jankx'); ?></th>
+                            <th><?php esc_html_e('Tỷ giá (so với Base)', 'jankx'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($enabled as $code):
+                            $rate = isset($rates[$code]) ? $rates[$code] : ($code === $baseCurrency ? 1.0 : '');
+                            // Base currency always has rate 1.0, user can't change it here easily without making it confusing.
+                            ?>
+                            <tr>
+                                <td><strong><?php echo esc_html($code); ?></strong></td>
+                                <td>
+                                    <input type="number" step="any" min="0" name="manual_rates[<?php echo esc_attr($code); ?>]"
+                                        value="<?php echo esc_attr($rate); ?>" class="regular-text" style="width:100%;" />
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <p class="description">
+                    <?php esc_html_e('Ví dụ: Nếu Base là USD, tỷ giá VND = 25300 (Tức là 1 USD = 25300 VND). Mọi phép đổi từ EUR sang VND sẽ tự chia qua Base.', 'jankx'); ?>
+                </p>
+            </td>
+        </tr>
+        <?php
     }
 
     /**
@@ -119,8 +183,8 @@ class ConverterSettingsPage
                 <label for="oer_api_key"><?php esc_html_e('API Key', 'jankx'); ?></label>
             </th>
             <td>
-                <input type="password" id="oer_api_key" name="openexchangerates_api_key" 
-                    class="regular-text" value="<?php echo esc_attr($apiKey); ?>" />
+                <input type="password" id="oer_api_key" name="openexchangerates_api_key" class="regular-text"
+                    value="<?php echo esc_attr($apiKey); ?>" />
                 <p class="description">
                     <a href="https://openexchangerates.io/signup/free" target="_blank">
                         <?php esc_html_e('Get a free API key', 'jankx'); ?>
@@ -160,8 +224,8 @@ class ConverterSettingsPage
                 <label for="fio_api_key"><?php esc_html_e('API Key', 'jankx'); ?></label>
             </th>
             <td>
-                <input type="password" id="fio_api_key" name="fixerio_api_key" 
-                    class="regular-text" value="<?php echo esc_attr($apiKey); ?>" />
+                <input type="password" id="fio_api_key" name="fixerio_api_key" class="regular-text"
+                    value="<?php echo esc_attr($apiKey); ?>" />
                 <p class="description">
                     <a href="https://fixer.io/" target="_blank">
                         <?php esc_html_e('Get an API key from Fixer.io', 'jankx'); ?>
@@ -195,7 +259,7 @@ class ConverterSettingsPage
     {
         $activeType = get_option('jankx_currency_converter_type', 'noop');
         $converter = $this->manager->getActiveConverter();
-        
+
         // Unwrap if cached
         if (method_exists($converter, 'getInnerConverter')) {
             $innerConverter = $converter->getInnerConverter();
@@ -204,7 +268,7 @@ class ConverterSettingsPage
         }
         ?>
         <h3><?php esc_html_e('Converter Status', 'jankx'); ?></h3>
-        
+
         <table class="widefat">
             <thead>
                 <tr>
@@ -219,16 +283,16 @@ class ConverterSettingsPage
                         <strong><?php echo esc_html($converter->getName()); ?></strong>
                     </td>
                     <td>
-                        <?php if ($converter->isReady()) : ?>
+                        <?php if ($converter->isReady()): ?>
                             <span class="dashicons dashicons-yes" style="color: green;"></span>
                             <?php esc_html_e('Ready', 'jankx'); ?>
-                        <?php else : ?>
+                        <?php else: ?>
                             <span class="dashicons dashicons-no" style="color: red;"></span>
                             <?php esc_html_e('Not Ready', 'jankx'); ?>
                         <?php endif; ?>
                     </td>
                     <td>
-                        <?php 
+                        <?php
                         if ($converter->isReady()) {
                             // Try a test conversion
                             $rate = $converter->getRate('USD', 'VND');
@@ -259,12 +323,13 @@ class ConverterSettingsPage
         <h3 style="margin-top: 30px;"><?php esc_html_e('Usage Examples', 'jankx'); ?></h3>
         <p><?php esc_html_e('To use the currency converter in your code:', 'jankx'); ?></p>
         <pre><code><?php echo esc_html(
-'// Display price with automatic conversion
+            '// Display price with automatic conversion
 echo CurrencyManager::formatPriceWithConversion(100); // 100 USD → display in current currency
 
 // Get raw converted value
 $converted = CurrencyManager::convertPrice(100, "USD", "VND");
-'); ?></code></pre>
+'
+        ); ?></code></pre>
         <?php
     }
 
@@ -273,9 +338,11 @@ $converted = CurrencyManager::convertPrice(100, "USD", "VND");
      */
     public function handleFormSubmission(): void
     {
-        if (!isset($_POST['save_converter_settings']) || 
+        if (
+            !isset($_POST['save_converter_settings']) ||
             !current_user_can('manage_options') ||
-            !check_admin_referer('wp-nonce-your-form-name')) {
+            !check_admin_referer('wp-nonce-your-form-name')
+        ) {
             return;
         }
 
@@ -328,6 +395,26 @@ $converted = CurrencyManager::convertPrice(100, "USD", "VND");
             FixerIOConverter::setBaseCurrency($baseCurrency);
             $config['fixerio_api_key'] = $apiKey;
             $config['fixerio_base_currency'] = $baseCurrency;
+        } elseif ($converterType === 'manual') {
+            $baseCurrency = strtoupper(sanitize_text_field($_POST['manual_base_currency'] ?? CurrencyManager::getDefaultCurrency()));
+            $rawRates = $_POST['manual_rates'] ?? [];
+
+            $rates = [];
+            foreach ($rawRates as $code => $rate) {
+                $code = strtoupper(sanitize_key($code));
+                $rate = (float) $rate;
+                if ($rate > 0) {
+                    $rates[$code] = $rate;
+                }
+            }
+
+            // Ép đồng base phải là 1.0
+            $rates[$baseCurrency] = 1.0;
+
+            ManualRateConverter::saveRatesMap($rates);
+            update_option(ManualRateConverter::OPTION_BASE, $baseCurrency);
+
+            $config['manual_base_currency'] = $baseCurrency;
         }
 
         // Save config
