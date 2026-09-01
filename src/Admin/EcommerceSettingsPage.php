@@ -192,6 +192,41 @@ class EcommerceSettingsPage
             'sanitize_callback' => 'sanitize_textarea_field',
             'default' => "VAT | 10 | 10",
         ]);
+
+        // Per-currency format overrides (position, thousand_sep, decimal_sep, decimals riêng từng đồng)
+        foreach (CurrencyManager::getAllCurrencies() as $code => $unused) {
+            register_setting(self::OPTION_GROUP, 'jankx_currency_fmt_' . $code, [
+                'type'              => 'array',
+                'sanitize_callback' => [$this, 'sanitizeCurrencyFormatSettings'],
+                'default'           => [],
+            ]);
+        }
+    }
+
+    /**
+     * Sanitize per-currency format override array.
+     * Trường 'position' rỗng có nghĩa "dùng global fallback".
+     */
+    public function sanitizeCurrencyFormatSettings($value): array
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+        $clean = [];
+        $allowedPositions = ['left', 'right', 'left_space', 'right_space', ''];
+        if (isset($value['position']) && in_array($value['position'], $allowedPositions, true)) {
+            $clean['position'] = $value['position'];
+        }
+        if (array_key_exists('thousand_sep', $value)) {
+            $clean['thousand_sep'] = sanitize_text_field($value['thousand_sep']);
+        }
+        if (array_key_exists('decimal_sep', $value)) {
+            $clean['decimal_sep'] = sanitize_text_field($value['decimal_sep']);
+        }
+        if (isset($value['decimals'])) {
+            $clean['decimals'] = absint($value['decimals']);
+        }
+        return $clean;
     }
 
     public function sanitizeEnabledCurrencies($value): array
@@ -385,13 +420,22 @@ class EcommerceSettingsPage
                     <th style="width:60px;"><?php esc_html_e('Mã', 'jankx'); ?></th>
                     <th style="width:50px;"></th>
                     <th><?php esc_html_e('Tên tiền tệ', 'jankx'); ?></th>
-                    <th style="width:100px;"><?php esc_html_e('Ký hiệu', 'jankx'); ?></th>
-                    <th style="width:120px;"><?php esc_html_e('Mặc định', 'jankx'); ?></th>
-                    <th style="width:100px;"><?php esc_html_e('Số thập phân', 'jankx'); ?></th>
+                    <th style="width:70px;"><?php esc_html_e('Ký hiệu', 'jankx'); ?></th>
+                    <th style="width:100px;"><?php esc_html_e('Mặc định', 'jankx'); ?></th>
+                    <th style="width:80px;" title="<?php esc_attr_e('Số chữ số thập phân', 'jankx'); ?>"><?php esc_html_e('Thập phân', 'jankx'); ?></th>
+                    <th style="width:170px;"><?php esc_html_e('Vị trí ký hiệu', 'jankx'); ?></th>
+                    <th style="width:70px;" title="<?php esc_attr_e('Dấu phân cách hàng nghìn', 'jankx'); ?>"><?php esc_html_e('Dấu nghìn', 'jankx'); ?></th>
+                    <th style="width:70px;" title="<?php esc_attr_e('Dấu phân cách thập phân', 'jankx'); ?>"><?php esc_html_e('Dấu T.phân', 'jankx'); ?></th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($allCurrencies as $code => $currency): ?>
+                <?php foreach ($allCurrencies as $code => $currency):
+                    $fmt           = (array) get_option('jankx_currency_fmt_' . $code, []);
+                    $perDecimals   = isset($fmt['decimals'])     ? (int)$fmt['decimals']        : $currency['decimals'];
+                    $perPosition   = $fmt['position']   ?? '';
+                    $perThousand   = array_key_exists('thousand_sep', $fmt) ? $fmt['thousand_sep'] : $currency['thousand_sep'];
+                    $perDecimalSep = array_key_exists('decimal_sep',  $fmt) ? $fmt['decimal_sep']  : $currency['decimal_sep'];
+                ?>
                     <tr>
                         <td>
                             <input type="checkbox" name="jankx_enabled_currencies[]"
@@ -410,39 +454,61 @@ class EcommerceSettingsPage
                             </label>
                         </td>
                         <td>
-                            <select name="jankx_currency_decimals" class="small-text">
+                            <select name="jankx_currency_fmt_<?php echo esc_attr($code); ?>[decimals]" class="small-text">
                                 <?php for ($i = 0; $i <= 4; $i++): ?>
-                                    <option value="<?php echo $i; ?>" <?php selected($decimals, $i); ?>><?php echo $i; ?></option>
+                                    <option value="<?php echo $i; ?>" <?php selected($perDecimals, $i); ?>><?php echo $i; ?></option>
                                 <?php endfor; ?>
                             </select>
+                        </td>
+                        <td>
+                            <select name="jankx_currency_fmt_<?php echo esc_attr($code); ?>[position]" class="small-text">
+                                <option value="" <?php selected($perPosition, ''); ?>><?php esc_html_e('— Mặc định —', 'jankx'); ?></option>
+                                <option value="left"        <?php selected($perPosition, 'left'); ?>><?php esc_html_e('Trước ($100)', 'jankx'); ?></option>
+                                <option value="right"       <?php selected($perPosition, 'right'); ?>><?php esc_html_e('Sau (100$)', 'jankx'); ?></option>
+                                <option value="left_space"  <?php selected($perPosition, 'left_space'); ?>><?php esc_html_e('Trước, cách ($ 100)', 'jankx'); ?></option>
+                                <option value="right_space" <?php selected($perPosition, 'right_space'); ?>><?php esc_html_e('Sau, cách (100 $)', 'jankx'); ?></option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text"
+                                   name="jankx_currency_fmt_<?php echo esc_attr($code); ?>[thousand_sep]"
+                                   value="<?php echo esc_attr($perThousand); ?>"
+                                   class="small-text" style="width:45px;" maxlength="5">
+                        </td>
+                        <td>
+                            <input type="text"
+                                   name="jankx_currency_fmt_<?php echo esc_attr($code); ?>[decimal_sep]"
+                                   value="<?php echo esc_attr($perDecimalSep); ?>"
+                                   class="small-text" style="width:45px;" maxlength="5">
                         </td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
 
-        <h3><?php esc_html_e('Định dạng tiền tệ', 'jankx'); ?></h3>
+        <h3><?php esc_html_e('Định dạng mặc định (Fallback)', 'jankx'); ?></h3>
+        <p class="description"><?php esc_html_e('Áp dụng khi đồng tiền không có tuỳ chỉnh riêng hoặc vị trí ký hiệu chọn "— Mặc định —".', 'jankx'); ?></p>
         <table class="form-table">
             <tr>
-                <th scope="row"><?php esc_html_e('Vị trí ký hiệu', 'jankx'); ?></th>
+                <th scope="row"><?php esc_html_e('Vị trí ký hiệu mặc định', 'jankx'); ?></th>
                 <td>
                     <select name="jankx_currency_position">
-                        <option value="left" <?php selected($position, 'left'); ?>><?php esc_html_e('Trước số tiền ($100)', 'jankx'); ?></option>
-                        <option value="right" <?php selected($position, 'right'); ?>><?php esc_html_e('Sau số tiền (100$)', 'jankx'); ?></option>
-                        <option value="left_space" <?php selected($position, 'left_space'); ?>><?php esc_html_e('Trước số tiền, cách ($ 100)', 'jankx'); ?></option>
+                        <option value="left"        <?php selected($position, 'left'); ?>><?php esc_html_e('Trước số tiền ($100)', 'jankx'); ?></option>
+                        <option value="right"       <?php selected($position, 'right'); ?>><?php esc_html_e('Sau số tiền (100$)', 'jankx'); ?></option>
+                        <option value="left_space"  <?php selected($position, 'left_space'); ?>><?php esc_html_e('Trước số tiền, cách ($ 100)', 'jankx'); ?></option>
                         <option value="right_space" <?php selected($position, 'right_space'); ?>><?php esc_html_e('Sau số tiền, cách (100 $)', 'jankx'); ?></option>
                     </select>
                 </td>
             </tr>
             <tr>
-                <th scope="row"><label for="jankx_currency_thousand_sep"><?php esc_html_e('Dấu phân cách hàng nghìn', 'jankx'); ?></label></th>
+                <th scope="row"><label for="jankx_currency_thousand_sep"><?php esc_html_e('Dấu phân cách hàng nghìn mặc định', 'jankx'); ?></label></th>
                 <td>
                     <input type="text" id="jankx_currency_thousand_sep" name="jankx_currency_thousand_sep"
                            value="<?php echo esc_attr($thousandSep); ?>" class="small-text">
                 </td>
             </tr>
             <tr>
-                <th scope="row"><label for="jankx_currency_decimal_sep"><?php esc_html_e('Dấu phân cách thập phân', 'jankx'); ?></label></th>
+                <th scope="row"><label for="jankx_currency_decimal_sep"><?php esc_html_e('Dấu phân cách thập phân mặc định', 'jankx'); ?></label></th>
                 <td>
                     <input type="text" id="jankx_currency_decimal_sep" name="jankx_currency_decimal_sep"
                            value="<?php echo esc_attr($decimalSep); ?>" class="small-text">
@@ -452,18 +518,22 @@ class EcommerceSettingsPage
 
         <h3><?php esc_html_e('Xem trước', 'jankx'); ?></h3>
         <div class="jankx-price-preview" style="padding:16px; background:#f9f9f9; border:1px solid #ddd; border-radius:4px;">
+            <?php foreach ($enabled as $previewCode):
+                $previewCurrency = CurrencyManager::getCurrency($previewCode);
+                if (!$previewCurrency) continue;
+            ?>
             <p>
-                <strong>USD:</strong> <?php echo esc_html(CurrencyManager::formatPrice(1234567.89, 'USD')); ?>
+                <strong><?php echo esc_html($previewCode); ?>:</strong>
+                <?php echo esc_html(CurrencyManager::formatPrice(1234567.89, $previewCode)); ?>
             </p>
-            <p>
-                <strong>VND:</strong> <?php echo esc_html(CurrencyManager::formatPrice(1234567.89, 'VND')); ?>
-            </p>
+            <?php endforeach; ?>
         </div>
 
         <?php submit_button(); ?>
         </form>
         <?php
     }
+
 
     // ── PAYMENT TAB ──────────────────────────────────────────────────
 

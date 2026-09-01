@@ -95,12 +95,14 @@ class CurrencySwitcherBlock extends Block
     protected function renderDropdown(array $currencies, string $current, bool $showFlag, bool $showCode, bool $showSymbol): string
     {
         $html = '<div class="jcs-switcher jcs--dropdown">';
-        $html .= '<select class="jcs-select" data-jcs-action="switch">';
+        // Chuyển trang qua JS nội tuyến đơn giản nhưng không phụ thuộc bundle JS nặng nề
+        $html .= '<select class="jcs-select" onchange="window.location.href=this.value">';
 
         foreach ($currencies as $code => $currency) {
             $selected = $code === $current ? ' selected' : '';
+            $url = esc_url(add_query_arg('currency', $code));
             $label = $this->buildLabel($currency, $showFlag, $showCode, $showSymbol);
-            $html .= '<option value="' . esc_attr($code) . '"' . $selected . '>' . esc_html($label) . '</option>';
+            $html .= '<option value="' . $url . '"' . $selected . '>' . esc_html($label) . '</option>';
         }
 
         $html .= '</select>';
@@ -115,9 +117,11 @@ class CurrencySwitcherBlock extends Block
 
         foreach ($currencies as $code => $currency) {
             $active = $code === $current ? ' jcs--active' : '';
-            $html .= '<button type="button" class="jcs-btn' . $active . '" data-jcs-action="switch" data-jcs-currency="' . esc_attr($code) . '">';
+            $url = esc_url(add_query_arg('currency', $code));
+            // Đổi button sang thẻ link style button cho chuẩn SSR
+            $html .= '<a href="' . $url . '" class="jcs-btn' . $active . '" style="text-decoration:none;">';
             $html .= $this->buildLabelHtml($currency, $showFlag, $showCode, $showSymbol);
-            $html .= '</button>';
+            $html .= '</a>';
         }
 
         $html .= '</div>';
@@ -131,8 +135,10 @@ class CurrencySwitcherBlock extends Block
 
         foreach ($currencies as $code => $currency) {
             $active = $code === $current ? ' jcs--active' : '';
+            $url = esc_url(add_query_arg('currency', $code));
+
             $html .= '<li class="jcs-list-item' . $active . '">';
-            $html .= '<a href="#" data-jcs-action="switch" data-jcs-currency="' . esc_attr($code) . '">';
+            $html .= '<a href="' . $url . '">';
             $html .= $this->buildLabelHtml($currency, $showFlag, $showCode, $showSymbol);
             $html .= '</a>';
             $html .= '</li>';

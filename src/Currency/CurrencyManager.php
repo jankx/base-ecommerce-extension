@@ -107,6 +107,15 @@ class CurrencyManager
     {
         $default = self::getDefaultCurrency();
 
+        // 1. Kiểm tra request trực tiếp để phản hồi nóng
+        if (!empty($_GET['currency'])) {
+            $code = strtoupper(sanitize_text_field($_GET['currency']));
+            if (isset(self::$allCurrencies[$code]) && in_array($code, self::getEnabledCurrencies(), true)) {
+                return $code;
+            }
+        }
+
+        // 2. Kiểm tra User Meta nếu đăng nhập
         if (is_user_logged_in()) {
             $userCurrency = get_user_meta(get_current_user_id(), self::SESSION_KEY, true);
             if ($userCurrency && isset(self::$allCurrencies[$userCurrency])) {
@@ -114,6 +123,15 @@ class CurrencyManager
             }
         }
 
+        // 3. Fallback qua Cookie (Dùng Cookie đáng tin cậy hơn Session trên WP server)
+        if (isset($_COOKIE[self::SESSION_KEY])) {
+            $cookieCurrency = $_COOKIE[self::SESSION_KEY];
+            if (isset(self::$allCurrencies[$cookieCurrency])) {
+                return $cookieCurrency;
+            }
+        }
+
+        // 4. Session (Dự phòng)
         if (isset($_SESSION[self::SESSION_KEY])) {
             $sessionCurrency = $_SESSION[self::SESSION_KEY];
             if (isset(self::$allCurrencies[$sessionCurrency])) {
@@ -135,8 +153,14 @@ class CurrencyManager
             return false;
         }
 
+        // Lưu cho user đăng nhập
         if (is_user_logged_in()) {
             update_user_meta(get_current_user_id(), self::SESSION_KEY, $code);
+        }
+
+        // Lưu vào Cookie (Live trong 30 ngày)
+        if (!headers_sent()) {
+            setcookie(self::SESSION_KEY, $code, time() + 30 * DAY_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
         }
 
         $_SESSION[self::SESSION_KEY] = $code;
@@ -144,6 +168,17 @@ class CurrencyManager
         do_action('jankx/ecommerce/currency/changed', $code);
 
         return true;
+    }
+
+    /**
+     * Bắt request ?currency=XXX để thay đổi tiền tệ và cache lại.
+     */
+    public static function handleCurrencySwitchRequest(): void
+    {
+        if (!empty($_GET['currency'])) {
+            $code = strtoupper(sanitize_text_field($_GET['currency']));
+            self::setCurrentCurrency($code);
+        }
     }
 
     public static function formatPriceRaw(float $price, ?string $currencyCode = null): string
@@ -155,12 +190,25 @@ class CurrencyManager
             return number_format($price, 2) . ' ' . $currencyCode;
         }
 
-        $decimals = self::getOption(self::OPTION_DECIMALS, $currency['decimals']);
-        $thousandSep = self::getOption(self::OPTION_THOUSAND_SEP, $currency['thousand_sep']);
-        $decimalSep = self::getOption(self::OPTION_DECIMAL_SEP, $currency['decimal_sep']);
-        $position = self::getCurrencyPosition();
+        // Đọc per-currency override, fallback về global setting rồi currency default
+        $fmt = (array) get_option('jankx_currency_fmt_' . $currencyCode, []);
+        $decimals = isset($fmt['decimals'])
+            ? (int) $fmt['decimals']
+            : (int) self::getOption(self::OPTION_DECIMALS, $currency['decimals']);
+        $thousandSep = array_key_exists('thousand_sep', $fmt)
+            ? $fmt['thousand_sep']
+            : self::getOption(self::OPTION_THOUSAND_SEP, $currency['thousand_sep']);
+        $decimalSep = array_key_exists('decimal_sep', $fmt)
+            ? $fmt['decimal_sep']
+            : self::getOption(self::OPTION_DECIMAL_SEP, $currency['decimal_sep']);
 
-        $formatted = number_format($price, (int) $decimals, $decimalSep, $thousandSep);
+        // Per-currency position; rỗng = dùng global fallback
+        $perPosition = $fmt['position'] ?? '';
+        $position = ($perPosition !== '')
+            ? $perPosition
+            : self::getCurrencyPosition();
+
+        $formatted = number_format($price, $decimals, $decimalSep, $thousandSep);
 
         switch ($position) {
             case 'left':

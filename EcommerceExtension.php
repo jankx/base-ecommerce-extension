@@ -130,12 +130,12 @@ class EcommerceExtension extends AbstractExtension
         }
 
         $blockClasses = [
-            'cart'               => CartBlock::class,
-            'cart-item'          => CartItemBlock::class,
-            'checkout'           => CheckoutBlock::class,
+            'cart' => CartBlock::class,
+            'cart-item' => CartItemBlock::class,
+            'checkout' => CheckoutBlock::class,
             'account-tab-orders' => AccountTabOrdersBlock::class,
-            'add-to-cart'        => AddToCartBlock::class,
-            'currency-switcher'  => CurrencySwitcherBlock::class,
+            'add-to-cart' => AddToCartBlock::class,
+            'currency-switcher' => CurrencySwitcherBlock::class,
         ];
 
         foreach ($blockClasses as $blockName => $blockClass) {
@@ -247,11 +247,11 @@ class EcommerceExtension extends AbstractExtension
         );
 
         wp_localize_script('jankx-ecommerce', 'jankxEcommerce', [
-            'restUrl'   => esc_url_raw(rest_url(EcommerceController::REST_NAMESPACE)),
-            'cartUrl'   => self::get_cart_page_url(),
+            'restUrl' => esc_url_raw(rest_url(EcommerceController::REST_NAMESPACE)),
+            'cartUrl' => self::get_cart_page_url(),
             'ordersUrl' => self::get_orders_page_url(),
-            'i18n'      => [
-                'successTitle'   => __('Order placed successfully!', 'jankx'),
+            'i18n' => [
+                'successTitle' => __('Order placed successfully!', 'jankx'),
                 'successMessage' => __('Your order number is %s.', 'jankx'),
             ],
         ]);
@@ -291,12 +291,12 @@ class EcommerceExtension extends AbstractExtension
         }
 
         \Jankx\Extensions\MyAccount\MyAccountExtension::registerSubPage('orders', [
-            'label'       => __('Orders', 'jankx'),
-            'icon'        => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
-            'priority'    => 15,
-            'extension'   => 'my-account',
+            'label' => __('Orders', 'jankx'),
+            'icon' => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+            'priority' => 15,
+            'extension' => 'my-account',
             'show_in_nav' => true,
-            'callback'    => [new AccountTabOrdersBlock(), 'render'],
+            'callback' => [new AccountTabOrdersBlock(), 'render'],
         ]);
     }
 
@@ -321,11 +321,11 @@ class EcommerceExtension extends AbstractExtension
         }
 
         $pageId = wp_insert_post([
-            'post_title'   => __('Giỏ hàng', 'jankx'),
+            'post_title' => __('Giỏ hàng', 'jankx'),
             'post_content' => '<!-- wp:jankx/cart {"align":"wide"} /-->',
-            'post_status'  => 'publish',
-            'post_type'    => 'page',
-            'post_author'  => get_current_user_id(),
+            'post_status' => 'publish',
+            'post_type' => 'page',
+            'post_author' => get_current_user_id(),
         ]);
 
         if ($pageId && !is_wp_error($pageId)) {
@@ -341,11 +341,11 @@ class EcommerceExtension extends AbstractExtension
         }
 
         $pageId = wp_insert_post([
-            'post_title'   => __('Thanh toán', 'jankx'),
+            'post_title' => __('Thanh toán', 'jankx'),
             'post_content' => '<!-- wp:jankx/checkout {"align":"wide"} /-->',
-            'post_status'  => 'publish',
-            'post_type'    => 'page',
-            'post_author'  => get_current_user_id(),
+            'post_status' => 'publish',
+            'post_type' => 'page',
+            'post_author' => get_current_user_id(),
         ]);
 
         if ($pageId && !is_wp_error($pageId)) {
@@ -397,6 +397,9 @@ class EcommerceExtension extends AbstractExtension
 
     public function init_ecommerce_core(): void
     {
+        // Nhận diện và lưu cache (session/cookie) lựa chọn tiền tệ từ url ?currency=XXX
+        \Jankx\Extensions\Ecommerce\Currency\CurrencyManager::handleCurrencySwitchRequest();
+
         // Auto-detect and configure converter from environment/constants
         // (before getting manager instance)
         AutoConfigConverter::autoDetectAndConfigure();
@@ -507,7 +510,7 @@ class EcommerceExtension extends AbstractExtension
         }
 
         $labels = Order::getStatusLabels();
-        $total  = function_exists('jankx_currency_format')
+        $total = function_exists('jankx_currency_format')
             ? jankx_currency_format($order->getTotal())
             : number_format($order->getTotal(), 0, ',', '.') . ' ' . $order->getCurrency();
 
@@ -520,12 +523,12 @@ class EcommerceExtension extends AbstractExtension
                 $total
             ),
             [
-                'order_id'     => $order->getId(),
+                'order_id' => $order->getId(),
                 'order_number' => $order->getOrderNumber(),
-                'status'       => $order->getStatus(),
-                'total'        => $order->getTotal(),
-                'currency'     => $order->getCurrency(),
-                'action_url'   => $this->get_order_url($order),
+                'status' => $order->getStatus(),
+                'total' => $order->getTotal(),
+                'currency' => $order->getCurrency(),
+                'action_url' => $this->get_order_url($order),
             ]
         );
     }
@@ -556,13 +559,13 @@ class EcommerceExtension extends AbstractExtension
 
         // Include tracking number when order is being shipped
         $data = [
-            'order_id'     => $order->getId(),
+            'order_id' => $order->getId(),
             'order_number' => $order->getOrderNumber(),
-            'old_status'   => $oldStatus,
-            'new_status'   => $newStatus,
-            'total'        => $order->getTotal(),
-            'currency'     => $order->getCurrency(),
-            'action_url'   => $this->get_order_url($order),
+            'old_status' => $oldStatus,
+            'new_status' => $newStatus,
+            'total' => $order->getTotal(),
+            'currency' => $order->getCurrency(),
+            'action_url' => $this->get_order_url($order),
         ];
 
         if ($newStatus === Order::STATUS_SHIPPING && $order->getTrackingNumber()) {
