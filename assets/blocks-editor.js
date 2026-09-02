@@ -19,6 +19,10 @@
   var blockMetadata = window.jankxEcommerceBlockMetadata || {};
 
   Object.keys(blockMetadata).forEach(function (blockName) {
+    // Skip blocks that have their own editorScript – those register themselves.
+    if (blockMetadata[blockName] && blockMetadata[blockName].editorScript) {
+      return;
+    }
     if (select('core/blocks').getBlockType(blockName)) {
       return;
     }
@@ -29,7 +33,14 @@
     'blocks.registerBlockType',
     'jankx/ecommerce-editor-inject',
     function (settings, name) {
-      if (!blockMetadata[name]) {
+      var meta = blockMetadata[name];
+      if (!meta) {
+        return settings;
+      }
+
+      // Blocks with a dedicated editorScript already have their own full edit
+      // function (including InspectorControls). Do not overwrite it here.
+      if (meta.editorScript) {
         return settings;
       }
 

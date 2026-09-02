@@ -48,10 +48,12 @@ class CurrencySwitcherBlock extends Block
 
     public function render(array $attributes): string
     {
-        $display = $attributes['display'] ?? 'dropdown';
+        // block.json uses 'displayMode'; fall back to legacy 'display' key just in case
+        $display = $attributes['displayMode'] ?? $attributes['display'] ?? 'dropdown';
         $showFlag = $attributes['showFlag'] ?? true;
         $showCode = $attributes['showCode'] ?? true;
         $showSymbol = $attributes['showSymbol'] ?? false;
+        $showName = $attributes['showName'] ?? false;
 
         $enabled = CurrencyManager::getEnabledCurrenciesList();
         $current = CurrencyManager::getCurrentCurrency();
@@ -62,21 +64,22 @@ class CurrencySwitcherBlock extends Block
 
         if (count($enabled) === 1) {
             $currency = reset($enabled);
-            return $this->renderSingle($currency, $showFlag, $showCode, $showSymbol);
+            return $this->renderSingle($currency, $showFlag, $showCode, $showSymbol, $showName);
         }
 
         if ($display === 'buttons') {
-            return $this->renderButtons($enabled, $current, $showFlag, $showCode, $showSymbol);
+            return $this->renderButtons($enabled, $current, $showFlag, $showCode, $showSymbol, $showName);
         }
 
-        if ($display === 'list') {
-            return $this->renderList($enabled, $current, $showFlag, $showCode, $showSymbol);
+        // 'inline' is the block.json value; 'list' is the legacy alias
+        if ($display === 'inline' || $display === 'list') {
+            return $this->renderList($enabled, $current, $showFlag, $showCode, $showSymbol, $showName);
         }
 
-        return $this->renderDropdown($enabled, $current, $showFlag, $showCode, $showSymbol);
+        return $this->renderDropdown($enabled, $current, $showFlag, $showCode, $showSymbol, $showName);
     }
 
-    protected function renderSingle(array $currency, bool $showFlag, bool $showCode, bool $showSymbol): string
+    protected function renderSingle(array $currency, bool $showFlag, bool $showCode, bool $showSymbol, bool $showName = false): string
     {
         $parts = [];
         if ($showFlag) {
@@ -88,11 +91,14 @@ class CurrencySwitcherBlock extends Block
         if ($showSymbol) {
             $parts[] = '<span class="jcs-symbol">' . esc_html($currency['symbol']) . '</span>';
         }
+        if ($showName) {
+            $parts[] = '<span class="jcs-name">' . esc_html($currency['name']) . '</span>';
+        }
 
         return '<div class="jcs-switcher jcs--single">' . implode(' ', $parts) . '</div>';
     }
 
-    protected function renderDropdown(array $currencies, string $current, bool $showFlag, bool $showCode, bool $showSymbol): string
+    protected function renderDropdown(array $currencies, string $current, bool $showFlag, bool $showCode, bool $showSymbol, bool $showName = false): string
     {
         $html = '<div class="jcs-switcher jcs--dropdown">';
         // Chuyển trang qua JS nội tuyến đơn giản nhưng không phụ thuộc bundle JS nặng nề
@@ -101,7 +107,7 @@ class CurrencySwitcherBlock extends Block
         foreach ($currencies as $code => $currency) {
             $selected = $code === $current ? ' selected' : '';
             $url = esc_url(add_query_arg('currency', $code));
-            $label = $this->buildLabel($currency, $showFlag, $showCode, $showSymbol);
+            $label = $this->buildLabel($currency, $showFlag, $showCode, $showSymbol, $showName);
             $html .= '<option value="' . $url . '"' . $selected . '>' . esc_html($label) . '</option>';
         }
 
@@ -111,7 +117,7 @@ class CurrencySwitcherBlock extends Block
         return $html;
     }
 
-    protected function renderButtons(array $currencies, string $current, bool $showFlag, bool $showCode, bool $showSymbol): string
+    protected function renderButtons(array $currencies, string $current, bool $showFlag, bool $showCode, bool $showSymbol, bool $showName = false): string
     {
         $html = '<div class="jcs-switcher jcs--buttons">';
 
@@ -120,7 +126,7 @@ class CurrencySwitcherBlock extends Block
             $url = esc_url(add_query_arg('currency', $code));
             // Đổi button sang thẻ link style button cho chuẩn SSR
             $html .= '<a href="' . $url . '" class="jcs-btn' . $active . '" style="text-decoration:none;">';
-            $html .= $this->buildLabelHtml($currency, $showFlag, $showCode, $showSymbol);
+            $html .= $this->buildLabelHtml($currency, $showFlag, $showCode, $showSymbol, $showName);
             $html .= '</a>';
         }
 
@@ -129,7 +135,7 @@ class CurrencySwitcherBlock extends Block
         return $html;
     }
 
-    protected function renderList(array $currencies, string $current, bool $showFlag, bool $showCode, bool $showSymbol): string
+    protected function renderList(array $currencies, string $current, bool $showFlag, bool $showCode, bool $showSymbol, bool $showName = false): string
     {
         $html = '<ul class="jcs-switcher jcs--list">';
 
@@ -139,7 +145,7 @@ class CurrencySwitcherBlock extends Block
 
             $html .= '<li class="jcs-list-item' . $active . '">';
             $html .= '<a href="' . $url . '">';
-            $html .= $this->buildLabelHtml($currency, $showFlag, $showCode, $showSymbol);
+            $html .= $this->buildLabelHtml($currency, $showFlag, $showCode, $showSymbol, $showName);
             $html .= '</a>';
             $html .= '</li>';
         }
@@ -149,7 +155,7 @@ class CurrencySwitcherBlock extends Block
         return $html;
     }
 
-    protected function buildLabel(array $currency, bool $showFlag, bool $showCode, bool $showSymbol): string
+    protected function buildLabel(array $currency, bool $showFlag, bool $showCode, bool $showSymbol, bool $showName = false): string
     {
         $parts = [];
         if ($showFlag) {
@@ -161,10 +167,13 @@ class CurrencySwitcherBlock extends Block
         if ($showSymbol) {
             $parts[] = $currency['symbol'];
         }
+        if ($showName) {
+            $parts[] = $currency['name'];
+        }
         return implode(' ', $parts) ?: $currency['code'];
     }
 
-    protected function buildLabelHtml(array $currency, bool $showFlag, bool $showCode, bool $showSymbol): string
+    protected function buildLabelHtml(array $currency, bool $showFlag, bool $showCode, bool $showSymbol, bool $showName = false): string
     {
         $html = '';
         if ($showFlag) {
@@ -175,6 +184,9 @@ class CurrencySwitcherBlock extends Block
         }
         if ($showSymbol) {
             $html .= ' <span class="jcs-symbol">(' . esc_html($currency['symbol']) . ')</span>';
+        }
+        if ($showName) {
+            $html .= ' <span class="jcs-name">' . esc_html($currency['name']) . '</span>';
         }
         return $html ?: esc_html($currency['code']);
     }
