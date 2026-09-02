@@ -6,9 +6,6 @@
 }
 
 .jcs--single {
-    padding: 6px 12px;
-    background: #f9f9f9;
-    border-radius: 4px;
     font-size: 0.9em;
 }
 
@@ -29,9 +26,7 @@
 /* Dropdown */
 .jcs-select {
     padding: 8px 32px 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 10px center;
+    background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 10px center;
     appearance: none;
     cursor: pointer;
     font-size: 0.9em;
@@ -54,9 +49,7 @@
     align-items: center;
     gap: 4px;
     padding: 6px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: #fff;
+    background: transparent;
     cursor: pointer;
     font-size: 0.9em;
     transition: all 0.2s ease;

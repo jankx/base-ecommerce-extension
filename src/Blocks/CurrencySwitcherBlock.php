@@ -95,12 +95,12 @@ class CurrencySwitcherBlock extends Block
             $parts[] = '<span class="jcs-name">' . esc_html($currency['name']) . '</span>';
         }
 
-        return '<div class="jcs-switcher jcs--single">' . implode(' ', $parts) . '</div>';
+        return '<div ' . get_block_wrapper_attributes(['class' => 'jcs-switcher jcs--single']) . '>' . implode(' ', $parts) . '</div>';
     }
 
     protected function renderDropdown(array $currencies, string $current, bool $showFlag, bool $showCode, bool $showSymbol, bool $showName = false): string
     {
-        $html = '<div class="jcs-switcher jcs--dropdown">';
+        $html = '<div ' . get_block_wrapper_attributes(['class' => 'jcs-switcher jcs--dropdown']) . '>';
         // Chuyển trang qua JS nội tuyến đơn giản nhưng không phụ thuộc bundle JS nặng nề
         $html .= '<select class="jcs-select" onchange="window.location.href=this.value">';
 
@@ -119,7 +119,7 @@ class CurrencySwitcherBlock extends Block
 
     protected function renderButtons(array $currencies, string $current, bool $showFlag, bool $showCode, bool $showSymbol, bool $showName = false): string
     {
-        $html = '<div class="jcs-switcher jcs--buttons">';
+        $html = '<div ' . get_block_wrapper_attributes(['class' => 'jcs-switcher jcs--buttons']) . '>';
 
         foreach ($currencies as $code => $currency) {
             $active = $code === $current ? ' jcs--active' : '';
@@ -137,7 +137,7 @@ class CurrencySwitcherBlock extends Block
 
     protected function renderList(array $currencies, string $current, bool $showFlag, bool $showCode, bool $showSymbol, bool $showName = false): string
     {
-        $html = '<ul class="jcs-switcher jcs--list">';
+        $html = '<ul ' . get_block_wrapper_attributes(['class' => 'jcs-switcher jcs--list']) . '>';
 
         foreach ($currencies as $code => $currency) {
             $active = $code === $current ? ' jcs--active' : '';
