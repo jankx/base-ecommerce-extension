@@ -158,11 +158,13 @@ class CartItemBlock extends Block
 
     protected function cartIcon(): string
     {
-        return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
-            . 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-            . '<circle cx="9" cy="21" r="1"></circle>'
-            . '<circle cx="20" cy="21" r="1"></circle>'
-            . '<path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>'
+        return '<svg width="24" height="40" viewBox="0 0 24 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+            . '<path d="M8 24L16.7201 23.2733C19.4486 23.046 20.0611 22.45 20.3635 19.7289L21 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>'
+            . '<path d="M6 14H22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>'
+            . '<circle cx="6" cy="28" r="2" stroke="currentColor" stroke-width="1.5"/>'
+            . '<circle cx="17" cy="28" r="2" stroke="currentColor" stroke-width="1.5"/>'
+            . '<path d="M8 28L15 28" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>'
+            . '<path d="M2 10H2.966C3.91068 10 4.73414 10.6246 4.96326 11.5149L7.93852 23.0765C8.08887 23.6608 7.9602 24.2797 7.58824 24.7616L6.63213 26" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>'
             . '</svg>';
     }
 

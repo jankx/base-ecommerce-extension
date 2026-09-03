@@ -45,6 +45,7 @@ module.exports = {
         ...defaultConfig.output,
         path: EXTENSION_DIR,
         filename: '[name].js',
+        clean: false,
     },
 
     plugins: filteredPlugins,

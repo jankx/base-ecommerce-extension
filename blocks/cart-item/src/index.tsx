@@ -1,8 +1,8 @@
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps, InnerBlocks, InspectorControls } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import ServerSideRender from '@wordpress/server-side-render';
 import metadata from '../block.json';
 
 const ALLOWED_BLOCKS = [
@@ -11,14 +11,28 @@ const ALLOWED_BLOCKS = [
     'core/image',
 ];
 
+const CART_SVG = '<svg width="24" height="40" viewBox="0 0 24 40" fill="none" xmlns="http://www.w3.org/2000/svg">'
+    + '<path d="M8 24L16.7201 23.2733C19.4486 23.046 20.0611 22.45 20.3635 19.7289L21 14" stroke="#5C6C7E" stroke-width="1.5" stroke-linecap="round"/>'
+    + '<path d="M6 14H22" stroke="#5C6C7E" stroke-width="1.5" stroke-linecap="round"/>'
+    + '<circle cx="6" cy="28" r="2" stroke="#5C6C7E" stroke-width="1.5"/>'
+    + '<circle cx="17" cy="28" r="2" stroke="#5C6C7E" stroke-width="1.5"/>'
+    + '<path d="M8 28L15 28" stroke="#5C6C7E" stroke-width="1.5" stroke-linecap="round"/>'
+    + '<path d="M2 10H2.966C3.91068 10 4.73414 10.6246 4.96326 11.5149L7.93852 23.0765C8.08887 23.6608 7.9602 24.2797 7.58824 24.7616L6.63213 26" stroke="#5C6C7E" stroke-width="1.5" stroke-linecap="round"/>'
+    + '</svg>';
+
 const EDIT_TEMPLATE = [
-    ['jankx/svg-icon', {}],
+    ['jankx/svg-icon', { icon: CART_SVG }],
 ];
 
 function Edit({ attributes, setAttributes, clientId }) {
     const blockProps = useBlockProps({
         className: 'jankx-server-rendered',
     });
+
+    const hasInnerBlocks = useSelect(
+        (select) => (select('core/block-editor') as any).getBlockCount(clientId) > 0,
+        [clientId]
+    );
 
     return (
         <>
@@ -43,25 +57,35 @@ function Edit({ attributes, setAttributes, clientId }) {
             </InspectorControls>
 
             <div {...blockProps}>
-                <div className="jankx-mini-cart-editor-icon">
-                    <InnerBlocks
-                        allowedBlocks={ALLOWED_BLOCKS}
-                        template={EDIT_TEMPLATE}
-                        templateLock={false}
-                        renderAppender={InnerBlocks.ButtonBlockAppender}
-                    />
-                </div>
-                <ServerSideRender
-                    block={metadata.name}
-                    attributes={attributes}
-                />
+                <button type="button" className="jankx-mini-cart-toggle" aria-expanded="false"
+                    aria-label={__('Open cart', 'jankx')} style={{ pointerEvents: 'none' }}>
+                    <span className="jankx-mini-cart-icon" aria-hidden="true">
+                        {!hasInnerBlocks && (
+                            <svg width="24" height="40" viewBox="0 0 24 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 24L16.7201 23.2733C19.4486 23.046 20.0611 22.45 20.3635 19.7289L21 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                                <path d="M6 14H22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                                <circle cx="6" cy="28" r="2" stroke="currentColor" strokeWidth="1.5" />
+                                <circle cx="17" cy="28" r="2" stroke="currentColor" strokeWidth="1.5" />
+                                <path d="M8 28L15 28" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                                <path d="M2 10H2.966C3.91068 10 4.73414 10.6246 4.96326 11.5149L7.93852 23.0765C8.08887 23.6608 7.9602 24.2797 7.58824 24.7616L6.63213 26" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                            </svg>
+                        )}
+                        <InnerBlocks
+                            allowedBlocks={ALLOWED_BLOCKS}
+                            template={EDIT_TEMPLATE}
+                            templateLock="all"
+                            renderAppender={false}
+                        />
+                    </span>
+                    <span className="jankx-mini-cart-count is-empty" data-jankx-cart-count>0</span>
+                </button>
             </div>
         </>
     );
 }
 
 function Save() {
-    return null;
+    return <InnerBlocks.Content />;
 }
 
 registerBlockType(metadata.name, {

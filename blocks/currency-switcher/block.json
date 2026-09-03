@@ -64,6 +64,17 @@
     "iconSize": {
       "type": "string",
       "default": "medium"
+    },
+    "className": {
+      "type": "string"
+    },
+    "style": {
+      "type": "object",
+      "default": {
+        "color": {
+          "background": "#fff"
+        }
+      }
     }
   },
   "textdomain": "jankx",

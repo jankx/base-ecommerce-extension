@@ -1,0 +1,13 @@
+{
+    "name": "@jankx/base-ecommerce",
+    "version": "1.0.0",
+    "description": "Base Ecommerce Gutenberg blocks",
+    "private": true,
+    "devDependencies": {
+        "@wordpress/scripts": "^30.23.0"
+    },
+    "scripts": {
+        "build": "wp-scripts build --config=webpack.config.js",
+        "start": "wp-scripts start --config=webpack.config.js"
+    }
+}

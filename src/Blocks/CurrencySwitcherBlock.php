@@ -62,21 +62,54 @@ class CurrencySwitcherBlock extends Block
             return '';
         }
 
+        // Determine the display mode first so the wrapper class is consistent,
+        // then render the inner content. get_block_wrapper_attributes() is called
+        // exactly once here (mirroring LanguageSwitcherBlock) so border/color/spacing
+        // support styles from block.json are applied to a single consistent wrapper.
+        $mode = 'dropdown';
         if (count($enabled) === 1) {
-            $currency = reset($enabled);
-            return $this->renderSingle($currency, $showFlag, $showCode, $showSymbol, $showName);
+            $mode = 'single';
+            $inner = $this->renderSingle(reset($enabled), $showFlag, $showCode, $showSymbol, $showName);
+        } elseif ($display === 'buttons') {
+            $mode = 'buttons';
+            $inner = $this->renderButtons($enabled, $current, $showFlag, $showCode, $showSymbol, $showName);
+        } elseif ($display === 'inline' || $display === 'list') {
+            // 'inline' is the block.json value; 'list' is the legacy alias
+            $mode = 'list';
+            $inner = $this->renderList($enabled, $current, $showFlag, $showCode, $showSymbol, $showName);
+        } else {
+            $inner = $this->renderDropdown($enabled, $current, $showFlag, $showCode, $showSymbol, $showName);
         }
 
-        if ($display === 'buttons') {
-            return $this->renderButtons($enabled, $current, $showFlag, $showCode, $showSymbol, $showName);
+        return sprintf(
+            '<div %s>%s</div>',
+            get_block_wrapper_attributes([
+                'class' => 'jcs-switcher jcs--' . $mode,
+                'style' => $this->resolveWrapperStyle($attributes),
+            ]),
+            $inner
+        );
+    }
+
+    /**
+     * Resolve the inline style for the block wrapper.
+     *
+     * Returns the user-set background from the block supports when available,
+     * otherwise falls back to a default white background so the switcher has a
+     * consistent appearance on the frontend even for legacy blocks.
+     *
+     * @param array $attributes Block attributes.
+     * @return string Inline CSS style string.
+     */
+    protected function resolveWrapperStyle(array $attributes): string
+    {
+        $background = $attributes['style']['color']['background'] ?? null;
+
+        if (empty($background) || $background === 'transparent') {
+            return 'background-color:#fff;';
         }
 
-        // 'inline' is the block.json value; 'list' is the legacy alias
-        if ($display === 'inline' || $display === 'list') {
-            return $this->renderList($enabled, $current, $showFlag, $showCode, $showSymbol, $showName);
-        }
-
-        return $this->renderDropdown($enabled, $current, $showFlag, $showCode, $showSymbol, $showName);
+        return '';
     }
 
     protected function renderSingle(array $currency, bool $showFlag, bool $showCode, bool $showSymbol, bool $showName = false): string
@@ -95,14 +128,13 @@ class CurrencySwitcherBlock extends Block
             $parts[] = '<span class="jcs-name">' . esc_html($currency['name']) . '</span>';
         }
 
-        return '<div ' . get_block_wrapper_attributes(['class' => 'jcs-switcher jcs--single']) . '>' . implode(' ', $parts) . '</div>';
+        return implode(' ', $parts);
     }
 
     protected function renderDropdown(array $currencies, string $current, bool $showFlag, bool $showCode, bool $showSymbol, bool $showName = false): string
     {
-        $html = '<div ' . get_block_wrapper_attributes(['class' => 'jcs-switcher jcs--dropdown']) . '>';
         // Chuyển trang qua JS nội tuyến đơn giản nhưng không phụ thuộc bundle JS nặng nề
-        $html .= '<select class="jcs-select" onchange="window.location.href=this.value">';
+        $html = '<select class="jcs-select" onchange="window.location.href=this.value">';
 
         foreach ($currencies as $code => $currency) {
             $selected = $code === $current ? ' selected' : '';
@@ -112,32 +144,28 @@ class CurrencySwitcherBlock extends Block
         }
 
         $html .= '</select>';
-        $html .= '</div>';
 
         return $html;
     }
 
     protected function renderButtons(array $currencies, string $current, bool $showFlag, bool $showCode, bool $showSymbol, bool $showName = false): string
     {
-        $html = '<div ' . get_block_wrapper_attributes(['class' => 'jcs-switcher jcs--buttons']) . '>';
-
+        $buttons = [];
         foreach ($currencies as $code => $currency) {
             $active = $code === $current ? ' jcs--active' : '';
             $url = esc_url(add_query_arg('currency', $code));
             // Đổi button sang thẻ link style button cho chuẩn SSR
-            $html .= '<a href="' . $url . '" class="jcs-btn' . $active . '" style="text-decoration:none;">';
-            $html .= $this->buildLabelHtml($currency, $showFlag, $showCode, $showSymbol, $showName);
-            $html .= '</a>';
+            $buttons[] = '<a href="' . $url . '" class="jcs-btn' . $active . '" style="text-decoration:none;">'
+                . $this->buildLabelHtml($currency, $showFlag, $showCode, $showSymbol, $showName)
+                . '</a>';
         }
 
-        $html .= '</div>';
-
-        return $html;
+        return implode(' ', $buttons);
     }
 
     protected function renderList(array $currencies, string $current, bool $showFlag, bool $showCode, bool $showSymbol, bool $showName = false): string
     {
-        $html = '<ul ' . get_block_wrapper_attributes(['class' => 'jcs-switcher jcs--list']) . '>';
+        $html = '<ul class="jcs-list">';
 
         foreach ($currencies as $code => $currency) {
             $active = $code === $current ? ' jcs--active' : '';
