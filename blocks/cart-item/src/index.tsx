@@ -144,7 +144,7 @@ function Edit({ attributes, setAttributes, clientId }) {
                         />
                     </span>
                     <span
-                        className="jankx-mini-cart-count is-empty"
+                        className="jankx-mini-cart-count"
                         data-jankx-cart-count
                         style={{
                             color: attributes.badgeColor,
@@ -164,7 +164,7 @@ function Edit({ attributes, setAttributes, clientId }) {
                             margin: typeof attributes.badgeMargin === 'string' ? attributes.badgeMargin : undefined,
                         }}
                     >
-                        0
+                        3
                     </span>
                 </button>
             </div>
