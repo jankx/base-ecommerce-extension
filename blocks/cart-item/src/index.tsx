@@ -21,12 +21,12 @@ const CART_SVG = '<svg width="24" height="40" viewBox="0 0 24 40" fill="none" xm
     + '</svg>';
 
 const EDIT_TEMPLATE = [
-    ['jankx/svg-icon', { icon: CART_SVG }],
+    ['jankx/svg-icon', { icon: CART_SVG, width: '24px' }],
 ];
 
 function Edit({ attributes, setAttributes, clientId }) {
     const blockProps = useBlockProps({
-        className: 'jankx-server-rendered',
+        className: 'jankx-mini-cart',
     });
 
     const hasInnerBlocks = useSelect(
