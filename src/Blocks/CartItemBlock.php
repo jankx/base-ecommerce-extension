@@ -72,14 +72,14 @@ class CartItemBlock extends Block
         ]);
 
         $output = sprintf('<div %s>', $wrapperAttrs);
-        $output .= $this->renderToggle($cart, $content);
+        $output .= $this->renderToggle($cart, $content, $attributes);
         $output .= $this->renderDrawer($cart);
         $output .= '</div>';
 
         return $output;
     }
 
-    protected function renderToggle(Cart $cart, string $innerBlocksContent = ''): string
+    protected function renderToggle(Cart $cart, string $innerBlocksContent = '', array $attributes = []): string
     {
         $count = $cart->getItemCount();
 
@@ -88,10 +88,67 @@ class CartItemBlock extends Block
             ? '<span class="jankx-mini-cart-icon jankx-mini-cart-icon--custom" aria-hidden="true">' . $innerBlocksContent . '</span>'
             : '<span class="jankx-mini-cart-icon" aria-hidden="true">' . $this->cartIcon() . '</span>';
 
+        // Build inline styles for the badge
+        $badgeStyles = [];
+        if (!empty($attributes['badgeColor']))
+            $badgeStyles[] = 'color: ' . $attributes['badgeColor'];
+        if (!empty($attributes['badgeBgColor']))
+            $badgeStyles[] = 'background-color: ' . $attributes['badgeBgColor'];
+        if (!empty($attributes['badgeTop']))
+            $badgeStyles[] = 'top: ' . $attributes['badgeTop'];
+        if (!empty($attributes['badgeRight']))
+            $badgeStyles[] = 'right: ' . $attributes['badgeRight'];
+        if (!empty($attributes['badgeWidth']))
+            $badgeStyles[] = 'min-width: ' . $attributes['badgeWidth'];
+        if (!empty($attributes['badgeHeight']))
+            $badgeStyles[] = 'height: ' . $attributes['badgeHeight'] . '; line-height: ' . $attributes['badgeHeight'];
+        if (!empty($attributes['badgeFontSize']))
+            $badgeStyles[] = 'font-size: ' . $attributes['badgeFontSize'];
+        if (!empty($attributes['badgeBorderWidth']))
+            $badgeStyles[] = 'border-width: ' . $attributes['badgeBorderWidth'] . '; border-style: solid';
+        if (!empty($attributes['badgeBorderColor']))
+            $badgeStyles[] = 'border-color: ' . $attributes['badgeBorderColor'];
+        if (!empty($attributes['badgeBorderRadius']))
+            $badgeStyles[] = 'border-radius: ' . $attributes['badgeBorderRadius'];
+
+        // Handle spacing (margin/padding) which are usually objects from BoxControl
+        if (!empty($attributes['badgePadding'])) {
+            $p = $attributes['badgePadding'];
+            if (is_string($p)) { // Custom shorthand
+                $badgeStyles[] = 'padding: ' . $p;
+            } elseif (is_array($p)) { // BoxControl object
+                if (isset($p['top']))
+                    $badgeStyles[] = 'padding-top: ' . $p['top'];
+                if (isset($p['right']))
+                    $badgeStyles[] = 'padding-right: ' . $p['right'];
+                if (isset($p['bottom']))
+                    $badgeStyles[] = 'padding-bottom: ' . $p['bottom'];
+                if (isset($p['left']))
+                    $badgeStyles[] = 'padding-left: ' . $p['left'];
+            }
+        }
+        if (!empty($attributes['badgeMargin'])) {
+            $m = $attributes['badgeMargin'];
+            if (is_string($m)) {
+                $badgeStyles[] = 'margin: ' . $m;
+            } elseif (is_array($m)) {
+                if (isset($m['top']))
+                    $badgeStyles[] = 'margin-top: ' . $m['top'];
+                if (isset($m['right']))
+                    $badgeStyles[] = 'margin-right: ' . $m['right'];
+                if (isset($m['bottom']))
+                    $badgeStyles[] = 'margin-bottom: ' . $m['bottom'];
+                if (isset($m['left']))
+                    $badgeStyles[] = 'margin-left: ' . $m['left'];
+            }
+        }
+
+        $styleAttr = !empty($badgeStyles) ? ' style="' . esc_attr(implode('; ', $badgeStyles)) . '"' : '';
+
         return '<button type="button" class="jankx-mini-cart-toggle" aria-expanded="false" '
             . 'aria-controls="jankx-mini-cart-drawer" aria-label="' . esc_attr__('Open cart', 'jankx') . '">'
             . $iconHtml
-            . '<span class="jankx-mini-cart-count' . ($count ? '' : ' is-empty') . '" data-jankx-cart-count>'
+            . '<span class="jankx-mini-cart-count' . ($count ? '' : ' is-empty') . '" data-jankx-cart-count' . $styleAttr . '>'
             . (int) $count . '</span>'
             . '</button>';
     }

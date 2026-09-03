@@ -1,7 +1,7 @@
 import { registerBlockType } from '@wordpress/blocks';
-import { useBlockProps, InnerBlocks, InspectorControls } from '@wordpress/block-editor';
+import { useBlockProps, InnerBlocks, InspectorControls, PanelColorSettings } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import { PanelBody, ToggleControl, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import metadata from '../block.json';
 
@@ -54,6 +54,72 @@ function Edit({ attributes, setAttributes, clientId }) {
                         onChange={(val) => setAttributes({ jankxHideOnMobile: val })}
                     />
                 </PanelBody>
+
+                <PanelColorSettings
+                    title={__('Badge Colors', 'jankx')}
+                    colorSettings={[
+                        {
+                            value: attributes.badgeColor,
+                            onChange: (colorValue) => setAttributes({ badgeColor: colorValue }),
+                            label: __('Text Color', 'jankx'),
+                        },
+                        {
+                            value: attributes.badgeBgColor,
+                            onChange: (colorValue) => setAttributes({ badgeBgColor: colorValue }),
+                            label: __('Background Color', 'jankx'),
+                        },
+                        {
+                            value: attributes.badgeBorderColor,
+                            onChange: (colorValue) => setAttributes({ badgeBorderColor: colorValue }),
+                            label: __('Border Color', 'jankx'),
+                        },
+                    ]}
+                />
+
+                <PanelBody title={__('Badge Styles', 'jankx')} initialOpen={false}>
+                    <TextControl
+                        label={__('Top Position', 'jankx')}
+                        value={attributes.badgeTop || ''}
+                        onChange={(val) => setAttributes({ badgeTop: val })}
+                        help="e.g. -4px or 0"
+                    />
+                    <TextControl
+                        label={__('Right Position', 'jankx')}
+                        value={attributes.badgeRight || ''}
+                        onChange={(val) => setAttributes({ badgeRight: val })}
+                        help="e.g. -4px or 0"
+                    />
+                    <TextControl
+                        label={__('Width', 'jankx')}
+                        value={attributes.badgeWidth || ''}
+                        onChange={(val) => setAttributes({ badgeWidth: val })}
+                        help="e.g. 18px"
+                    />
+                    <TextControl
+                        label={__('Height', 'jankx')}
+                        value={attributes.badgeHeight || ''}
+                        onChange={(val) => setAttributes({ badgeHeight: val })}
+                        help="e.g. 18px"
+                    />
+                    <TextControl
+                        label={__('Font Size', 'jankx')}
+                        value={attributes.badgeFontSize || ''}
+                        onChange={(val) => setAttributes({ badgeFontSize: val })}
+                        help="e.g. 11px or 0.8rem"
+                    />
+                    <TextControl
+                        label={__('Border Width', 'jankx')}
+                        value={attributes.badgeBorderWidth || ''}
+                        onChange={(val) => setAttributes({ badgeBorderWidth: val })}
+                        help="e.g. 1px"
+                    />
+                    <TextControl
+                        label={__('Border Radius', 'jankx')}
+                        value={attributes.badgeBorderRadius || ''}
+                        onChange={(val) => setAttributes({ badgeBorderRadius: val })}
+                        help="e.g. 99px"
+                    />
+                </PanelBody>
             </InspectorControls>
 
             <div {...blockProps}>
@@ -77,7 +143,29 @@ function Edit({ attributes, setAttributes, clientId }) {
                             renderAppender={false}
                         />
                     </span>
-                    <span className="jankx-mini-cart-count is-empty" data-jankx-cart-count>0</span>
+                    <span
+                        className="jankx-mini-cart-count is-empty"
+                        data-jankx-cart-count
+                        style={{
+                            color: attributes.badgeColor,
+                            backgroundColor: attributes.badgeBgColor,
+                            top: attributes.badgeTop,
+                            right: attributes.badgeRight,
+                            minWidth: attributes.badgeWidth,
+                            height: attributes.badgeHeight,
+                            lineHeight: attributes.badgeHeight,
+                            fontSize: attributes.badgeFontSize,
+                            borderWidth: attributes.badgeBorderWidth,
+                            borderColor: attributes.badgeBorderColor,
+                            borderStyle: attributes.badgeBorderWidth ? 'solid' : undefined,
+                            borderRadius: attributes.badgeBorderRadius,
+                            // Quick manual padding representation for editor inline styles (if string)
+                            padding: typeof attributes.badgePadding === 'string' ? attributes.badgePadding : undefined,
+                            margin: typeof attributes.badgeMargin === 'string' ? attributes.badgeMargin : undefined,
+                        }}
+                    >
+                        0
+                    </span>
                 </button>
             </div>
         </>

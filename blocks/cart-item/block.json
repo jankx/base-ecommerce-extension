@@ -27,6 +27,42 @@
     "jankxFlexGrow": {
       "type": "boolean",
       "default": false
+    },
+    "badgeColor": {
+      "type": "string"
+    },
+    "badgeBgColor": {
+      "type": "string"
+    },
+    "badgeTop": {
+      "type": "string"
+    },
+    "badgeRight": {
+      "type": "string"
+    },
+    "badgeWidth": {
+      "type": "string"
+    },
+    "badgeHeight": {
+      "type": "string"
+    },
+    "badgePadding": {
+      "type": "object"
+    },
+    "badgeMargin": {
+      "type": "object"
+    },
+    "badgeFontSize": {
+      "type": "string"
+    },
+    "badgeBorderWidth": {
+      "type": "string"
+    },
+    "badgeBorderColor": {
+      "type": "string"
+    },
+    "badgeBorderRadius": {
+      "type": "string"
     }
   },
   "supports": {
