@@ -1,4 +1,9 @@
 /* Currency Switcher Styles */
+.wp-block-jankx-currency-switcher {
+    background-color: #ffffff;
+    /* default – overridden by block color support inline style */
+}
+
 .jcs-switcher {
     display: inline-flex;
     align-items: center;
