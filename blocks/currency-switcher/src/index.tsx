@@ -4,6 +4,7 @@ import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import ServerSideRender from '@wordpress/server-side-render';
 import metadata from '../block.json';
+import './style.scss';
 
 function Edit({ attributes, setAttributes }) {
     const blockProps = useBlockProps({

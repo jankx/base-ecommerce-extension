@@ -10,10 +10,10 @@ class CurrencySwitcherBlock extends Block
 
     protected function registerHooks(): void
     {
-        add_action('wp_enqueue_scripts', [$this, 'enqueueFrontendAssets']);
+        add_action('wp_enqueue_scripts', [$this, 'enqueueScripts']);
     }
 
-    public function enqueueFrontendAssets(): void
+    public function enqueueScripts(): void
     {
         if (!is_singular() && !is_page()) {
             return;
@@ -23,13 +23,6 @@ class CurrencySwitcherBlock extends Block
         if (!$post || !has_block(self::BLOCK_ID, $post)) {
             return;
         }
-
-        wp_enqueue_style(
-            'jankx-currency-switcher',
-            $this->getAssetsUrl('currency-switcher.css'),
-            [],
-            filemtime($this->getAssetsPath('currency-switcher.css'))
-        );
 
         wp_enqueue_script(
             'jankx-currency-switcher',
@@ -103,12 +96,6 @@ class CurrencySwitcherBlock extends Block
      */
     protected function resolveWrapperStyle(array $attributes): string
     {
-        $background = $attributes['style']['color']['background'] ?? null;
-
-        if (empty($background) || $background === 'transparent') {
-            return 'background-color:#fff;';
-        }
-
         return '';
     }
 
@@ -133,17 +120,33 @@ class CurrencySwitcherBlock extends Block
 
     protected function renderDropdown(array $currencies, string $current, bool $showFlag, bool $showCode, bool $showSymbol, bool $showName = false): string
     {
-        // Chuyển trang qua JS nội tuyến đơn giản nhưng không phụ thuộc bundle JS nặng nề
-        $html = '<select class="jcs-select" onchange="window.location.href=this.value">';
-
-        foreach ($currencies as $code => $currency) {
-            $selected = $code === $current ? ' selected' : '';
-            $url = esc_url(add_query_arg('currency', $code));
-            $label = $this->buildLabel($currency, $showFlag, $showCode, $showSymbol, $showName);
-            $html .= '<option value="' . $url . '"' . $selected . '>' . esc_html($label) . '</option>';
+        $currentCurrency = $currencies[$current] ?? reset($currencies);
+        if (!is_array($currentCurrency)) {
+            $currentCurrency = [];
         }
 
-        $html .= '</select>';
+        // Mirrors LanguageSwitcherBlock dropdown structure (button + absolute menu)
+        // so the two switcher blocks share the same frontend pattern.
+        $html = '<div class="jcs-dropdown-wrapper">';
+        $html .= '<button class="jcs-dropdown" type="button" aria-haspopup="true" aria-expanded="false">';
+        $html .= $this->buildLabelHtml($currentCurrency, $showFlag, $showCode, $showSymbol, $showName);
+        $html .= '<span class="jcs-arrow">▼</span>';
+        $html .= '</button>';
+
+        $html .= '<ul class="jcs-dropdown-menu">';
+        foreach ($currencies as $code => $currency) {
+            $isCurrent = $code === $current;
+            $itemClasses = ['jcs-dropdown-item'];
+            if ($isCurrent) {
+                $itemClasses[] = 'current-currency';
+            }
+
+            $html .= '<li class="' . esc_attr(implode(' ', $itemClasses)) . '">';
+            $html .= '<a href="#" class="jcs-dropdown-link" data-jcs-action="switch" data-jcs-currency="' . esc_attr($code) . '">';
+            $html .= $this->buildLabelHtml($currency, $showFlag, $showCode, $showSymbol, $showName);
+            $html .= '</a></li>';
+        }
+        $html .= '</ul></div>';
 
         return $html;
     }

@@ -1,0 +1,179 @@
+/* Currency Switcher Styles */
+.jcs-switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.jcs-switcher .jcs--single {
+    font-size: 0.9em;
+}
+
+.jcs-switcher .jcs-flag {
+    font-size: 1.2em;
+    line-height: 1;
+}
+
+.jcs-switcher .jcs-code {
+    font-weight: normal;
+}
+
+.jcs-switcher .jcs-symbol {
+    color: #666;
+    font-size: 0.9em;
+}
+
+/* Dropdown */
+.jcs-dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+}
+
+.jcs-switcher .jcs-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: transparent !important;
+    border: 0 !important;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1.2;
+    min-width: 80px;
+    max-width: 100%;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.jcs-switcher .jcs-dropdown:focus {
+    outline: none;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.jcs-arrow {
+    margin-left: auto;
+    font-size: 10px;
+    transition: transform 0.2s ease;
+}
+
+.jcs-dropdown-wrapper:hover .jcs-arrow {
+    transform: rotate(180deg);
+}
+
+.jcs-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 2px;
+    margin-bottom: 0px !important;
+    padding: 2px 0 !important;
+    list-style: none !important;
+    background: transparent;
+    border: 0;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-5px);
+    transition: all 0.2s ease;
+    min-width: 120px;
+    max-width: calc(100vw - 20px);
+    width: max-content;
+}
+
+.jcs-dropdown-wrapper:hover .jcs-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.jcs-dropdown-menu .jcs-dropdown-item {
+    margin: 0 !important;
+    list-style: none !important;
+}
+
+.jcs-dropdown-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    text-decoration: none;
+    border: 0;
+    transition: all 0.2s ease;
+}
+
+.jcs-dropdown-link:hover {
+    text-decoration: none;
+}
+
+.jcs-dropdown-menu .current-currency .jcs-dropdown-link,
+.jcs-dropdown-item.current-currency .jcs-dropdown-link {
+    font-weight: 600;
+}
+
+/* Buttons */
+.jcs--buttons {
+    gap: 4px;
+}
+
+.jcs-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.2s ease;
+}
+
+.jcs-btn:hover {
+    border-color: #599F12;
+    color: #599F12;
+}
+
+.jcs-btn.jcs--active {
+    background: #599F12;
+    border-color: #599F12;
+    color: #fff;
+}
+
+/* List */
+.jcs--list {
+    display: flex;
+    gap: 4px;
+}
+
+.jcs-list {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    gap: 4px;
+}
+
+.jcs-list-item {
+    margin: 0 !important;
+    list-style: none !important;
+}
+
+.jcs-list-item a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 6px;
+    text-decoration: none;
+    color: inherit;
+    border-radius: 3px;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.jcs-list-item a:hover {
+    background: #f0f0f0;
+}
+
+.jcs-list-item.jcs--active a {
+    background: #599F12;
+    color: #fff;
+}
