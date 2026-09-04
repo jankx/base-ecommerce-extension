@@ -96,6 +96,10 @@ class CurrencySwitcherBlock extends Block
      */
     protected function resolveWrapperStyle(array $attributes): string
     {
+        $background = $attributes['style']['color']['background'] ?? '';
+        if (empty($background) || 'transparent' === $background) {
+            return 'background-color:var(--wp--preset--color--base);';
+        }
         return '';
     }
 

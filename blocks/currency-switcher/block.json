@@ -73,7 +73,7 @@
       "type": "object",
       "default": {
         "color": {
-          "background": "#fff"
+          "background": "var(--wp--preset--color--base)"
         }
       }
     }
