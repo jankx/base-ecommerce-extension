@@ -27,6 +27,10 @@ class AddToCartBlock extends Block
         $productType = $this->resolvePostType($block, $postId);
 
         if (!$postId || !EcommerceExtension::is_product($postId)) {
+            if ($this->isEditorRequest()) {
+                return $this->renderEditorPlaceholder($attributes);
+            }
+
             return '';
         }
 
@@ -112,6 +116,58 @@ class AddToCartBlock extends Block
             . esc_html__('Liên hệ với chúng tôi để được tư vấn và báo giá.', 'jankx')
             . '</p>'
             . '</div>';
+    }
+
+    protected function renderEditorPlaceholder($attributes): string
+    {
+        $wrapperAttrs = get_block_wrapper_attributes([
+            'class' => 'jankx-add-to-cart jankx-add-to-cart--editor',
+        ]);
+
+        $attributes = is_array($attributes) ? $attributes : [];
+
+        $output = sprintf('<div %s>', $wrapperAttrs);
+
+        if (!empty($attributes['title'])) {
+            $output .= '<h3 class="jankx-add-to-cart__title">' . esc_html($attributes['title']) . '</h3>';
+        }
+
+        if (!empty($attributes['show_departure'])) {
+            $output .= '<div class="jankx-add-to-cart__field">'
+                . '<label>' . esc_html__('Ngày khởi hành', 'jankx') . '</label>'
+                . '<input type="date" class="jankx-input" value="' . esc_attr(current_time('Y-m-d')) . '" tabindex="-1" aria-hidden="true" disabled>'
+                . '</div>';
+        }
+
+        $output .= '<div class="jankx-add-to-cart__row">';
+
+        $output .= '<span class="jankx-add-to-cart__price">' . esc_html(CurrencyManager::formatPrice(1500000)) . '</span>';
+
+        if (!isset($attributes['show_quantity']) || !empty($attributes['show_quantity'])) {
+            $output .= '<input type="number" class="jankx-input jankx-add-to-cart__qty" value="1" min="1"'
+                . ' tabindex="-1" aria-hidden="true" disabled>';
+        }
+
+        $output .= '<button type="button" class="jankx-btn jankx-btn-primary jankx-add-to-cart__btn" tabindex="-1">'
+            . esc_html__('Thêm vào giỏ hàng', 'jankx')
+            . '</button>';
+
+        $output .= '</div>';
+
+        $output .= '<p class="jankx-add-to-cart__status">'
+            . esc_html__('Bản xem trước trong trình soạn thảo — giá và mức giảm hiển thị theo sản phẩm hiện tại.', 'jankx')
+            . '</p>';
+
+        $output .= '</div>';
+
+        return $output;
+    }
+
+    protected function isEditorRequest(): bool
+    {
+        return defined('REST_REQUEST') && REST_REQUEST
+            && !empty($_SERVER['REQUEST_URI'])
+            && strpos($_SERVER['REQUEST_URI'], '/block-renderer/') !== false;
     }
 
     protected function resolvePostId($block): int

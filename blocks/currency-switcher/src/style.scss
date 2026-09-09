@@ -4,10 +4,13 @@
     /* default – overridden by block color support inline style */
 }
 
+/* Inner switcher wrapper inherits background from the block wrapper so that
+   the Gutenberg color panel background setting is visually applied */
 .jcs-switcher {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    background-color: inherit;
 }
 
 .jcs-switcher .jcs--single {
