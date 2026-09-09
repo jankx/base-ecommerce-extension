@@ -13,19 +13,19 @@ function Edit({ attributes, setAttributes }) {
     return (
         <>
             <InspectorControls>
-                <PanelBody title={__('Add to Cart Settings', 'jankx')}>
+                <PanelBody title={__('Cài đặt nút Thêm vào giỏ hàng', 'jankx')}>
                     <TextControl
-                        label={__('Title', 'jankx')}
+                        label={__('Tiêu đề', 'jankx')}
                         value={attributes.title}
                         onChange={(value) => setAttributes({ title: value })}
                     />
                     <ToggleControl
-                        label={__('Show Quantity', 'jankx')}
+                        label={__('Hiển thị ô số lượng', 'jankx')}
                         checked={attributes.show_quantity}
                         onChange={(value) => setAttributes({ show_quantity: value })}
                     />
                     <ToggleControl
-                        label={__('Show Departure', 'jankx')}
+                        label={__('Hiển thị ngày khởi hành', 'jankx')}
                         checked={attributes.show_departure}
                         onChange={(value) => setAttributes({ show_departure: value })}
                     />
