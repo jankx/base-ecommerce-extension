@@ -107,6 +107,10 @@ class EcommerceExtension extends AbstractExtension
         // Editor integration for the blocks.
         add_action('enqueue_block_editor_assets', [$this, 'enqueue_block_editor_assets']);
 
+        // Editor styles must go through enqueue_block_assets to work inside
+        // the Gutenberg editor iframe (WordPress 6.6+).
+        add_action('enqueue_block_assets', [$this, 'enqueue_block_editor_styles']);
+
         // Frontend assets on the cart/checkout pages and single product pages.
         add_action('wp_enqueue_scripts', [$this, 'enqueue_frontend_assets']);
 
@@ -179,6 +183,17 @@ class EcommerceExtension extends AbstractExtension
             }
         }
         wp_localize_script('jankx-ecommerce-blocks-editor', 'jankxEcommerceBlockMetadata', $blockMetadata);
+    }
+
+    /**
+     * Enqueue editor styles via enqueue_block_assets so they work inside
+     * the Gutenberg editor iframe (WordPress 6.6+).
+     */
+    public function enqueue_block_editor_styles(): void
+    {
+        if (!is_admin()) {
+            return;
+        }
 
         wp_enqueue_style(
             'jankx-ecommerce-blocks-editor',
