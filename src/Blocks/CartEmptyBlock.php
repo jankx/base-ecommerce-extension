@@ -38,6 +38,10 @@ class CartEmptyBlock extends Block
             'class' => 'jankx-empty-state',
         ]);
 
+        if (!empty(trim((string) $content))) {
+            return sprintf('<div %s>%s</div>', $wrapperAttrs, $content);
+        }
+
         return $this->renderEmptyHtml($attributes, $wrapperAttrs);
     }
 
