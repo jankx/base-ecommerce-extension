@@ -5,6 +5,7 @@ use Jankx\Extensions\Ecommerce\Cart\Cart;
 use Jankx\Extensions\Ecommerce\Checkout\CheckoutManager;
 use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
 use Jankx\Extensions\Ecommerce\Order\Order;
+use Jankx\Extensions\Ecommerce\Order\OrderCreationManager;
 use Jankx\Extensions\Ecommerce\Payment\PaymentManager;
 
 /**
@@ -95,6 +96,43 @@ class EcommerceController
                     'required'          => true,
                     'type'              => 'string',
                     'sanitize_callback' => 'sanitize_text_field',
+                ],
+            ],
+        ]);
+
+        register_rest_route(self::REST_NAMESPACE, '/orders/form', [
+            'methods'             => \WP_REST_Server::CREATABLE,
+            'callback'            => [$this, 'createFormOrder'],
+            'permission_callback' => '__return_true',
+            'args'                => [
+                'product_id' => [
+                    'required'          => true,
+                    'type'              => 'integer',
+                    'sanitize_callback' => 'absint',
+                ],
+                'customer_name' => [
+                    'required'          => true,
+                    'type'              => 'string',
+                    'sanitize_callback' => 'sanitize_text_field',
+                ],
+                'customer_phone' => [
+                    'required'          => true,
+                    'type'              => 'string',
+                    'sanitize_callback' => 'sanitize_text_field',
+                ],
+                'customer_email' => [
+                    'required'          => true,
+                    'type'              => 'string',
+                    'sanitize_callback' => 'sanitize_email',
+                ],
+                'note' => [
+                    'type'              => 'string',
+                    'sanitize_callback' => 'sanitize_textarea_field',
+                ],
+                'quantity' => [
+                    'type'              => 'integer',
+                    'default'           => 1,
+                    'sanitize_callback' => 'absint',
                 ],
             ],
         ]);
@@ -368,4 +406,31 @@ class EcommerceController
             'message' => __('Tiền tệ không hợp lệ.', 'jankx'),
         ], 400);
     }
+
+    /**
+     * Create an order directly from a product form submission.
+     * Uses the ManualFormOrderStrategy via OrderCreationManager.
+     */
+    public function createFormOrder(\WP_REST_Request $request): \WP_REST_Response
+    {
+        $params = $request->get_params();
+        $result = OrderCreationManager::getInstance()->process('manual_form', $params);
+
+        if (!$result['success']) {
+            return new \WP_REST_Response([
+                'success' => false,
+                'message' => $result['errors'],
+            ], 400);
+        }
+
+        /** @var \Jankx\Extensions\Ecommerce\Order\Order $order */
+        $order = $result['order'];
+
+        return rest_ensure_response([
+            'success' => true,
+            'message' => __('Gửi thông tin đặt sản phẩm thành công! Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.', 'jankx'),
+            'order'   => $order ? $order->toArray() : null,
+        ]);
+    }
 }
+

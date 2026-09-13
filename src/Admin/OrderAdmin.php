@@ -83,6 +83,14 @@ class OrderAdmin
             OrderModel::update($orderId, ['tracking_number' => $trackingNumber]);
         }
 
+        // Update order total if provided (e.g. manual price quote for form orders)
+        if (isset($_POST['order_total']) && $_POST['order_total'] !== '') {
+            $newTotal = floatval($_POST['order_total']);
+            if ($newTotal >= 0) {
+                OrderModel::update($orderId, ['total' => $newTotal]);
+            }
+        }
+
         wp_redirect(admin_url('admin.php?page=' . self::PAGE_SLUG . '&view=' . $orderId . '&updated=1'));
         exit;
     }
@@ -170,6 +178,9 @@ class OrderAdmin
                                     <a href="<?php echo esc_url(admin_url('admin.php?page=' . self::PAGE_SLUG . '&view=' . $order->getId())); ?>">
                                         <strong><?php echo esc_html($order->getOrderNumber()); ?></strong>
                                     </a>
+                                    <?php if ($order->getPaymentMethod() === 'manual'): ?>
+                                        <br><span class="jankx-order-badge jankx-order-badge--manual"><?php esc_html_e('Đặt qua form', 'jankx'); ?></span>
+                                    <?php endif; ?>
                                 </td>
                                 <td>
                                     <?php if ($order->getCustomerName()): ?>
@@ -192,9 +203,15 @@ class OrderAdmin
                                     ?>
                                 </td>
                                 <td style="text-align: right;">
-                                    <strong><?php echo esc_html(CurrencyManager::formatPrice($order->getTotal())); ?></strong>
+                                    <?php if ($order->getTotal() <= 0 && $order->getPaymentMethod() === 'manual'): ?>
+                                        <span class="jankx-order-badge jankx-order-badge--quote"><?php esc_html_e('Chờ báo giá', 'jankx'); ?></span>
+                                    <?php else: ?>
+                                        <strong><?php echo esc_html(CurrencyManager::formatPrice($order->getTotal())); ?></strong>
+                                    <?php endif; ?>
                                     <?php if ($order->getPaymentMethod()): ?>
-                                        <div class="description"><?php echo esc_html($order->getPaymentMethod()); ?></div>
+                                        <div class="description">
+                                            <?php echo $order->getPaymentMethod() === 'manual' ? esc_html__('Xử lý thủ công', 'jankx') : esc_html($order->getPaymentMethod()); ?>
+                                        </div>
                                     <?php endif; ?>
                                 </td>
                                 <td>
@@ -265,6 +282,11 @@ class OrderAdmin
                         <div id="jankx_order_details" class="postbox">
                             <h2 class="hndle"><span><?php esc_html_e('Order Details', 'jankx'); ?></span></h2>
                             <div class="inside">
+                                <?php if ($order->getPaymentMethod() === 'manual' && $order->getTotal() <= 0): ?>
+                                    <div class="notice notice-info inline" style="margin: 12px 12px 0 12px;">
+                                        <p><strong><?php esc_html_e('Đơn đặt qua form (Xử lý thủ công):', 'jankx'); ?></strong> <?php esc_html_e('Đơn hàng này chưa có giá tiền ban đầu. Vui lòng liên hệ với khách hàng để tư vấn và nhập số tiền chốt vào ô "Báo giá / Tổng tiền" ở cột bên phải.', 'jankx'); ?></p>
+                                    </div>
+                                <?php endif; ?>
                                 <!-- Summary bar -->
                                 <div class="jankx-order-summary-bar">
                                     <div class="jankx-order-summary-bar__item">
@@ -278,7 +300,11 @@ class OrderAdmin
                                     <div class="jankx-order-summary-bar__item">
                                         <span class="jankx-order-summary-bar__label"><?php esc_html_e('ORDER TOTAL', 'jankx'); ?></span>
                                         <span class="jankx-order-summary-bar__value jankx-order-summary-bar__value--highlight">
-                                            <?php echo esc_html(CurrencyManager::formatPrice($order->getTotal())); ?>
+                                            <?php if ($order->getTotal() <= 0 && $order->getPaymentMethod() === 'manual'): ?>
+                                                <span class="jankx-order-badge jankx-order-badge--quote"><?php esc_html_e('CHỜ BÁO GIÁ', 'jankx'); ?></span>
+                                            <?php else: ?>
+                                                <?php echo esc_html(CurrencyManager::formatPrice($order->getTotal())); ?>
+                                            <?php endif; ?>
                                         </span>
                                     </div>
                                     <div class="jankx-order-summary-bar__item">
@@ -287,7 +313,15 @@ class OrderAdmin
                                     </div>
                                     <div class="jankx-order-summary-bar__item">
                                         <span class="jankx-order-summary-bar__label"><?php esc_html_e('PAYMENT', 'jankx'); ?></span>
-                                        <span class="jankx-order-summary-bar__value"><?php echo esc_html($order->getPaymentMethod() ?: '—'); ?></span>
+                                        <span class="jankx-order-summary-bar__value">
+                                            <?php
+                                            if ($order->getPaymentMethod() === 'manual') {
+                                                echo esc_html__('Xử lý thủ công (Đặt qua form)', 'jankx');
+                                            } else {
+                                                echo esc_html($order->getPaymentMethod() ?: '—');
+                                            }
+                                            ?>
+                                        </span>
                                     </div>
                                     <div class="jankx-order-summary-bar__item">
                                         <span class="jankx-order-summary-bar__label"><?php esc_html_e('CREATED', 'jankx'); ?></span>
@@ -475,6 +509,16 @@ class OrderAdmin
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="order_total"><?php esc_html_e('BÁO GIÁ / TỔNG TIỀN (VND)', 'jankx'); ?></label>
+                                        <input type="number" step="any" min="0" name="order_total" id="order_total"
+                                               value="<?php echo esc_attr($order->getTotal()); ?>"
+                                               placeholder="<?php esc_attr_e('Nhập giá báo cho khách...', 'jankx'); ?>">
+                                        <?php if ($order->getPaymentMethod() === 'manual'): ?>
+                                            <small class="description" style="display:block;margin-top:4px;color:#64748b;"><?php esc_html_e('Cập nhật số tiền sau khi thỏa thuận báo giá với khách hàng.', 'jankx'); ?></small>
+                                        <?php endif; ?>
                                     </div>
 
                                     <!-- Tracking Number (visible when current status is shipping or target is shipping/completed) -->

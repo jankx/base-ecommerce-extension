@@ -134,6 +134,21 @@
     color: #64748b;
 }
 
+.jankx-order-badge--manual {
+    background: #ede9fe;
+    color: #7c3aed;
+    font-size: 11px;
+    padding: 2px 8px;
+    margin-top: 4px;
+}
+
+.jankx-order-badge--quote {
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px dashed #f59e0b;
+    font-weight: 600;
+}
+
 
 /* ── Order Summary Header Bar ── */
 .jankx-order-summary-bar {
