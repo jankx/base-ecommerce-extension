@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/cart-item-checkbox",
+  "title": "Cart Item Checkbox",
+  "category": "jankx",
+  "icon": "yes-alt",
+  "description": "Checkbox to select this cart item.",
+  "textdomain": "jankx",
+  "supports": {
+    "html": false
+  },
+  "editorScript": "file:./build/index.js"
+}

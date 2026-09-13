@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/cart-item-price",
+  "title": "Cart Item Price",
+  "category": "jankx",
+  "icon": "money",
+  "description": "Line total of the current cart item.",
+  "textdomain": "jankx",
+  "supports": {
+    "html": false
+  },
+  "editorScript": "file:./build/index.js"
+}

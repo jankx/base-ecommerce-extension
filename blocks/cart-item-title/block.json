@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/cart-item-title",
+  "title": "Cart Item Title",
+  "category": "jankx",
+  "icon": "heading",
+  "description": "Product name of the current cart item.",
+  "textdomain": "jankx",
+  "supports": {
+    "html": false
+  },
+  "editorScript": "file:./build/index.js"
+}

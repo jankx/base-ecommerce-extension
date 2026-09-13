@@ -6,6 +6,13 @@ use Jankx\Extensions\Ecommerce\Blocks\AccountTabOrdersBlock;
 use Jankx\Extensions\Ecommerce\Blocks\AddToCartBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CartBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CartItemBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CartItemCheckboxBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CartItemImageBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CartItemTitleBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CartItemMetaBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CartItemQuantityBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CartItemPriceBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CartItemRemoveBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CheckoutBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CurrencySwitcherBlock;
 use Jankx\Extensions\Ecommerce\Cart\Cart;
@@ -136,6 +143,13 @@ class EcommerceExtension extends AbstractExtension
         $blockClasses = [
             'cart' => CartBlock::class,
             'cart-item' => CartItemBlock::class,
+            'cart-item-checkbox' => CartItemCheckboxBlock::class,
+            'cart-item-image' => CartItemImageBlock::class,
+            'cart-item-title' => CartItemTitleBlock::class,
+            'cart-item-meta' => CartItemMetaBlock::class,
+            'cart-item-quantity' => CartItemQuantityBlock::class,
+            'cart-item-price' => CartItemPriceBlock::class,
+            'cart-item-remove' => CartItemRemoveBlock::class,
             'checkout' => CheckoutBlock::class,
             'account-tab-orders' => AccountTabOrdersBlock::class,
             'add-to-cart' => AddToCartBlock::class,
@@ -173,7 +187,22 @@ class EcommerceExtension extends AbstractExtension
 
         $blocksDir = $this->get_extension_path() . '/blocks';
         $blockMetadata = [];
-        foreach (['cart', 'cart-item', 'checkout', 'account-tab-orders', 'add-to-cart', 'currency-switcher'] as $slug) {
+        $blockSlugs = [
+            'cart',
+            'cart-item',
+            'cart-item-checkbox',
+            'cart-item-image',
+            'cart-item-title',
+            'cart-item-meta',
+            'cart-item-quantity',
+            'cart-item-price',
+            'cart-item-remove',
+            'checkout',
+            'account-tab-orders',
+            'add-to-cart',
+            'currency-switcher',
+        ];
+        foreach ($blockSlugs as $slug) {
             $blockJson = $blocksDir . '/' . $slug . '/block.json';
             if (file_exists($blockJson)) {
                 $metadata = json_decode(file_get_contents($blockJson), true);

@@ -3,12 +3,29 @@ namespace Jankx\Extensions\Ecommerce\Blocks;
 
 use Jankx\Extensions\Ecommerce\Block;
 use Jankx\Extensions\Ecommerce\Cart\Cart;
-use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
+use Jankx\Extensions\Ecommerce\Cart\CartItem;
+use Jankx\Extensions\Ecommerce\Cart\CartItemContext;
 use Jankx\Extensions\Ecommerce\EcommerceExtension;
 
 class CartBlock extends Block
 {
     protected $blockId = 'jankx/cart';
+
+    /**
+     * Default inner block template used when the cart block has no saved
+     * inner blocks (e.g. legacy `<!-- wp:jankx/cart /-->` content).
+     *
+     * @var string[]
+     */
+    protected $defaultItemInnerBlocks = [
+        'jankx/cart-item-checkbox',
+        'jankx/cart-item-image',
+        'jankx/cart-item-title',
+        'jankx/cart-item-meta',
+        'jankx/cart-item-quantity',
+        'jankx/cart-item-price',
+        'jankx/cart-item-remove',
+    ];
 
     public function render($attributes, $content = '', $block = null)
     {
@@ -22,7 +39,7 @@ class CartBlock extends Block
         if ($cart->isEmpty()) {
             $output .= $this->renderEmptyCart();
         } else {
-            $output .= $this->renderItems($cart);
+            $output .= $this->renderItems($cart, $block);
             $output .= $this->renderTotals($cart);
         }
 
@@ -47,51 +64,67 @@ class CartBlock extends Block
             . '</div>';
     }
 
-    protected function renderItems(Cart $cart): string
+    protected function renderItems(Cart $cart, $block = null): string
     {
-        $output = '<div class="jankx-cart-items">';
-        $output .= '<div class="jankx-cart-item-head">'
-            . '<span class="jankx-col-product">' . esc_html__('Product', 'jankx') . '</span>'
-            . '<span class="jankx-col-price">' . esc_html__('Price', 'jankx') . '</span>'
-            . '<span class="jankx-col-qty">' . esc_html__('Quantity', 'jankx') . '</span>'
-            . '<span class="jankx-col-total">' . esc_html__('Total', 'jankx') . '</span>'
-            . '<span class="jankx-col-action"></span>'
-            . '</div>';
+        $innerBlocks = [];
+        if ($block && !empty($block->inner_blocks)) {
+            $innerBlocks = $block->inner_blocks;
+        }
+
+        $output = '<div class="jankx-cart-items jankx-cart-items--list">';
 
         foreach ($cart->getItems() as $itemKey => $item) {
-            $productId = $item->getProductId();
-            $thumbnail = get_the_post_thumbnail_url($productId, 'thumbnail');
-            $productUrl = get_permalink($productId);
-
+            CartItemContext::set($item);
             $output .= '<div class="jankx-cart-item" data-item-key="' . esc_attr($itemKey) . '">';
-            $output .= '<div class="jankx-col-product">';
-            if ($thumbnail) {
-                $output .= '<a class="jankx-cart-thumb" href="' . esc_url($productUrl) . '">'
-                    . '<img src="' . esc_url($thumbnail) . '" alt="' . esc_attr($item->getName()) . '"></a>';
-            }
-            $output .= '<div class="jankx-cart-name">';
-            $output .= '<a href="' . esc_url($productUrl) . '">' . esc_html($item->getName()) . '</a>';
-            foreach ($item->getArgs() as $argKey => $argValue) {
-                if (is_string($argValue)) {
-                    $output .= '<span class="jankx-cart-args">' . esc_html($argKey . ': ' . $argValue) . '</span>';
-                }
-            }
-            $output .= '</div></div>';
 
-            $output .= '<div class="jankx-col-price">' . esc_html($this->formatPrice($item->getUnitPrice())) . '</div>';
-            $output .= '<div class="jankx-col-qty">' . esc_html($item->getQuantity()) . '</div>';
-            $output .= '<div class="jankx-col-total">' . esc_html($this->formatPrice($item->getSubtotal())) . '</div>';
-            $output .= '<div class="jankx-col-action">'
-                . '<button type="button" class="jankx-cart-remove" data-item-key="' . esc_attr($itemKey) . '">'
-                . esc_html__('Remove', 'jankx') . '</button>'
-                . '</div>';
+            if (count($innerBlocks) > 0) {
+                foreach ($innerBlocks as $innerBlock) {
+                    $output .= $innerBlock->render();
+                }
+            } else {
+                $output .= $this->renderDefaultItem();
+            }
 
             $output .= '</div>';
         }
 
+        CartItemContext::set(null);
         $output .= '</div>';
 
         return $output;
+    }
+
+    /**
+     * Render the fallback item layout composed of the built-in sub-blocks.
+     */
+    protected function renderDefaultItem(): string
+    {
+        $output = '';
+        foreach ($this->defaultItemInnerBlocks as $slug) {
+            $blockClass = $this->resolveInnerBlockClass($slug);
+            if (!$blockClass) {
+                continue;
+            }
+            $blockInstance = new $blockClass();
+            $output .= $blockInstance->render([]);
+        }
+
+        return $output;
+    }
+
+    protected function resolveInnerBlockClass(string $blockId): ?string
+    {
+        $map = [
+            'jankx/cart-item-checkbox' => CartItemCheckboxBlock::class,
+            'jankx/cart-item-image'    => CartItemImageBlock::class,
+            'jankx/cart-item-title'    => CartItemTitleBlock::class,
+            'jankx/cart-item-meta'     => CartItemMetaBlock::class,
+            'jankx/cart-item-quantity' => CartItemQuantityBlock::class,
+            'jankx/cart-item-price'    => CartItemPriceBlock::class,
+            'jankx/cart-item-remove'   => CartItemRemoveBlock::class,
+        ];
+
+        return $map[$blockId] ?? null;
     }
 
     protected function renderTotals(Cart $cart): string

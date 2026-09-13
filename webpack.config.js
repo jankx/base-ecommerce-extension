@@ -35,6 +35,13 @@ module.exports = {
     entry: {
         'blocks/cart/build/index': './blocks/cart/src/index.tsx',
         'blocks/cart-item/build/index': './blocks/cart-item/src/index.tsx',
+        'blocks/cart-item-checkbox/build/index': './blocks/cart-item-checkbox/src/index.tsx',
+        'blocks/cart-item-image/build/index': './blocks/cart-item-image/src/index.tsx',
+        'blocks/cart-item-title/build/index': './blocks/cart-item-title/src/index.tsx',
+        'blocks/cart-item-meta/build/index': './blocks/cart-item-meta/src/index.tsx',
+        'blocks/cart-item-quantity/build/index': './blocks/cart-item-quantity/src/index.tsx',
+        'blocks/cart-item-price/build/index': './blocks/cart-item-price/src/index.tsx',
+        'blocks/cart-item-remove/build/index': './blocks/cart-item-remove/src/index.tsx',
         'blocks/checkout/build/index': './blocks/checkout/src/index.tsx',
         'blocks/account-tab-orders/build/index': './blocks/account-tab-orders/src/index.tsx',
         'blocks/add-to-cart/build/index': './blocks/add-to-cart/src/index.tsx',

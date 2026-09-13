@@ -19,7 +19,7 @@
     }
 
     document.addEventListener('click', function (event) {
-        var button = event.target.closest('.jankx-cart-remove');
+        var button = event.target.closest('.jankx-cart-remove, .jankx-cart-item__remove');
         if (!button) {
             return;
         }
@@ -38,6 +38,41 @@
             button.disabled = false;
         }).catch(function () {
             alert('Failed to remove item.');
+            button.disabled = false;
+        });
+    });
+
+    document.addEventListener('click', function (event) {
+        var button = event.target.closest('.jankx-cart-item__qty-btn');
+        if (!button) {
+            return;
+        }
+
+        event.preventDefault();
+        var itemKey = button.getAttribute('data-item-key');
+        var step = parseInt(button.getAttribute('data-step'), 10) || 0;
+        var valueEl = document.querySelector('.jankx-cart-item__qty-value[data-item-key="' + itemKey + '"]');
+        if (!valueEl) {
+            return;
+        }
+
+        var current = parseInt(valueEl.textContent, 10) || 1;
+        var next = Math.max(1, current + step);
+
+        button.disabled = true;
+        getJson({
+            url: window.jankxEcommerce.restUrl + '/cart/items/' + encodeURIComponent(itemKey) + '/quantity',
+            method: 'PUT',
+            body: { quantity: next }
+        }).then(function (response) {
+            if (response.success) {
+                window.location.reload();
+                return;
+            }
+            alert(response.message || 'Failed to update quantity.');
+            button.disabled = false;
+        }).catch(function () {
+            alert('Failed to update quantity.');
             button.disabled = false;
         });
     });

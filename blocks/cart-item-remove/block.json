@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/cart-item-remove",
+  "title": "Cart Item Remove",
+  "category": "jankx",
+  "icon": "trash",
+  "description": "Remove button for the current cart item.",
+  "textdomain": "jankx",
+  "supports": {
+    "html": false
+  },
+  "editorScript": "file:./build/index.js"
+}

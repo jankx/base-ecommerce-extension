@@ -62,6 +62,23 @@ class EcommerceController
             ],
         ]);
 
+        register_rest_route(self::REST_NAMESPACE, '/cart/items/(?P<item_key>[a-zA-Z0-9]+)/quantity', [
+            'methods'             => \WP_REST_Server::EDITABLE,
+            'callback'            => [$this, 'updateCartItemQuantity'],
+            'permission_callback' => '__return_true',
+            'args'                => [
+                'item_key' => [
+                    'required' => true,
+                    'type'     => 'string',
+                ],
+                'quantity' => [
+                    'required' => true,
+                    'type'     => 'integer',
+                    'minimum' => 1,
+                ],
+            ],
+        ]);
+
         register_rest_route(self::REST_NAMESPACE, '/checkout', [
             'methods'             => \WP_REST_Server::CREATABLE,
             'callback'            => [$this, 'checkout'],
@@ -192,6 +209,26 @@ class EcommerceController
         );
 
         if (!$removed) {
+            return new \WP_REST_Response([
+                'success' => false,
+                'message' => __('Không tìm thấy sản phẩm trong giỏ hàng.', 'jankx'),
+            ], 404);
+        }
+
+        return rest_ensure_response([
+            'success' => true,
+            'cart'    => Cart::get_instance()->toArray(),
+        ]);
+    }
+
+    public function updateCartItemQuantity(\WP_REST_Request $request): \WP_REST_Response
+    {
+        $updated = Cart::get_instance()->updateItem(
+            (string) $request->get_param('item_key'),
+            (int) $request->get_param('quantity')
+        );
+
+        if (!$updated) {
             return new \WP_REST_Response([
                 'success' => false,
                 'message' => __('Không tìm thấy sản phẩm trong giỏ hàng.', 'jankx'),

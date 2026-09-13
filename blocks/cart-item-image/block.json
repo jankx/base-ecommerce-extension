@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/cart-item-image",
+  "title": "Cart Item Image",
+  "category": "jankx",
+  "icon": "format-image",
+  "description": "Featured image of the current cart item.",
+  "textdomain": "jankx",
+  "supports": {
+    "html": false
+  },
+  "editorScript": "file:./build/index.js"
+}
