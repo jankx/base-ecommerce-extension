@@ -13,6 +13,8 @@ use Jankx\Extensions\Ecommerce\Blocks\CartItemMetaBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CartItemQuantityBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CartItemPriceBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CartItemRemoveBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CartTotalsBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CartEmptyBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CheckoutBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CurrencySwitcherBlock;
 use Jankx\Extensions\Ecommerce\Cart\Cart;
@@ -150,6 +152,8 @@ class EcommerceExtension extends AbstractExtension
             'cart-item-quantity' => CartItemQuantityBlock::class,
             'cart-item-price' => CartItemPriceBlock::class,
             'cart-item-remove' => CartItemRemoveBlock::class,
+            'cart-totals' => CartTotalsBlock::class,
+            'cart-empty' => CartEmptyBlock::class,
             'checkout' => CheckoutBlock::class,
             'account-tab-orders' => AccountTabOrdersBlock::class,
             'add-to-cart' => AddToCartBlock::class,
@@ -197,6 +201,8 @@ class EcommerceExtension extends AbstractExtension
             'cart-item-quantity',
             'cart-item-price',
             'cart-item-remove',
+            'cart-totals',
+            'cart-empty',
             'checkout',
             'account-tab-orders',
             'add-to-cart',

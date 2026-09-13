@@ -6,6 +6,8 @@ use Jankx\Extensions\Ecommerce\Cart\Cart;
 use Jankx\Extensions\Ecommerce\Cart\CartItem;
 use Jankx\Extensions\Ecommerce\Cart\CartItemContext;
 use Jankx\Extensions\Ecommerce\EcommerceExtension;
+use Jankx\Extensions\Ecommerce\Blocks\CartTotalsBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CartEmptyBlock;
 
 class CartBlock extends Block
 {
@@ -37,10 +39,47 @@ class CartBlock extends Block
         $output = sprintf('<div %s>', $wrapperAttrs);
 
         if ($cart->isEmpty()) {
-            $output .= $this->renderEmptyCart();
+            $emptyInnerBlocks = [];
+            if ($block && !empty($block->inner_blocks)) {
+                foreach ($block->inner_blocks as $innerBlock) {
+                    if ($innerBlock->name === 'jankx/cart-empty') {
+                        $emptyInnerBlocks[] = $innerBlock;
+                    }
+                }
+            }
+
+            if (!empty($emptyInnerBlocks)) {
+                foreach ($emptyInnerBlocks as $emptyBlock) {
+                    $output .= $emptyBlock->render();
+                }
+            } elseif (!CartEmptyBlock::hasRendered() && !(function_exists('has_block') && has_block('jankx/cart-empty'))) {
+                $output .= $this->renderEmptyCart();
+            }
         } else {
-            $output .= $this->renderItems($cart, $block);
-            $output .= $this->renderTotals($cart);
+            $itemInnerBlocks = [];
+            $totalsInnerBlocks = [];
+
+            if ($block && !empty($block->inner_blocks)) {
+                foreach ($block->inner_blocks as $innerBlock) {
+                    if ($innerBlock->name === 'jankx/cart-totals') {
+                        $totalsInnerBlocks[] = $innerBlock;
+                    } elseif ($innerBlock->name === 'jankx/cart-empty') {
+                        continue;
+                    } else {
+                        $itemInnerBlocks[] = $innerBlock;
+                    }
+                }
+            }
+
+            $output .= $this->renderItems($cart, $itemInnerBlocks);
+
+            if (!empty($totalsInnerBlocks)) {
+                foreach ($totalsInnerBlocks as $totalsBlock) {
+                    $output .= $totalsBlock->render();
+                }
+            } elseif (!CartTotalsBlock::hasRendered() && !(function_exists('has_block') && has_block('jankx/cart-totals'))) {
+                $output .= $this->renderTotals($cart);
+            }
         }
 
         $output .= '</div>';
@@ -50,25 +89,21 @@ class CartBlock extends Block
 
     protected function renderEmptyCart(): string
     {
-        $continueUrl = (string) apply_filters(
-            'jankx/ecommerce/cart/continue_shopping_url',
-            home_url('/')
-        );
-
-        return '<div class="jankx-empty-state">'
-            . '<span class="jankx-empty-icon" aria-hidden="true">&#128722;</span>'
-            . '<h2 class="jankx-section-title">' . esc_html__('Your cart is empty', 'jankx') . '</h2>'
-            . '<p>' . esc_html__('Add some products before checking out.', 'jankx') . '</p>'
-            . '<a href="' . esc_url($continueUrl) . '" class="jankx-btn jankx-btn-primary">'
-            . esc_html__('Continue shopping', 'jankx') . '</a>'
-            . '</div>';
+        $emptyBlock = new CartEmptyBlock();
+        return $emptyBlock->renderEmptyHtml();
     }
 
-    protected function renderItems(Cart $cart, $block = null): string
+    protected function renderItems(Cart $cart, $innerBlocksOrBlock = null): string
     {
-        $innerBlocks = [];
-        if ($block && !empty($block->inner_blocks)) {
-            $innerBlocks = $block->inner_blocks;
+        $itemInnerBlocks = [];
+        if (is_array($innerBlocksOrBlock)) {
+            $itemInnerBlocks = $innerBlocksOrBlock;
+        } elseif ($innerBlocksOrBlock && !empty($innerBlocksOrBlock->inner_blocks)) {
+            foreach ($innerBlocksOrBlock->inner_blocks as $innerBlock) {
+                if ($innerBlock->name !== 'jankx/cart-totals' && $innerBlock->name !== 'jankx/cart-empty') {
+                    $itemInnerBlocks[] = $innerBlock;
+                }
+            }
         }
 
         $output = '<div class="jankx-cart-items jankx-cart-items--list">';
@@ -77,8 +112,8 @@ class CartBlock extends Block
             CartItemContext::set($item);
             $output .= '<div class="jankx-cart-item" data-item-key="' . esc_attr($itemKey) . '">';
 
-            if (count($innerBlocks) > 0) {
-                foreach ($innerBlocks as $innerBlock) {
+            if (count($itemInnerBlocks) > 0) {
+                foreach ($itemInnerBlocks as $innerBlock) {
                     $output .= $innerBlock->render();
                 }
             } else {
@@ -129,37 +164,8 @@ class CartBlock extends Block
 
     protected function renderTotals(Cart $cart): string
     {
-        $checkoutUrl = EcommerceExtension::get_checkout_page_url();
-
-        $output = '<div class="jankx-cart-totals">';
-        $output .= '<h2 class="jankx-section-title">' . esc_html__('Cart totals', 'jankx') . '</h2>';
-
-        $output .= $this->renderCouponSection($cart);
-
-        if ($cart->getDiscount() > 0) {
-            $output .= '<div class="jankx-total-row">'
-                . '<span>' . esc_html__('Subtotal', 'jankx') . '</span>'
-                . '<span>' . esc_html($this->formatPrice($cart->getSubtotal())) . '</span>'
-                . '</div>';
-            $output .= '<div class="jankx-total-row">'
-                . '<span>' . esc_html__('Discount', 'jankx') . '</span>'
-                . '<span>' . esc_html('-' . $this->formatPrice($cart->getDiscount())) . '</span>'
-                . '</div>';
-        }
-
-        $output .= '<div class="jankx-total-row jankx-total-grand">'
-            . '<span>' . esc_html__('Total', 'jankx') . '</span>'
-            . '<span>' . esc_html($this->formatPrice($cart->getTotal())) . '</span>'
-            . '</div>';
-
-        $output .= '<div class="jankx-cart-actions">'
-            . '<a href="' . esc_url($checkoutUrl) . '" class="jankx-btn jankx-btn-primary jankx-btn-checkout">'
-            . esc_html__('Proceed to checkout', 'jankx') . '</a>'
-            . '</div>';
-
-        $output .= '</div>';
-
-        return $output;
+        $totalsBlock = new CartTotalsBlock();
+        return $totalsBlock->renderTotalsHtml($cart);
     }
 
     /**

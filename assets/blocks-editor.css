@@ -123,3 +123,32 @@
     padding: 8px;
     background: #fbfbfb;
 }
+
+.jankx-cart-totals--editor {
+    border: 1px dashed #c5c5c5;
+    border-radius: 8px;
+    padding: 1.25rem;
+    background: #fafafa;
+    max-width: 420px;
+}
+
+.jankx-cart-totals--editor .jankx-coupon-input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.jankx-cart-totals--editor .jankx-coupon-code {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.jankx-cart-empty--editor {
+    border: 1px dashed #c5c5c5;
+    border-radius: 8px;
+    padding: 2rem 1rem;
+    background: #fafafa;
+    text-align: center;
+}

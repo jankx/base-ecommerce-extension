@@ -42,6 +42,8 @@ module.exports = {
         'blocks/cart-item-quantity/build/index': './blocks/cart-item-quantity/src/index.tsx',
         'blocks/cart-item-price/build/index': './blocks/cart-item-price/src/index.tsx',
         'blocks/cart-item-remove/build/index': './blocks/cart-item-remove/src/index.tsx',
+        'blocks/cart-totals/build/index': './blocks/cart-totals/src/index.tsx',
+        'blocks/cart-empty/build/index': './blocks/cart-empty/src/index.tsx',
         'blocks/checkout/build/index': './blocks/checkout/src/index.tsx',
         'blocks/account-tab-orders/build/index': './blocks/account-tab-orders/src/index.tsx',
         'blocks/add-to-cart/build/index': './blocks/add-to-cart/src/index.tsx',

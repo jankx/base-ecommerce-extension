@@ -2,7 +2,7 @@ import { registerBlockType } from '@wordpress/blocks';
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 import metadata from '../block.json';
 
-const ALLOWED_BLOCKS = [
+const ITEM_ALLOWED_BLOCKS = [
     'jankx/cart-item-checkbox',
     'jankx/cart-item-image',
     'jankx/cart-item-title',
@@ -12,7 +12,13 @@ const ALLOWED_BLOCKS = [
     'jankx/cart-item-remove',
 ];
 
-const DEFAULT_TEMPLATE = ALLOWED_BLOCKS.map((name) => [name]);
+const ALLOWED_BLOCKS = [
+    ...ITEM_ALLOWED_BLOCKS,
+    'jankx/cart-totals',
+    'jankx/cart-empty',
+];
+
+const DEFAULT_TEMPLATE = ITEM_ALLOWED_BLOCKS.map((name) => [name]);
 
 function Edit() {
     const blockProps = useBlockProps({
