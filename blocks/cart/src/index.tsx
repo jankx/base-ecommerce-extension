@@ -18,7 +18,11 @@ const ALLOWED_BLOCKS = [
     'jankx/cart-empty',
 ];
 
-const DEFAULT_TEMPLATE = ITEM_ALLOWED_BLOCKS.map((name) => [name]);
+const DEFAULT_TEMPLATE = [
+    ...ITEM_ALLOWED_BLOCKS.map((name) => [name]),
+    ['jankx/cart-totals'],
+    ['jankx/cart-empty'],
+];
 
 function Edit() {
     const blockProps = useBlockProps({
@@ -28,7 +32,7 @@ function Edit() {
     return (
         <div {...blockProps}>
             <div className="jankx-cart-block__editor-note">
-                Sắp xếp các block con để tạo layout cho mỗi sản phẩm trong giỏ hàng.
+                Tùy chỉnh giỏ hàng: Các block item và totals hiển thị khi có sản phẩm; block cart-empty hiển thị khi giỏ hàng trống.
             </div>
             <div className="jankx-cart-block__items-preview">
                 <InnerBlocks

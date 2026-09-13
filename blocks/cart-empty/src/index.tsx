@@ -46,6 +46,19 @@ function Edit({ attributes, setAttributes }) {
             </InspectorControls>
 
             <div {...blockProps}>
+                <div style={{
+                    display: 'inline-block',
+                    padding: '2px 8px',
+                    marginBottom: '8px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    background: '#e3f2fd',
+                    color: '#1565c0',
+                    borderRadius: '4px',
+                }}>
+                    {__('Hiển thị khi giỏ hàng trống', 'jankx')}
+                </div>
                 <span className="jankx-empty-icon" aria-hidden="true">&#128722;</span>
                 <RichText
                     tagName="h2"
