@@ -431,11 +431,31 @@ class EcommerceController
         $currency = sanitize_text_field($request->get_param('currency'));
 
         if (CurrencyManager::setCurrentCurrency($currency)) {
-            return rest_ensure_response([
+            $response = rest_ensure_response([
                 'success'  => true,
                 'currency' => $currency,
                 'symbol'   => CurrencyManager::getCurrency($currency)['symbol'] ?? $currency,
             ]);
+
+            $cookiePath = defined('COOKIEPATH') && COOKIEPATH ? COOKIEPATH : '/';
+            $cookieDomain = defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : '';
+            $cookieHeader = sprintf(
+                '%s=%s; expires=%s; Max-Age=%d; path=%s; SameSite=Lax',
+                CurrencyManager::SESSION_KEY,
+                $currency,
+                gmdate('D, d-M-Y H:i:s T', time() + 30 * DAY_IN_SECONDS),
+                30 * DAY_IN_SECONDS,
+                $cookiePath
+            );
+            if (!empty($cookieDomain)) {
+                $cookieHeader .= '; domain=' . $cookieDomain;
+            }
+            if (is_ssl()) {
+                $cookieHeader .= '; Secure';
+            }
+            $response->header('Set-Cookie', $cookieHeader, false);
+
+            return $response;
         }
 
         return new \WP_REST_Response([

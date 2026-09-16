@@ -159,11 +159,18 @@ class CurrencyManager
         }
 
         // Lưu vào Cookie (Live trong 30 ngày)
+        $cookiePath = defined('COOKIEPATH') && COOKIEPATH ? COOKIEPATH : '/';
+        $cookieDomain = defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : '';
         if (!headers_sent()) {
-            setcookie(self::SESSION_KEY, $code, time() + 30 * DAY_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+            setcookie(self::SESSION_KEY, $code, time() + 30 * DAY_IN_SECONDS, $cookiePath, $cookieDomain, is_ssl(), false);
         }
 
-        $_SESSION[self::SESSION_KEY] = $code;
+        // Cập nhật ngay $_COOKIE trong request hiện tại để getCurrentCurrency() trả về đúng giá trị mới
+        $_COOKIE[self::SESSION_KEY] = $code;
+
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            $_SESSION[self::SESSION_KEY] = $code;
+        }
 
         do_action('jankx/ecommerce/currency/changed', $code);
 

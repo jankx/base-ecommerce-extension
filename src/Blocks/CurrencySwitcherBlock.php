@@ -15,20 +15,15 @@ class CurrencySwitcherBlock extends Block
 
     public function enqueueScripts(): void
     {
-        if (!is_singular() && !is_page()) {
-            return;
-        }
-
-        global $post;
-        if (!$post || !has_block(self::BLOCK_ID, $post)) {
-            return;
-        }
+        $jsUrl = $this->getAssetsUrl('currency-switcher.js');
+        $jsPath = $this->getAssetsPath('currency-switcher.js');
+        $version = file_exists($jsPath) ? filemtime($jsPath) : '1.0.0';
 
         wp_enqueue_script(
             'jankx-currency-switcher',
-            $this->getAssetsUrl('currency-switcher.js'),
+            $jsUrl,
             [],
-            filemtime($this->getAssetsPath('currency-switcher.js')),
+            $version,
             true
         );
 
@@ -41,6 +36,8 @@ class CurrencySwitcherBlock extends Block
 
     public function render(array $attributes): string
     {
+        $this->enqueueScripts();
+
         // block.json uses 'displayMode'; fall back to legacy 'display' key just in case
         $display = $attributes['displayMode'] ?? $attributes['display'] ?? 'dropdown';
         $showFlag = $attributes['showFlag'] ?? true;
@@ -145,8 +142,10 @@ class CurrencySwitcherBlock extends Block
                 $itemClasses[] = 'current-currency';
             }
 
+            $url = esc_url(add_query_arg('currency', $code));
+
             $html .= '<li class="' . esc_attr(implode(' ', $itemClasses)) . '">';
-            $html .= '<a href="#" class="jcs-dropdown-link" data-jcs-action="switch" data-jcs-currency="' . esc_attr($code) . '">';
+            $html .= '<a href="' . $url . '" class="jcs-dropdown-link" data-jcs-action="switch" data-jcs-currency="' . esc_attr($code) . '">';
             $html .= $this->buildLabelHtml($currency, $showFlag, $showCode, $showSymbol, $showName);
             $html .= '</a></li>';
         }
@@ -228,11 +227,19 @@ class CurrencySwitcherBlock extends Block
 
     protected function getAssetsUrl(string $file): string
     {
-        return dirname($this->blockPath ? dirname($this->blockPath) : dirname(__DIR__)) . '/assets/' . $file;
+        $ext = \Jankx\Extensions\Ecommerce\EcommerceExtension::get_instance();
+        if ($ext) {
+            return $ext->get_extension_url() . '/assets/' . $file;
+        }
+        return get_stylesheet_directory_uri() . '/extensions/base-ecommerce/assets/' . $file;
     }
 
     protected function getAssetsPath(string $file): string
     {
-        return dirname($this->blockPath ? dirname($this->blockPath) : dirname(__DIR__)) . '/assets/' . $file;
+        $ext = \Jankx\Extensions\Ecommerce\EcommerceExtension::get_instance();
+        if ($ext) {
+            return $ext->get_extension_path() . '/assets/' . $file;
+        }
+        return dirname(__DIR__, 2) . '/assets/' . $file;
     }
 }

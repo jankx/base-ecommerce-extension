@@ -65,7 +65,8 @@
     transition: transform 0.2s ease;
 }
 
-.jcs-dropdown-wrapper:hover .jcs-arrow {
+.jcs-dropdown-wrapper:hover .jcs-arrow,
+.jcs-dropdown-wrapper.is-open .jcs-arrow {
     transform: rotate(180deg);
 }
 
@@ -89,7 +90,9 @@
     width: max-content;
 }
 
-.jcs-dropdown-wrapper:hover .jcs-dropdown-menu {
+.jcs-dropdown-wrapper:hover .jcs-dropdown-menu,
+.jcs-dropdown-wrapper.is-open .jcs-dropdown-menu,
+.jcs-dropdown-menu.is-open {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
