@@ -70,26 +70,133 @@ class OrderAdmin
             return;
         }
 
-        $newStatus = sanitize_text_field($_POST['order_status'] ?? '');
-        $note = sanitize_textarea_field($_POST['order_note'] ?? '');
-        $trackingNumber = sanitize_text_field($_POST['tracking_number'] ?? '');
-
-        if ($newStatus) {
-            OrderModel::updateStatus($orderId, $newStatus, $note);
+        $order = OrderModel::findById($orderId);
+        if (!$order) {
+            return;
         }
 
-        // Save tracking number if provided
-        if ($trackingNumber !== '') {
-            OrderModel::update($orderId, ['tracking_number' => $trackingNumber]);
-        }
+        $currentUserId = get_current_user_id();
+        $now = current_time('mysql');
+        $history = $order['history'] ?? [];
+        $oldItems = $order['items'] ?? [];
+        $updateData = [];
 
-        // Update order total if provided (e.g. manual price quote for form orders)
-        if (isset($_POST['order_total']) && $_POST['order_total'] !== '') {
-            $newTotal = floatval($_POST['order_total']);
-            if ($newTotal >= 0) {
-                OrderModel::update($orderId, ['total' => $newTotal]);
+        // ── 1. Process order item price/qty changes ───────
+        $postedItems = $_POST['order_items'] ?? [];
+        if (!empty($postedItems) && is_array($postedItems)) {
+            $newItems = [];
+            foreach ($oldItems as $idx => $oldItem) {
+                $posted = $postedItems[$idx] ?? [];
+                $newUnitPrice = isset($posted['unit_price']) && $posted['unit_price'] !== ''
+                    ? max(0, floatval($posted['unit_price']))
+                    : (float) ($oldItem['unit_price'] ?? 0);
+                $newQty = isset($posted['quantity']) && $posted['quantity'] !== ''
+                    ? max(1, intval($posted['quantity']))
+                    : (int) ($oldItem['quantity'] ?? 1);
+
+                $oldUnitPrice = (float) ($oldItem['unit_price'] ?? 0);
+                $oldQty = (int) ($oldItem['quantity'] ?? 1);
+
+                $priceChanged = abs($newUnitPrice - $oldUnitPrice) > 0.001;
+                $qtyChanged   = $newQty !== $oldQty;
+
+                if ($priceChanged || $qtyChanged) {
+                    $history[] = [
+                        'action'        => 'item_updated',
+                        'item_name'     => $oldItem['name'] ?? '',
+                        'product_id'    => $oldItem['product_id'] ?? 0,
+                        'old_unit_price' => $oldUnitPrice,
+                        'new_unit_price' => $newUnitPrice,
+                        'old_qty'       => $oldQty,
+                        'new_qty'       => $newQty,
+                        'user_id'       => $currentUserId,
+                        'created_at'    => $now,
+                    ];
+                }
+
+                $newItem = array_merge($oldItem, [
+                    'unit_price' => $newUnitPrice,
+                    'quantity'   => $newQty,
+                    'total'      => round($newUnitPrice * $newQty, 2),
+                ]);
+                $newItems[] = $newItem;
             }
+
+            $updateData['items'] = $newItems;
+
+            // Sync jankx_order_posts table
+            OrderModel::updateOrderPosts($orderId, $newItems);
+        } else {
+            $newItems = $oldItems;
         }
+
+        // ── 2. Handle order total ─────────────────────────
+        if (isset($_POST['order_total']) && $_POST['order_total'] !== '') {
+            $newTotal = max(0, floatval($_POST['order_total']));
+            $oldTotal = (float) ($order['total'] ?? 0);
+            if (abs($newTotal - $oldTotal) > 0.001) {
+                $history[] = [
+                    'action'    => 'price_updated',
+                    'old_total' => $oldTotal,
+                    'new_total' => $newTotal,
+                    'user_id'   => $currentUserId,
+                    'created_at' => $now,
+                ];
+            }
+            $updateData['total'] = $newTotal;
+        }
+
+        // ── 3. Handle tracking number ─────────────────────
+        $trackingNumber = sanitize_text_field($_POST['tracking_number'] ?? '');
+        $oldTracking = (string) ($order['tracking_number'] ?? '');
+        if ($trackingNumber !== $oldTracking) {
+            $history[] = [
+                'action'      => 'tracking_updated',
+                'old_tracking' => $oldTracking,
+                'new_tracking' => $trackingNumber,
+                'user_id'     => $currentUserId,
+                'created_at'  => $now,
+            ];
+            $updateData['tracking_number'] = $trackingNumber;
+        }
+
+        // ── 4. Handle status change ───────────────────────
+        $newStatus = sanitize_text_field($_POST['order_status'] ?? '');
+        $oldStatus = (string) ($order['status'] ?? '');
+        if ($newStatus && $newStatus !== $oldStatus) {
+            $history[] = [
+                'action'     => 'status_changed',
+                'from'       => $oldStatus,
+                'to'         => $newStatus,
+                'user_id'    => $currentUserId,
+                'created_at' => $now,
+            ];
+            $updateData['status'] = $newStatus;
+            $updateData['handler_id'] = $currentUserId;
+        }
+
+        // ── 5. Handle note ────────────────────────────────
+        $note = sanitize_textarea_field($_POST['order_note'] ?? '');
+        if ($note !== '') {
+            $history[] = [
+                'action'     => 'note_added',
+                'note'       => $note,
+                'user_id'    => $currentUserId,
+                'created_at' => $now,
+            ];
+            $notes = $order['notes'] ?? [];
+            $notes[] = [
+                'note'       => $note,
+                'customer'   => false,
+                'user_id'    => $currentUserId,
+                'created_at' => $now,
+            ];
+            $updateData['notes'] = $notes;
+        }
+
+        // ── 6. Save ───────────────────────────────────────
+        $updateData['history'] = $history;
+        OrderModel::update($orderId, $updateData);
 
         wp_redirect(admin_url('admin.php?page=' . self::PAGE_SLUG . '&view=' . $orderId . '&updated=1'));
         exit;
@@ -396,26 +503,48 @@ class OrderAdmin
                                             <thead>
                                                 <tr>
                                                     <th><?php esc_html_e('PRODUCT', 'jankx'); ?></th>
-                                                    <th><?php esc_html_e('QTY', 'jankx'); ?></th>
-                                                    <th><?php esc_html_e('UNIT PRICE', 'jankx'); ?></th>
-                                                    <th><?php esc_html_e('TOTAL', 'jankx'); ?></th>
+                                                    <th style="width:80px;"><?php esc_html_e('QTY', 'jankx'); ?></th>
+                                                    <th style="width:160px;"><?php esc_html_e('UNIT PRICE', 'jankx'); ?></th>
+                                                    <th style="width:130px;"><?php esc_html_e('TOTAL', 'jankx'); ?></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <?php if (empty($items)): ?>
                                                     <tr><td colspan="4" style="text-align: center; color: #a7aaad;"><?php esc_html_e('No items.', 'jankx'); ?></td></tr>
                                                 <?php else: ?>
-                                                    <?php foreach ($items as $item): ?>
-                                                        <tr>
+                                                    <?php foreach ($items as $idx => $item): ?>
+                                                        <?php
+                                                        $itemTotal = $item->getUnitPrice() * $item->getQuantity();
+                                                        ?>
+                                                        <tr class="jankx-item-row" data-idx="<?php echo esc_attr($idx); ?>">
                                                             <td>
                                                                 <span class="item-name"><?php echo esc_html($item->getName()); ?></span>
                                                                 <?php if ($item->getProductId()): ?>
                                                                     <div class="item-meta">ID: <?php echo esc_html($item->getProductId()); ?></div>
                                                                 <?php endif; ?>
+                                                                <input type="hidden" name="order_items[<?php echo esc_attr($idx); ?>][product_id]" value="<?php echo esc_attr($item->getProductId()); ?>">
+                                                                <input type="hidden" name="order_items[<?php echo esc_attr($idx); ?>][name]" value="<?php echo esc_attr($item->getName()); ?>">
+                                                                <input type="hidden" name="order_items[<?php echo esc_attr($idx); ?>][product_type]" value="<?php echo esc_attr($item->getProductType()); ?>">
                                                             </td>
-                                                            <td><span class="qty-badge"><?php echo esc_html($item->getQuantity()); ?></span></td>
-                                                            <td class="unit-price"><?php echo esc_html(CurrencyManager::formatPrice($item->getUnitPrice())); ?></td>
-                                                            <td class="item-total"><?php echo esc_html(CurrencyManager::formatPrice($item->getTotal())); ?></td>
+                                                            <td>
+                                                                <input type="number" min="1" step="1"
+                                                                    name="order_items[<?php echo esc_attr($idx); ?>][quantity]"
+                                                                    value="<?php echo esc_attr($item->getQuantity()); ?>"
+                                                                    class="jankx-item-qty"
+                                                                    data-idx="<?php echo esc_attr($idx); ?>"
+                                                                    style="width:60px;">
+                                                            </td>
+                                                            <td class="unit-price">
+                                                                <input type="number" min="0" step="any"
+                                                                    name="order_items[<?php echo esc_attr($idx); ?>][unit_price]"
+                                                                    value="<?php echo esc_attr($item->getUnitPrice()); ?>"
+                                                                    class="jankx-item-price"
+                                                                    data-idx="<?php echo esc_attr($idx); ?>"
+                                                                    style="width:120px;">
+                                                            </td>
+                                                            <td class="item-total" id="jankx-item-total-<?php echo esc_attr($idx); ?>">
+                                                                <?php echo esc_html(CurrencyManager::formatPrice($itemTotal)); ?>
+                                                            </td>
                                                         </tr>
                                                     <?php endforeach; ?>
                                                 <?php endif; ?>
@@ -423,10 +552,16 @@ class OrderAdmin
                                             <tfoot>
                                                 <tr>
                                                     <td colspan="3" class="total-label"><?php esc_html_e('ORDER TOTAL', 'jankx'); ?></td>
-                                                    <td class="total-value"><?php echo esc_html(CurrencyManager::formatPrice($order->getTotal())); ?></td>
+                                                    <td class="total-value" id="jankx-order-total-display"><?php echo esc_html(CurrencyManager::formatPrice($order->getTotal())); ?></td>
                                                 </tr>
                                             </tfoot>
                                         </table>
+                                        <?php if (!empty($items)): ?>
+                                        <p style="margin: 8px 12px 0; font-size: 12px; color: #64748b;">
+                                            <span style="font-size:14px;">&#9998;</span>
+                                            <?php esc_html_e('Chỉnh sửa số lượng hoặc đơn giá rồi nhấn "Cập nhật đơn hàng" để lưu. Thay đổi sẽ được ghi vào lịch sử.', 'jankx'); ?>
+                                        </p>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
 
@@ -459,14 +594,77 @@ class OrderAdmin
                                                             <span class="jankx-history-action">
                                                                 <?php
                                                                 $action = $entry['action'] ?? '';
-                                                                if ($action === 'status_changed') {
-                                                                    printf(
-                                                                        esc_html__('changed status from %s to %s', 'jankx'),
-                                                                        '<strong>' . esc_html(Order::getStatusLabel($entry['from'] ?? '')) . '</strong>',
-                                                                        '<strong>' . esc_html(Order::getStatusLabel($entry['to'] ?? '')) . '</strong>'
-                                                                    );
-                                                                } else {
-                                                                    echo esc_html(ucfirst($action));
+                                                                switch ($action) {
+                                                                    case 'status_changed':
+                                                                        printf(
+                                                                            /* translators: 1: old status label, 2: new status label */
+                                                                            esc_html__('đã chuyển trạng thái từ %s sang %s', 'jankx'),
+                                                                            '<strong>' . esc_html(Order::getStatusLabel($entry['from'] ?? '')) . '</strong>',
+                                                                            '<strong>' . esc_html(Order::getStatusLabel($entry['to'] ?? '')) . '</strong>'
+                                                                        );
+                                                                        break;
+                                                                    case 'price_updated':
+                                                                        printf(
+                                                                            /* translators: 1: old total, 2: new total */
+                                                                            esc_html__('đã cập nhật tổng tiền từ %s → %s', 'jankx'),
+                                                                            '<strong>' . esc_html(CurrencyManager::formatPrice($entry['old_total'] ?? 0)) . '</strong>',
+                                                                            '<strong>' . esc_html(CurrencyManager::formatPrice($entry['new_total'] ?? 0)) . '</strong>'
+                                                                        );
+                                                                        break;
+                                                                    case 'tracking_updated':
+                                                                        $oldTrk = $entry['old_tracking'] ?? '';
+                                                                        $newTrk = $entry['new_tracking'] ?? '';
+                                                                        if ($oldTrk === '') {
+                                                                            printf(
+                                                                                esc_html__('đã thêm mã vận đơn %s', 'jankx'),
+                                                                                '<strong>' . esc_html($newTrk) . '</strong>'
+                                                                            );
+                                                                        } elseif ($newTrk === '') {
+                                                                            printf(
+                                                                                esc_html__('đã xóa mã vận đơn %s', 'jankx'),
+                                                                                '<strong>' . esc_html($oldTrk) . '</strong>'
+                                                                            );
+                                                                        } else {
+                                                                            printf(
+                                                                                esc_html__('đã cập nhật mã vận đơn từ %s → %s', 'jankx'),
+                                                                                '<strong>' . esc_html($oldTrk) . '</strong>',
+                                                                                '<strong>' . esc_html($newTrk) . '</strong>'
+                                                                            );
+                                                                        }
+                                                                        break;
+                                                                    case 'item_updated':
+                                                                        $itemName = $entry['item_name'] ?? '';
+                                                                        $oldUp    = (float) ($entry['old_unit_price'] ?? 0);
+                                                                        $newUp    = (float) ($entry['new_unit_price'] ?? 0);
+                                                                        $oldQty   = (int) ($entry['old_qty'] ?? 0);
+                                                                        $newQty   = (int) ($entry['new_qty'] ?? 0);
+                                                                        $changes  = [];
+                                                                        if (abs($newUp - $oldUp) > 0.001) {
+                                                                            $changes[] = sprintf(
+                                                                                esc_html__('đơn giá %s → %s', 'jankx'),
+                                                                                '<strong>' . esc_html(CurrencyManager::formatPrice($oldUp)) . '</strong>',
+                                                                                '<strong>' . esc_html(CurrencyManager::formatPrice($newUp)) . '</strong>'
+                                                                            );
+                                                                        }
+                                                                        if ($newQty !== $oldQty) {
+                                                                            $changes[] = sprintf(
+                                                                                esc_html__('số lượng %s → %s', 'jankx'),
+                                                                                '<strong>' . esc_html($oldQty) . '</strong>',
+                                                                                '<strong>' . esc_html($newQty) . '</strong>'
+                                                                            );
+                                                                        }
+                                                                        printf(
+                                                                            esc_html__('đã chỉnh sửa sản phẩm "%s": %s', 'jankx'),
+                                                                            esc_html($itemName),
+                                                                            implode(', ', $changes)
+                                                                        );
+                                                                        break;
+                                                                    case 'note_added':
+                                                                        echo esc_html__('đã thêm ghi chú', 'jankx');
+                                                                        break;
+                                                                    default:
+                                                                        echo esc_html(ucfirst($action));
+                                                                        break;
                                                                 }
                                                                 ?>
                                                             </span>
@@ -498,7 +696,7 @@ class OrderAdmin
                                         <?php echo esc_html(strtoupper(Order::getStatusLabel($order->getStatus()))); ?>
                                     </span>
                                 </div>
-                                <form method="post" class="jankx-status-form">
+                                <form method="post" class="jankx-status-form" id="jankx-order-update-form">
                                     <?php wp_nonce_field('jankx_update_order_status_' . $orderId); ?>
                                     <div class="form-group">
                                         <label for="order_status"><?php esc_html_e('MOVE TO', 'jankx'); ?></label>
@@ -537,7 +735,7 @@ class OrderAdmin
                                         <label for="order_note"><?php esc_html_e('NOTE', 'jankx'); ?></label>
                                         <textarea name="order_note" id="order_note" rows="4" placeholder="<?php esc_attr_e('Optional note...', 'jankx'); ?>"></textarea>
                                     </div>
-                                    <button type="submit" name="jankx_update_order_status" class="button-update"><?php esc_html_e('Update Status', 'jankx'); ?></button>
+                                    <button type="submit" name="jankx_update_order_status" class="button-update"><?php esc_html_e('Cập nhật đơn hàng', 'jankx'); ?></button>
                                 </form>
                             </div>
                         </div>
@@ -580,13 +778,33 @@ class OrderAdmin
 
         <script>
         (function(){
+            // ── Tracking group visibility ──
             var statusSelect = document.getElementById('order_status');
             var trackingGroup = document.getElementById('tracking-number-group');
-            if (!statusSelect || !trackingGroup) return;
+            if (statusSelect && trackingGroup) {
+                var showStatuses = ['shipping'];
+                statusSelect.addEventListener('change', function(){
+                    trackingGroup.style.display = showStatuses.indexOf(this.value) !== -1 ? '' : 'none';
+                });
+            }
 
-            var showStatuses = ['shipping'];
-            statusSelect.addEventListener('change', function(){
-                trackingGroup.style.display = showStatuses.indexOf(this.value) !== -1 ? '' : 'none';
+            // ── Live item total calculation ──
+            document.querySelectorAll('.jankx-item-row').forEach(function(row) {
+                var idx     = row.dataset.idx;
+                var qtyInput   = row.querySelector('.jankx-item-qty');
+                var priceInput = row.querySelector('.jankx-item-price');
+                var totalCell  = document.getElementById('jankx-item-total-' + idx);
+
+                function recalc() {
+                    var qty   = parseFloat(qtyInput ? qtyInput.value : 1) || 0;
+                    var price = parseFloat(priceInput ? priceInput.value : 0) || 0;
+                    if (totalCell) {
+                        totalCell.textContent = (qty * price).toLocaleString('vi-VN') + ' ₫';
+                    }
+                }
+
+                if (qtyInput)   qtyInput.addEventListener('input', recalc);
+                if (priceInput) priceInput.addEventListener('input', recalc);
             });
         })();
         </script>

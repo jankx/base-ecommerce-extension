@@ -343,6 +343,31 @@ class OrderModel
         return self::update($orderId, ['notes' => $notes]);
     }
 
+    public static function updateOrderPosts(int $orderId, array $items): void
+    {
+        global $wpdb;
+        $table = self::orderPostsTable();
+
+        $wpdb->delete($table, ['order_id' => $orderId], ['%d']);
+
+        foreach ($items as $item) {
+            $postId = (int) ($item['product_id'] ?? 0);
+            $postType = (string) ($item['product_type'] ?? 'product');
+            $quantity = (int) ($item['quantity'] ?? 1);
+            $unitPrice = (float) ($item['unit_price'] ?? 0);
+
+            if ($postId > 0) {
+                $wpdb->insert($table, [
+                    'order_id'   => $orderId,
+                    'post_id'    => $postId,
+                    'post_type'  => $postType,
+                    'quantity'   => $quantity,
+                    'unit_price' => $unitPrice,
+                ]);
+            }
+        }
+    }
+
     // ── DELETE ────────────────────────────────────────────
 
     public static function delete(int $orderId): bool
