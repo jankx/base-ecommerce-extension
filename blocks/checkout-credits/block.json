@@ -1,0 +1,20 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/checkout-credits",
+  "title": "Checkout Credits",
+  "category": "jankx",
+  "icon": "star-filled",
+  "description": "Credit balance toggle that lets the customer pay part of the order with their credit balance.",
+  "textdomain": "jankx",
+  "attributes": {
+    "jankxCheckoutColumn": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "supports": {
+    "html": false
+  },
+  "editorScript": "file:./build/index.js"
+}

@@ -16,6 +16,14 @@ use Jankx\Extensions\Ecommerce\Blocks\CartItemRemoveBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CartTotalsBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CartEmptyBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CheckoutBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CheckoutCustomerDetailsBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CheckoutPaymentMethodsBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CheckoutOrderReviewBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CheckoutReviewItemNameBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CheckoutReviewItemPriceBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CheckoutCreditsBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CheckoutActionsBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CheckoutEmptyBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CurrencySwitcherBlock;
 use Jankx\Extensions\Ecommerce\Cart\Cart;
 use Jankx\Extensions\Ecommerce\Checkout\CheckoutManager;
@@ -155,6 +163,14 @@ class EcommerceExtension extends AbstractExtension
             'cart-totals' => CartTotalsBlock::class,
             'cart-empty' => CartEmptyBlock::class,
             'checkout' => CheckoutBlock::class,
+            'checkout-customer-details' => CheckoutCustomerDetailsBlock::class,
+            'checkout-payment-methods' => CheckoutPaymentMethodsBlock::class,
+            'checkout-order-review' => CheckoutOrderReviewBlock::class,
+            'checkout-review-item-name' => CheckoutReviewItemNameBlock::class,
+            'checkout-review-item-price' => CheckoutReviewItemPriceBlock::class,
+            'checkout-credits' => CheckoutCreditsBlock::class,
+            'checkout-actions' => CheckoutActionsBlock::class,
+            'checkout-empty' => CheckoutEmptyBlock::class,
             'account-tab-orders' => AccountTabOrdersBlock::class,
             'add-to-cart' => AddToCartBlock::class,
             'currency-switcher' => CurrencySwitcherBlock::class,
@@ -204,6 +220,14 @@ class EcommerceExtension extends AbstractExtension
             'cart-totals',
             'cart-empty',
             'checkout',
+            'checkout-customer-details',
+            'checkout-payment-methods',
+            'checkout-order-review',
+            'checkout-review-item-name',
+            'checkout-review-item-price',
+            'checkout-credits',
+            'checkout-actions',
+            'checkout-empty',
             'account-tab-orders',
             'add-to-cart',
             'currency-switcher',

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/checkout-review-item-price",
+  "title": "Order Review Item Price",
+  "category": "jankx",
+  "icon": "money-alt",
+  "description": "Subtotal price of one checkout order review row.",
+  "textdomain": "jankx",
+  "supports": {
+    "html": false
+  },
+  "editorScript": "file:./build/index.js"
+}

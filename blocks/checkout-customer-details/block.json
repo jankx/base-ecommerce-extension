@@ -1,0 +1,20 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/checkout-customer-details",
+  "title": "Checkout Customer Details",
+  "category": "jankx",
+  "icon": "id",
+  "description": "Billing fields of the checkout form: full name, email, phone, address and optional account creation.",
+  "textdomain": "jankx",
+  "attributes": {
+    "jankxCheckoutColumn": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "supports": {
+    "html": false
+  },
+  "editorScript": "file:./build/index.js"
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/checkout-actions",
+  "title": "Checkout Actions",
+  "category": "jankx",
+  "icon": "button",
+  "description": "Error box and the place order button of the checkout form.",
+  "textdomain": "jankx",
+  "attributes": {
+    "jankxCheckoutColumn": {
+      "type": "string",
+      "default": ""
+    }
+  },
+  "supports": {
+    "html": false
+  },
+  "editorScript": "file:./build/index.js"
+}

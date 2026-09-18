@@ -3,13 +3,45 @@ namespace Jankx\Extensions\Ecommerce\Blocks;
 
 use Jankx\Extensions\Ecommerce\Block;
 use Jankx\Extensions\Ecommerce\Cart\Cart;
-use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
 
+/**
+ * Checkout container block.
+ *
+ * Renders the checkout `<form>` wrapper and groups its inner section blocks
+ * into the two-column layout (customer | summary) based on each section's
+ * `jankxCheckoutColumn` attribute. When the cart is empty the form is
+ * replaced by the `jankx/checkout-empty` inner block (or a default fallback).
+ *
+ * Legacy content like `<!-- wp:jankx/checkout /-->` (no inner blocks) keeps
+ * rendering the default composed checkout form.
+ *
+ * @package Jankx\Extensions\Ecommerce
+ */
 class CheckoutBlock extends Block
 {
     protected $blockId = 'jankx/checkout';
 
-    public function render($attributes, $content = '', $block = null)
+    protected $sectionClassMap = [
+        'jankx/checkout-customer-details' => CheckoutCustomerDetailsBlock::class,
+        'jankx/checkout-payment-methods'  => CheckoutPaymentMethodsBlock::class,
+        'jankx/checkout-order-review'     => CheckoutOrderReviewBlock::class,
+        'jankx/checkout-credits'          => CheckoutCreditsBlock::class,
+        'jankx/checkout-actions'          => CheckoutActionsBlock::class,
+        'jankx/checkout-empty'            => CheckoutEmptyBlock::class,
+    ];
+
+    protected $defaultCustomerSections = [
+        'jankx/checkout-customer-details',
+        'jankx/checkout-payment-methods',
+    ];
+
+    protected $defaultSummarySections = [
+        'jankx/checkout-order-review',
+        'jankx/checkout-credits',
+        'jankx/checkout-actions',
+    ];
+
+    public function render($attributes, $content = '', $block = null): string
     {
         $cart = Cart::get_instance();
         $wrapperAttrs = get_block_wrapper_attributes([
@@ -19,9 +51,9 @@ class CheckoutBlock extends Block
         $output = sprintf('<div %s>', $wrapperAttrs);
 
         if ($cart->isEmpty()) {
-            $output .= $this->renderEmptyCart();
+            $output .= $this->renderEmpty($block);
         } else {
-            $output .= $this->renderCheckoutForm($cart);
+            $output .= $this->renderForm($block);
         }
 
         $output .= '</div>';
@@ -29,234 +61,116 @@ class CheckoutBlock extends Block
         return $output;
     }
 
-    protected function renderEmptyCart(): string
+    protected function renderEmpty($block): string
     {
-        $continueUrl = (string) apply_filters(
-            'jankx/ecommerce/cart/continue_shopping_url',
-            home_url('/')
-        );
+        $emptyBlocks = [];
+        if ($block && !empty($block->inner_blocks)) {
+            foreach ($block->inner_blocks as $innerBlock) {
+                if ($innerBlock->name === 'jankx/checkout-empty') {
+                    $emptyBlocks[] = $innerBlock;
+                }
+            }
+        }
 
-        return '<div class="jankx-empty-state">'
-            . '<span class="jankx-empty-icon" aria-hidden="true">&#128722;</span>'
-            . '<h2 class="jankx-section-title">' . esc_html__('Your cart is empty', 'jankx') . '</h2>'
-            . '<p>' . esc_html__('Nothing to check out yet.', 'jankx') . '</p>'
-            . '<a href="' . esc_url($continueUrl) . '" class="jankx-btn jankx-btn-primary">'
-            . esc_html__('Continue shopping', 'jankx') . '</a>'
-            . '</div>';
+        if (!empty($emptyBlocks)) {
+            $output = '';
+            foreach ($emptyBlocks as $emptyBlock) {
+                $output .= $emptyBlock->render();
+            }
+
+            return $output;
+        }
+
+        return (new CheckoutEmptyBlock())->renderEmptyHtml();
     }
 
-    protected function renderCheckoutForm(Cart $cart): string
+    protected function renderForm($block): string
     {
-        $user = wp_get_current_user();
+        $innerBlocks = [];
+        if ($block && !empty($block->inner_blocks)) {
+            foreach ($block->inner_blocks as $innerBlock) {
+                if ($innerBlock->name === 'jankx/checkout-empty') {
+                    continue;
+                }
+                $innerBlocks[] = $innerBlock;
+            }
+        }
+
+        if (empty($innerBlocks)) {
+            return $this->renderDefaultForm();
+        }
+
+        $customerBlocks = [];
+        $summaryBlocks = [];
+        $otherBlocks = [];
+
+        foreach ($innerBlocks as $innerBlock) {
+            $column = $innerBlock->attributes['jankxCheckoutColumn'] ?? '';
+            if ($column === 'customer') {
+                $customerBlocks[] = $innerBlock;
+            } elseif ($column === 'summary') {
+                $summaryBlocks[] = $innerBlock;
+            } else {
+                $otherBlocks[] = $innerBlock;
+            }
+        }
 
         $output = '<form class="jankx-checkout-form" method="post" novalidate>';
-
         $output .= '<div class="jankx-checkout-cols">';
 
         $output .= '<div class="jankx-checkout-customer">';
-        $output .= '<h2 class="jankx-section-title">' . esc_html__('Billing details', 'jankx') . '</h2>';
-
-        $output .= '<div class="jankx-field">'
-            . '<label for="jankx_customer_name">' . esc_html__('Full name', 'jankx') . ' <span class="jankx-required">*</span></label>'
-            . '<input type="text" id="jankx_customer_name" name="customer_name" class="jankx-input" required '
-            . 'value="' . esc_attr($user->display_name) . '">'
-            . '</div>';
-
-        $output .= '<div class="jankx-field">'
-            . '<label for="jankx_customer_email">' . esc_html__('Email', 'jankx') . ' <span class="jankx-required">*</span></label>'
-            . '<input type="email" id="jankx_customer_email" name="customer_email" class="jankx-input" required '
-            . 'value="' . esc_attr($user->user_email) . '">'
-            . '</div>';
-
-        $phone = get_user_meta($user->ID, 'phone', true);
-        $output .= '<div class="jankx-field">'
-            . '<label for="jankx_customer_phone">' . esc_html__('Phone', 'jankx') . '</label>'
-            . '<input type="tel" id="jankx_customer_phone" name="customer_phone" class="jankx-input" '
-            . 'value="' . esc_attr($phone) . '">'
-            . '</div>';
-
-        $output .= '<div class="jankx-field">'
-            . '<label for="jankx_customer_address">' . esc_html__('Address', 'jankx') . '</label>'
-            . '<textarea id="jankx_customer_address" name="customer_address" class="jankx-input" rows="3"></textarea>'
-            . '</div>';
-
-        if (!is_user_logged_in()) {
-            $output .= '<div class="jankx-field jankx-create-account-field">'
-                . '<label class="jankx-checkbox">'
-                . '<input type="checkbox" id="jankx_create_account" name="create_account" value="1" checked>'
-                . '<span>' . esc_html__('Tạo tài khoản với email này', 'jankx') . '</span>'
-                . '</label>'
-                . '<p class="jankx-field-desc">' . esc_html__('Tạo mật khẩu sẽ được gửi qua email sau khi đặt hàng.', 'jankx') . '</p>'
-                . '</div>';
+        foreach ($customerBlocks as $innerBlock) {
+            $output .= $innerBlock->render();
         }
-
-        $output .= $this->renderPaymentMethods();
-
         $output .= '</div>';
 
         $output .= '<div class="jankx-checkout-summary">';
-        $output .= '<h2 class="jankx-section-title">' . esc_html__('Your order', 'jankx') . '</h2>';
-        $output .= '<div class="jankx-order-review">';
-
-        foreach ($cart->getItems() as $item) {
-            $output .= '<div class="jankx-review-item">'
-                . '<span class="jankx-review-name">' . esc_html($item->getName())
-                . ' <span class="jankx-review-qty">&times; ' . esc_html($item->getQuantity()) . '</span></span>'
-                . '<span class="jankx-review-price">' . esc_html($this->formatPrice($item->getSubtotal())) . '</span>'
-                . '</div>';
+        foreach ($summaryBlocks as $innerBlock) {
+            $output .= $innerBlock->render();
         }
-
-        $creditDiscount = $this->getCreditDiscount($cart);
-        $otherDiscount = max(0, $cart->getDiscount() - $creditDiscount);
-
-        $output .= '<div class="jankx-review-total-row jankx-review-discount-row"' . ($otherDiscount > 0 ? '' : ' hidden') . '>'
-            . '<span>' . esc_html__('Discount', 'jankx') . '</span>'
-            . '<span class="jankx-review-discount-value">' . esc_html('-' . $this->formatPrice($otherDiscount)) . '</span>'
-            . '</div>';
-
-        $output .= '<div class="jankx-review-total-row jankx-review-credit-row"' . ($creditDiscount > 0 ? '' : ' hidden') . '>'
-            . '<span>' . esc_html__('Credits', 'jankx') . '</span>'
-            . '<span class="jankx-review-credit-value">' . esc_html('-' . $this->formatPrice($creditDiscount)) . '</span>'
-            . '</div>';
-
-        $output .= '<div class="jankx-review-total-row jankx-review-total">'
-            . '<span>' . esc_html__('Total', 'jankx') . '</span>'
-            . '<span class="jankx-review-total-value">' . esc_html($this->formatPrice($cart->getTotal())) . '</span>'
-            . '</div>';
-
-        $output .= '</div>';
-
-        $output .= $this->renderCreditsSection($cart);
-
-        $output .= '<div class="jankx-checkout-error" role="alert" hidden></div>';
-
-        $output .= '<button type="submit" class="jankx-btn jankx-btn-primary jankx-btn-place-order">'
-            . esc_html__('Place order', 'jankx') . '</button>';
-
         $output .= '</div>';
 
         $output .= '</div>';
+
+        foreach ($otherBlocks as $innerBlock) {
+            $output .= $innerBlock->render();
+        }
 
         $output .= '</form>';
 
         return $output;
     }
 
-    protected function renderPaymentMethods(): string
+    protected function renderDefaultForm(): string
     {
-        $gateways = $this->getPaymentMethods();
+        $output = '<form class="jankx-checkout-form" method="post" novalidate>';
+        $output .= '<div class="jankx-checkout-cols">';
 
-        $output = '<div class="jankx-field">';
-        $output .= '<label>' . esc_html__('Payment method', 'jankx') . '</label>';
-        $output .= '<div class="jankx-payment-methods">';
-
-        foreach ($gateways as $slug => $label) {
-            $output .= '<label class="jankx-payment-method">'
-                . '<input type="radio" name="payment_method" value="' . esc_attr($slug) . '"'
-                . ($slug === array_key_first($gateways) ? ' checked' : '') . '>'
-                . '<span>' . esc_html($label) . '</span>'
-                . '</label>';
+        $output .= '<div class="jankx-checkout-customer">';
+        foreach ($this->defaultCustomerSections as $slug) {
+            $output .= $this->renderSection($slug);
         }
-
-        $output .= '</div></div>';
-
-        return $output;
-    }
-
-    protected function getPaymentMethods(): array
-    {
-        $methods = [];
-        $enabledGateways = get_option('jankx_payment_gateways', []);
-
-        // Built-in gateways
-        $builtIn = [
-            'bank_transfer' => __('Chuyển khoản ngân hàng', 'jankx'),
-            'cod' => __('Thanh toán khi nhận hàng (COD)', 'jankx'),
-        ];
-
-        // Online gateways from payment-system extension
-        $onlineGateways = [];
-        if (class_exists('\Jankx\Extensions\PaymentSystem\Gateways\GatewayManager')) {
-            $manager = \Jankx\Extensions\PaymentSystem\Gateways\GatewayManager::getInstance();
-            foreach ($manager->getAvailable() as $slug => $gateway) {
-                $onlineGateways[$slug] = $gateway->getName();
-            }
-        }
-
-        $allGateways = array_merge($builtIn, $onlineGateways);
-
-        // Filter by enabled gateways from admin settings
-        if (!empty($enabledGateways)) {
-            foreach ($enabledGateways as $slug) {
-                if (isset($allGateways[$slug])) {
-                    $methods[$slug] = $allGateways[$slug];
-                }
-            }
-        } else {
-            // No settings saved yet: show all available
-            $methods = $allGateways;
-        }
-
-        return (array) apply_filters('jankx/ecommerce/checkout/payment_methods', $methods);
-    }
-
-    protected function formatPrice(float $price): string
-    {
-        $converterManager = \Jankx\Extensions\Ecommerce\Currency\Converters\CurrencyConverterManager::getInstance();
-        return $converterManager->formatPriceWithConversion($price);
-    }
-
-    /**
-     * Credit payment toggle. Rendered by the user-credits extension when
-     * active; harmless no-op otherwise.
-     */
-    protected function renderCreditsSection(Cart $cart): string
-    {
-        $integration = $this->getCreditsIntegration();
-        if (!$integration || !$integration->isEnabled() || !is_user_logged_in()) {
-            return '';
-        }
-
-        $balance = $integration->getBalance();
-        if ($balance <= 0) {
-            return '';
-        }
-
-        $output = '<div class="jankx-credits-form">';
-        $output .= '<label class="jankx-credits-toggle-label">'
-            . '<input type="checkbox" class="jankx-credits-toggle" value="1"' . checked($integration->isApplied(), true, false) . '>'
-            . '<span>' . esc_html($integration->getLabel()) . '</span>'
-            . '</label>';
-        $output .= '<p class="jankx-credits-balance">'
-            . esc_html__('Số dư tín dụng:', 'jankx') . ' <strong class="jankx-credits-balance-value">'
-            . esc_html($this->formatPrice($balance))
-            . '</strong></p>';
-        $output .= '<span class="jankx-credits-message" role="status"></span>';
         $output .= '</div>';
 
+        $output .= '<div class="jankx-checkout-summary">';
+        foreach ($this->defaultSummarySections as $slug) {
+            $output .= $this->renderSection($slug);
+        }
+        $output .= '</div>';
+
+        $output .= '</div>';
+        $output .= '</form>';
+
         return $output;
     }
 
-    /**
-     * @return object|null
-     */
-    protected function getCreditsIntegration()
+    protected function renderSection(string $slug): string
     {
-        $class = '\Jankx\Extensions\UserCredits\Integration\CheckoutIntegration';
-        if (!class_exists($class)) {
-            return null;
+        $blockClass = $this->sectionClassMap[$slug] ?? null;
+        if (!$blockClass) {
+            return '';
         }
 
-        return $class::get_instance();
-    }
-
-    protected function getCreditDiscount(Cart $cart): float
-    {
-        $integration = $this->getCreditsIntegration();
-        if (!$integration) {
-            return 0.0;
-        }
-
-        return (float) $integration->getAppliedCreditDiscount($cart);
+        return (new $blockClass())->render([]);
     }
 }
