@@ -1,7 +1,7 @@
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps, InnerBlocks, InspectorControls, PanelColorSettings } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { PanelBody, ToggleControl, TextControl } from '@wordpress/components';
+import { PanelBody, ToggleControl, TextControl, NumberControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import metadata from '../block.json';
 
@@ -53,6 +53,16 @@ function Edit({ attributes, setAttributes, clientId }) {
                         checked={attributes.jankxHideOnMobile}
                         onChange={(val) => setAttributes({ jankxHideOnMobile: val })}
                     />
+                    {String(attributes.className || '').includes('is-style-dropdown') && (
+                        <NumberControl
+                            label={__('Dropdown max items', 'jankx')}
+                            value={typeof attributes.limit === 'number' ? attributes.limit : 3}
+                            min={1}
+                            max={20}
+                            onChange={(val) => setAttributes({ limit: val === '' ? 3 : Number(val) })}
+                            help={__('Hiển thị tối đa số sản phẩm trong dropdown. Số còn lại mở bằng nút "Xem tất cả".', 'jankx')}
+                        />
+                    )}
                 </PanelBody>
 
                 <PanelColorSettings

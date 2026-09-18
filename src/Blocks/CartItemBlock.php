@@ -54,6 +54,7 @@ class CartItemBlock extends Block
                 'empty' => __('Giỏ hàng của bạn đang trống.', 'jankx'),
                 'cart' => __('Giỏ hàng', 'jankx'),
                 'viewCart' => __('Xem giỏ hàng', 'jankx'),
+                'viewAll' => __('Xem tất cả', 'jankx'),
                 'checkout' => __('Thanh toán', 'jankx'),
                 'remove' => __('Xóa', 'jankx'),
                 'removeError' => __('Không thể xóa sản phẩm.', 'jankx'),
@@ -66,20 +67,32 @@ class CartItemBlock extends Block
     public function render($attributes, $content = '', $block = null)
     {
         $cart = Cart::get_instance();
+        $isDropdown = $this->isDropdownVariant($attributes);
+
+        $wrapperClass = 'jankx-mini-cart' . ($isDropdown ? ' jankx-mini-cart--dropdown' : ' jankx-mini-cart--drawer');
+        if (!empty($attributes['className'])) {
+            $wrapperClass .= ' ' . trim((string) $attributes['className']);
+        }
 
         $wrapperAttrs = get_block_wrapper_attributes([
-            'class' => 'jankx-mini-cart',
+            'class' => $wrapperClass,
         ]);
 
         $output = sprintf('<div %s>', $wrapperAttrs);
-        $output .= $this->renderToggle($cart, $content, $attributes);
-        $output .= $this->renderDrawer($cart);
+        $output .= $this->renderToggle($cart, $content, $attributes, $isDropdown);
+        $output .= $isDropdown ? $this->renderDropdown($cart, $attributes) : $this->renderDrawer($cart);
         $output .= '</div>';
 
         return $output;
     }
 
-    protected function renderToggle(Cart $cart, string $innerBlocksContent = '', array $attributes = []): string
+    protected function isDropdownVariant(array $attributes): bool
+    {
+        return !empty($attributes['className'])
+            && strpos((string) $attributes['className'], 'is-style-dropdown') !== false;
+    }
+
+    protected function renderToggle(Cart $cart, string $innerBlocksContent = '', array $attributes = [], bool $isDropdown = false): string
     {
         $count = $cart->getItemCount();
 
@@ -144,9 +157,10 @@ class CartItemBlock extends Block
         }
 
         $styleAttr = !empty($badgeStyles) ? ' style="' . esc_attr(implode('; ', $badgeStyles)) . '"' : '';
+        $panelId = $isDropdown ? 'jankx-mini-cart-dropdown' : 'jankx-mini-cart-drawer';
 
         return '<button type="button" class="jankx-mini-cart-toggle" aria-expanded="false" '
-            . 'aria-controls="jankx-mini-cart-drawer" aria-label="' . esc_attr__('Open cart', 'jankx') . '">'
+            . 'aria-controls="' . $panelId . '" aria-label="' . esc_attr__('Open cart', 'jankx') . '">'
             . $iconHtml
             . '<span class="jankx-mini-cart-count' . ($count ? '' : ' is-empty') . '" data-jankx-cart-count' . $styleAttr . '>'
             . (int) $count . '</span>'
@@ -173,27 +187,93 @@ class CartItemBlock extends Block
             $output .= '<p class="jankx-mini-cart-empty">' . esc_html__('Giỏ hàng của bạn đang trống.', 'jankx') . '</p>';
         } else {
             foreach ($cart->getItems() as $itemKey => $item) {
-                $productUrl = get_permalink($item->getProductId());
-                $output .= '<div class="jankx-mini-cart-row" data-item-key="' . esc_attr($itemKey) . '">';
-                $output .= '<div class="jankx-mini-cart-info">';
-                $output .= '<a class="jankx-mini-cart-name" href="' . esc_url($productUrl ?: '#') . '">'
-                    . esc_html($item->getName()) . '</a>';
-                $output .= '<span class="jankx-mini-cart-meta">' . (int) $item->getQuantity()
-                    . ' &times; ' . esc_html($this->formatPrice($item->getUnitPrice())) . '</span>';
-                $output .= '</div>';
-                $output .= '<div class="jankx-mini-cart-side">';
-                $output .= '<span class="jankx-mini-cart-price">' . esc_html($this->formatPrice($item->getSubtotal())) . '</span>';
-                $output .= '<button type="button" class="jankx-mini-cart-remove" data-item-key="' . esc_attr($itemKey)
-                    . '" aria-label="' . esc_attr__('Remove', 'jankx') . '">&times;</button>';
-                $output .= '</div>';
-                $output .= '</div>';
+                $output .= $this->renderCartRow($itemKey, $item);
             }
         }
         $output .= '</div>'; // End body
 
         // ALWAYS render the footer structure, just hide it if cart is empty.
         $output .= '<div class="jankx-mini-cart-foot" data-jankx-drawer-footer ' . ($cart->isEmpty() ? 'hidden' : '') . '>';
-        $output .= '<div class="jankx-mini-cart-total-row">'
+        $output .= $this->renderDropdownFooter($cart, $cartUrl, $checkoutUrl);
+        $output .= '</div>';
+
+        $output .= '</aside>';
+
+        return $output;
+    }
+
+    protected function renderDropdown(Cart $cart, array $attributes): string
+    {
+        $limit = isset($attributes['limit']) ? max(1, (int) $attributes['limit']) : 3;
+        $cartUrl = EcommerceExtension::get_cart_page_url();
+        $checkoutUrl = EcommerceExtension::get_checkout_page_url();
+
+        $output = '<div class="jankx-mini-cart-dropdown" id="jankx-mini-cart-dropdown" role="region" '
+            . 'aria-label="' . esc_attr__('Shopping cart', 'jankx') . '" data-jankx-dropdown-limit="' . $limit . '">';
+
+        $output .= '<div class="jankx-mini-cart-head">'
+            . '<span class="jankx-mini-cart-title">' . esc_html__('Giỏ hàng', 'jankx') . '</span>'
+            . '<button type="button" class="jankx-mini-cart-close" data-jankx-mini-cart-close aria-label="'
+            . esc_attr__('Close cart', 'jankx') . '">&times;</button>'
+            . '</div>';
+
+        $output .= '<div class="jankx-mini-cart-body" data-jankx-dropdown-items>';
+        if ($cart->isEmpty()) {
+            $output .= '<p class="jankx-mini-cart-empty">' . esc_html__('Giỏ hàng của bạn đang trống.', 'jankx') . '</p>';
+        } else {
+            $position = 0;
+            $extraRows = '';
+            $count = 0;
+            foreach ($cart->getItems() as $itemKey => $item) {
+                $count++;
+                $row = $this->renderCartRow($itemKey, $item);
+                if ($count <= $limit) {
+                    $output .= $row;
+                } else {
+                    $extraRows .= $row;
+                }
+            }
+            $remaining = $count - $limit;
+            if ($remaining > 0) {
+                $output .= '<button type="button" class="jankx-mini-cart-viewall" data-jankx-mini-cart-viewall aria-expanded="false">'
+                    . sprintf(esc_html__('Xem tất cả (%d)', 'jankx'), $remaining) . '</button>';
+                $output .= '<div class="jankx-mini-cart-extra" data-jankx-viewall-extra hidden>' . $extraRows . '</div>';
+            }
+        }
+        $output .= '</div>'; // End body
+
+        $output .= '<div class="jankx-mini-cart-foot" data-jankx-dropdown-footer ' . ($cart->isEmpty() ? 'hidden' : '') . '>';
+        $output .= $this->renderDropdownFooter($cart, $cartUrl, $checkoutUrl);
+        $output .= '</div>';
+
+        $output .= '</div>';
+
+        return $output;
+    }
+
+    protected function renderCartRow($itemKey, $item): string
+    {
+        $productUrl = get_permalink($item->getProductId());
+        $output = '<div class="jankx-mini-cart-row" data-item-key="' . esc_attr($itemKey) . '">';
+        $output .= '<div class="jankx-mini-cart-info">';
+        $output .= '<a class="jankx-mini-cart-name" href="' . esc_url($productUrl ?: '#') . '">'
+            . esc_html($item->getName()) . '</a>';
+        $output .= '<span class="jankx-mini-cart-meta">' . (int) $item->getQuantity()
+            . ' &times; ' . esc_html($this->formatPrice($item->getUnitPrice())) . '</span>';
+        $output .= '</div>';
+        $output .= '<div class="jankx-mini-cart-side">';
+        $output .= '<span class="jankx-mini-cart-price">' . esc_html($this->formatPrice($item->getSubtotal())) . '</span>';
+        $output .= '<button type="button" class="jankx-mini-cart-remove" data-item-key="' . esc_attr($itemKey)
+            . '" aria-label="' . esc_attr__('Remove', 'jankx') . '">&times;</button>';
+        $output .= '</div>';
+        $output .= '</div>';
+
+        return $output;
+    }
+
+    protected function renderDropdownFooter(Cart $cart, string $cartUrl, string $checkoutUrl): string
+    {
+        $output = '<div class="jankx-mini-cart-total-row">'
             . '<span>' . esc_html__('Tổng cộng', 'jankx') . '</span>'
             . '<strong data-jankx-drawer-total>' . esc_html($this->formatPrice($cart->getTotal())) . '</strong>'
             . '</div>';
@@ -206,9 +286,7 @@ class CartItemBlock extends Block
             $output .= '<a class="jankx-btn jankx-btn-primary jankx-mini-cart-link" href="' . esc_url($checkoutUrl) . '">'
                 . esc_html__('Thanh toán', 'jankx') . '</a>';
         }
-        $output .= '</div></div>';
-
-        $output .= '</aside>';
+        $output .= '</div>';
 
         return $output;
     }

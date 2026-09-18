@@ -5,8 +5,19 @@
   "title": "Cart Item (Mini Cart)",
   "category": "jankx",
   "icon": "cart",
-  "description": "Cart icon with item counter that opens a slide-out mini cart drawer.",
+  "description": "Cart icon with item counter. Variants: slide-out drawer or dropdown mini cart in the menu.",
   "textdomain": "jankx",
+  "styles": [
+    {
+      "name": "drawer",
+      "label": "Drawer",
+      "isDefault": true
+    },
+    {
+      "name": "dropdown",
+      "label": "Dropdown"
+    }
+  ],
   "attributes": {
     "jankxHideOnUltrawide": {
       "type": "boolean",
@@ -27,6 +38,10 @@
     "jankxFlexGrow": {
       "type": "boolean",
       "default": false
+    },
+    "limit": {
+      "type": "number",
+      "default": 3
     },
     "badgeColor": {
       "type": "string"

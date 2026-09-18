@@ -4,6 +4,7 @@ namespace Jankx\Extensions\Ecommerce\Admin;
 use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
 use Jankx\Extensions\Ecommerce\Order\Order;
 use Jankx\Extensions\Ecommerce\Order\OrderModel;
+use Jankx\Extensions\Ecommerce\Order\OrderPostType;
 
 /**
  * Custom Orders admin page using dedicated database tables.
@@ -27,7 +28,7 @@ class OrderAdmin
         add_menu_page(
             __('Đơn hàng', 'jankx'),
             __('Đơn hàng', 'jankx'),
-            'edit_posts',
+            OrderPostType::CAP_MANAGE,
             self::PAGE_SLUG,
             [$this, 'renderPage'],
             'dashicons-cart',
@@ -66,7 +67,7 @@ class OrderAdmin
 
     protected function handleStatusUpdate(int $orderId): void
     {
-        if (!current_user_can('edit_posts')) {
+        if (!current_user_can(OrderPostType::CAP_MANAGE)) {
             return;
         }
 
@@ -204,7 +205,7 @@ class OrderAdmin
 
     public function renderPage(): void
     {
-        if (!current_user_can('edit_posts')) {
+        if (!current_user_can(OrderPostType::CAP_MANAGE)) {
             return;
         }
 
