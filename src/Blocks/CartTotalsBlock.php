@@ -54,21 +54,29 @@ class CartTotalsBlock extends Block
 
         $output .= '<h2 class="jankx-section-title">' . esc_html__('Cart totals', 'jankx') . '</h2>';
         $output .= $this->renderCouponSection($cart);
+        $output .= $this->renderCreditsSection($cart);
 
-        if ($cart->getDiscount() > 0) {
-            $output .= '<div class="jankx-total-row">'
-                . '<span>' . esc_html__('Subtotal', 'jankx') . '</span>'
-                . '<span>' . esc_html($this->formatPrice($cart->getSubtotal())) . '</span>'
-                . '</div>';
-            $output .= '<div class="jankx-total-row">'
-                . '<span>' . esc_html__('Discount', 'jankx') . '</span>'
-                . '<span>' . esc_html('-' . $this->formatPrice($cart->getDiscount())) . '</span>'
-                . '</div>';
-        }
+        $creditDiscount = $this->getCreditDiscount($cart);
+        $otherDiscount = max(0, $cart->getDiscount() - $creditDiscount);
+
+        $output .= '<div class="jankx-total-row jankx-subtotal-row"' . ($cart->getDiscount() > 0 ? '' : ' hidden') . '>'
+            . '<span>' . esc_html__('Subtotal', 'jankx') . '</span>'
+            . '<span>' . esc_html($this->formatPrice($cart->getSubtotal())) . '</span>'
+            . '</div>';
+
+        $output .= '<div class="jankx-total-row jankx-discount-row"' . ($otherDiscount > 0 ? '' : ' hidden') . '>'
+            . '<span>' . esc_html__('Discount', 'jankx') . '</span>'
+            . '<span class="jankx-discount-value">' . esc_html('-' . $this->formatPrice($otherDiscount)) . '</span>'
+            . '</div>';
+
+        $output .= '<div class="jankx-total-row jankx-credit-discount-row"' . ($creditDiscount > 0 ? '' : ' hidden') . '>'
+            . '<span>' . esc_html__('Credits', 'jankx') . '</span>'
+            . '<span class="jankx-credit-discount-value">' . esc_html('-' . $this->formatPrice($creditDiscount)) . '</span>'
+            . '</div>';
 
         $output .= '<div class="jankx-total-row jankx-total-grand">'
             . '<span>' . esc_html__('Total', 'jankx') . '</span>'
-            . '<span>' . esc_html($this->formatPrice($cart->getTotal())) . '</span>'
+            . '<span class="jankx-total-grand-value">' . esc_html($this->formatPrice($cart->getTotal())) . '</span>'
             . '</div>';
 
         $output .= '<div class="jankx-cart-actions">'
@@ -121,5 +129,59 @@ class CartTotalsBlock extends Block
     {
         $converterManager = \Jankx\Extensions\Ecommerce\Currency\Converters\CurrencyConverterManager::getInstance();
         return $converterManager->formatPriceWithConversion($price);
+    }
+
+    /**
+     * Credit payment toggle. Rendered by the user-credits extension when
+     * active; harmless no-op otherwise.
+     */
+    protected function renderCreditsSection(Cart $cart): string
+    {
+        $integration = $this->getCreditsIntegration();
+        if (!$integration || !$integration->isEnabled() || !is_user_logged_in()) {
+            return '';
+        }
+
+        $balance = $integration->getBalance();
+        if ($balance <= 0) {
+            return '';
+        }
+
+        $output = '<div class="jankx-credits-form">';
+        $output .= '<label class="jankx-credits-toggle-label">'
+            . '<input type="checkbox" class="jankx-credits-toggle" value="1"' . checked($integration->isApplied(), true, false) . '>'
+            . '<span>' . esc_html($integration->getLabel()) . '</span>'
+            . '</label>';
+        $output .= '<p class="jankx-credits-balance">'
+            . esc_html__('Số dư tín dụng:', 'jankx') . ' <strong class="jankx-credits-balance-value">'
+            . esc_html($this->formatPrice($balance))
+            . '</strong></p>';
+        $output .= '<span class="jankx-credits-message" role="status"></span>';
+        $output .= '</div>';
+
+        return $output;
+    }
+
+    /**
+     * @return object|null
+     */
+    protected function getCreditsIntegration()
+    {
+        $class = '\Jankx\Extensions\UserCredits\Integration\CheckoutIntegration';
+        if (!class_exists($class)) {
+            return null;
+        }
+
+        return $class::get_instance();
+    }
+
+    protected function getCreditDiscount(Cart $cart): float
+    {
+        $integration = $this->getCreditsIntegration();
+        if (!$integration) {
+            return 0.0;
+        }
+
+        return (float) $integration->getAppliedCreditDiscount($cart);
     }
 }
