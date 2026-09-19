@@ -71,12 +71,18 @@ class CurrencySwitcherBlock extends Block
             $inner = $this->renderDropdown($enabled, $current, $showFlag, $showCode, $showSymbol, $showName);
         }
 
+        $wrapperAttrs = [
+            'class' => 'jcs-switcher jcs--' . $mode,
+        ];
+
+        $wrapperStyle = $this->resolveWrapperStyle($attributes);
+        if (is_string($wrapperStyle) && $wrapperStyle !== '') {
+            $wrapperAttrs['style'] = $wrapperStyle;
+        }
+
         return sprintf(
             '<div %s>%s</div>',
-            get_block_wrapper_attributes([
-                'class' => 'jcs-switcher jcs--' . $mode,
-                'style' => $this->resolveWrapperStyle($attributes),
-            ]),
+            get_block_wrapper_attributes($wrapperAttrs),
             $inner
         );
     }
@@ -97,7 +103,7 @@ class CurrencySwitcherBlock extends Block
         if (empty($background) || 'transparent' === $background) {
             return 'background-color:var(--wp--preset--color--base);';
         }
-        return '';
+        return false;
     }
 
     protected function renderSingle(array $currency, bool $showFlag, bool $showCode, bool $showSymbol, bool $showName = false): string
