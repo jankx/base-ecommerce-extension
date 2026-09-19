@@ -68,42 +68,16 @@ class CurrencySwitcherBlock extends Block
             $mode = 'list';
             $inner = $this->renderList($enabled, $current, $showFlag, $showCode, $showSymbol, $showName);
         } else {
-            $inner = $this->renderDropdown($enabled, $current, $showFlag, $showCode, $showSymbol, $showName);
-        }
-
-        $wrapperAttrs = [
-            'class' => 'jcs-switcher jcs--' . $mode,
-        ];
-
-        $wrapperStyle = $this->resolveWrapperStyle($attributes);
-        if (is_string($wrapperStyle) && $wrapperStyle !== '') {
-            $wrapperAttrs['style'] = $wrapperStyle;
+            $inner = $this->renderDropdown($enabled, $current, $showFlag, $showCode, $showSymbol, $showName, $attributes);
         }
 
         return sprintf(
             '<div %s>%s</div>',
-            get_block_wrapper_attributes($wrapperAttrs),
+            get_block_wrapper_attributes([
+                'class' => 'jcs-switcher jcs--' . $mode,
+            ]),
             $inner
         );
-    }
-
-    /**
-     * Resolve the inline style for the block wrapper.
-     *
-     * Returns the user-set background from the block supports when available,
-     * otherwise falls back to a default white background so the switcher has a
-     * consistent appearance on the frontend even for legacy blocks.
-     *
-     * @param array $attributes Block attributes.
-     * @return string Inline CSS style string.
-     */
-    protected function resolveWrapperStyle(array $attributes): string
-    {
-        $background = $attributes['style']['color']['background'] ?? '';
-        if (empty($background) || 'transparent' === $background) {
-            return 'background-color:var(--wp--preset--color--base);';
-        }
-        return false;
     }
 
     protected function renderSingle(array $currency, bool $showFlag, bool $showCode, bool $showSymbol, bool $showName = false): string
@@ -125,22 +99,26 @@ class CurrencySwitcherBlock extends Block
         return implode(' ', $parts);
     }
 
-    protected function renderDropdown(array $currencies, string $current, bool $showFlag, bool $showCode, bool $showSymbol, bool $showName = false): string
+    protected function renderDropdown(array $currencies, string $current, bool $showFlag, bool $showCode, bool $showSymbol, bool $showName = false, array $attributes = []): string
     {
         $currentCurrency = $currencies[$current] ?? reset($currencies);
         if (!is_array($currentCurrency)) {
             $currentCurrency = [];
         }
 
-        // Mirrors LanguageSwitcherBlock dropdown structure (button + absolute menu)
-        // so the two switcher blocks share the same frontend pattern.
+        $bgStyle = '';
+        $background = $attributes['style']['color']['background'] ?? '';
+        if (!empty($background) && 'transparent' !== $background) {
+            $bgStyle = ' style="background-color:' . esc_attr($background) . '"';
+        }
+
         $html = '<div class="jcs-dropdown-wrapper">';
         $html .= '<button class="jcs-dropdown" type="button" aria-haspopup="true" aria-expanded="false">';
         $html .= $this->buildLabelHtml($currentCurrency, $showFlag, $showCode, $showSymbol, $showName);
         $html .= '<span class="jcs-arrow">▼</span>';
         $html .= '</button>';
 
-        $html .= '<ul class="jcs-dropdown-menu">';
+        $html .= '<ul class="jcs-dropdown-menu"' . $bgStyle . '>';
         foreach ($currencies as $code => $currency) {
             $isCurrent = $code === $current;
             $itemClasses = ['jcs-dropdown-item'];
