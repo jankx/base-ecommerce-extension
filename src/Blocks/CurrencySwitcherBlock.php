@@ -113,7 +113,7 @@ class CurrencySwitcherBlock extends Block
         }
 
         $html = '<div class="jcs-dropdown-wrapper">';
-        $html .= '<button class="jcs-dropdown" type="button" aria-haspopup="true" aria-expanded="false">';
+        $html .= '<button class="jcs-dropdown" type="button" aria-haspopup="true" aria-expanded="false"' . $bgStyle . '>';
         $html .= $this->buildLabelHtml($currentCurrency, $showFlag, $showCode, $showSymbol, $showName);
         $html .= '<span class="jcs-arrow">▼</span>';
         $html .= '</button>';
