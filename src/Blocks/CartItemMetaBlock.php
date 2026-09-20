@@ -45,10 +45,16 @@ class CartItemMetaBlock extends Block
         // Tour type label (filterable)
         $typeLabel = (string) apply_filters('jankx/ecommerce/cart/item/type_label', '', $item);
         if ($typeLabel === '') {
-            // Try experience_tour_type meta
+            // Try experience_tour_type meta, then taxonomy experience_type
             $tourType = get_post_meta($productId, '_experience_tour_type', true);
-            if ($tourType) {
-                $typeLabel = $this->getTourTypeLabel($tourType);
+            if (!empty($tourType)) {
+                $term = get_term_by('slug', $tourType, 'experience_type');
+                $typeLabel = $term ? $term->name : $this->getTourTypeLabel($tourType);
+            } else {
+                $terms = get_the_terms($productId, 'experience_type');
+                if ($terms && !is_wp_error($terms)) {
+                    $typeLabel = $terms[0]->name;
+                }
             }
         }
         if ($typeLabel) {
