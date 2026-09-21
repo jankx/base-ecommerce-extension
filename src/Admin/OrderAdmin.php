@@ -400,6 +400,8 @@ class OrderAdmin
             <?php endif; ?>
 
             <div id="poststuff">
+                <form method="post" class="jankx-status-form" id="jankx-order-update-form">
+                <?php wp_nonce_field('jankx_update_order_status_' . $orderId); ?>
                 <div class="jankx-order-layout">
 
                     <!-- Main content -->
@@ -716,8 +718,6 @@ class OrderAdmin
                                         <?php echo esc_html(strtoupper(Order::getStatusLabel($order->getStatus()))); ?>
                                     </span>
                                 </div>
-                                <form method="post" class="jankx-status-form" id="jankx-order-update-form">
-                                    <?php wp_nonce_field('jankx_update_order_status_' . $orderId); ?>
                                     <div class="form-group">
                                         <label for="order_status"><?php esc_html_e('MOVE TO', 'jankx'); ?></label>
                                         <select name="order_status" id="order_status">
@@ -756,7 +756,6 @@ class OrderAdmin
                                         <textarea name="order_note" id="order_note" rows="4" placeholder="<?php esc_attr_e('Optional note...', 'jankx'); ?>"></textarea>
                                     </div>
                                     <button type="submit" name="jankx_update_order_status" class="button-update"><?php esc_html_e('Cập nhật đơn hàng', 'jankx'); ?></button>
-                                </form>
                             </div>
                         </div>
 
@@ -793,6 +792,7 @@ class OrderAdmin
 
                     </div>
                 </div>
+                </form>
             </div>
         </div>
 
