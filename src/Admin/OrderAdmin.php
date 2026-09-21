@@ -25,14 +25,33 @@ class OrderAdmin
 
     public function addMenuPage(): void
     {
+        $uncompletedStatuses = apply_filters('jankx/ecommerce/order/uncompleted_statuses', [
+            Order::STATUS_PENDING,
+            Order::STATUS_PROCESSING,
+            Order::STATUS_SHIPPING,
+        ]);
+
+        $uncompletedCount = Order::countOrders([
+            'status' => $uncompletedStatuses,
+        ]);
+
+        $menuTitle = __('Đơn hàng', 'jankx');
+        if ($uncompletedCount > 0) {
+            $menuTitle .= sprintf(
+                ' <span class="awaiting-mod count-%1$d"><span class="pending-count" aria-hidden="true">%2$s</span><span class="comments-in-moderation-text screen-reader-text">%2$s</span></span>',
+                $uncompletedCount,
+                number_format_i18n($uncompletedCount)
+            );
+        }
+
         add_menu_page(
             __('Đơn hàng', 'jankx'),
-            __('Đơn hàng', 'jankx'),
+            $menuTitle,
             OrderPostType::CAP_MANAGE,
             self::PAGE_SLUG,
             [$this, 'renderPage'],
             'dashicons-cart',
-            30
+            3
         );
     }
 

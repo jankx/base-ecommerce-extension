@@ -51,6 +51,23 @@ if (file_exists($frameworkDir . '/Extensions/AbstractExtension.php')) {
     require_once $frameworkDir . '/Extensions/AbstractExtension.php';
 }
 
+// 3a. EcommerceProductExtension (used by AddToCartStrategyFactory static calls).
+$ecommerceProductExt = __DIR__ . '/../../ecommerce-product/EcommerceProductExtension.php';
+if (file_exists($ecommerceProductExt)) {
+    require_once $ecommerceProductExt;
+}
+
+// 3b. NotificationService stub (used by EcommerceExtension::on_order_created).
+if (!class_exists('Jankx\Extensions\NotificationSystem\NotificationService')) {
+    // Minimal stub — the real class has many dependencies; tests only need send().
+    eval('
+        namespace Jankx\Extensions\NotificationSystem;
+        class NotificationService {
+            public static function send(int $userId, string $type, string $title, string $body, array $data = []): void {}
+        }
+    ');
+}
+
 // 3b. WordPress class stubs (wpdb, WP_Post, etc.)
 if (!defined('OBJECT')) {
     define('OBJECT', 'OBJECT');
@@ -120,6 +137,7 @@ function stub_wp_ecommerce_functions()
     Monkey\Functions\when('esc_html')->returnArg();
     Monkey\Functions\when('esc_html__')->returnArg();
     Monkey\Functions\when('esc_attr')->returnArg();
+    Monkey\Functions\when('esc_attr__')->returnArg();
     Monkey\Functions\when('esc_url')->returnArg();
     Monkey\Functions\when('home_url')->alias(function ($path = '', $scheme = null) {
         return 'http://example.com' . $path;
