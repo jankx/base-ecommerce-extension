@@ -36,7 +36,8 @@ class AccountTabOrdersBlock extends Block
             return $this->renderOrderDetailPage($orderNumber);
         }
 
-        $orders = $this->getUserOrders(get_current_user_id());
+        $result = $this->getUserOrders(get_current_user_id());
+        $orders = $result['orders'];
 
         $wrapperAttrs = get_block_wrapper_attributes([
             'class' => 'jankx-tab-panel jankx-tab-orders',
@@ -56,6 +57,8 @@ class AccountTabOrdersBlock extends Block
                 $output .= $this->renderOrderCard($order);
             }
             $output .= '</div>';
+
+            $output .= $this->renderPagination($result);
         }
 
         $output .= '</div>';
@@ -309,6 +312,7 @@ class AccountTabOrdersBlock extends Block
         $steps = [
             Order::STATUS_PENDING    => ['label' => __('Placed', 'jankx'),    'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'],
             Order::STATUS_PROCESSING => ['label' => __('Processing', 'jankx'), 'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>'],
+            Order::STATUS_SHIPPING   => ['label' => __('Shipping', 'jankx'),   'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>'],
             Order::STATUS_COMPLETED  => ['label' => __('Completed', 'jankx'),  'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'],
         ];
 
@@ -530,9 +534,12 @@ class AccountTabOrdersBlock extends Block
     protected function getUserOrders(int $userId): array
     {
         $user = wp_get_current_user();
+        $perPage = 10;
+        $currentPage = max(1, (int) ($_GET['page'] ?? 1));
 
         $args = [
-            'per_page'    => 10,
+            'per_page'    => $perPage,
+            'page'        => $currentPage,
             'orderby'     => 'created_at',
             'order'       => 'DESC',
         ];
@@ -546,11 +553,24 @@ class AccountTabOrdersBlock extends Block
             $args['customer_email'] = $user->user_email;
         }
 
-        $rows = OrderModel::query($args);
+        $countArgs = $args;
+        unset($countArgs['per_page'], $countArgs['page'], $countArgs['orderby'], $countArgs['order']);
 
-        return array_map(function ($row) {
+        $total = OrderModel::count($countArgs);
+        $rows = OrderModel::query($args);
+        $totalPages = (int) ceil($total / $perPage);
+
+        $orders = array_map(function ($row) {
             return new Order($row['id']);
         }, $rows);
+
+        return [
+            'orders'      => $orders,
+            'total'       => $total,
+            'total_pages' => $totalPages,
+            'page'        => $currentPage,
+            'per_page'    => $perPage,
+        ];
     }
 
     /**
@@ -604,5 +624,47 @@ class AccountTabOrdersBlock extends Block
     protected function formatPrice(float $price): string
     {
         return CurrencyManager::formatPrice($price);
+    }
+
+    protected function renderPagination(array $result): string
+    {
+        $totalPages = $result['total_pages'];
+        $currentPage = $result['page'];
+
+        if ($totalPages <= 1) {
+            return '';
+        }
+
+        $baseUrl = $this->getOrdersUrl();
+        $output = '<nav class="jankx-pagination" aria-label="' . esc_attr__('Orders pagination', 'jankx') . '">';
+        $output .= '<div class="jankx-pagination-inner">';
+
+        // Previous
+        if ($currentPage > 1) {
+            $output .= '<a class="jankx-pagination-btn jankx-pagination-prev" href="' . esc_url(add_query_arg('page', $currentPage - 1, $baseUrl)) . '">'
+                . '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>'
+                . '</a>';
+        }
+
+        // Page numbers
+        for ($i = 1; $i <= $totalPages; $i++) {
+            if ($i === $currentPage) {
+                $output .= '<span class="jankx-pagination-btn jankx-pagination-current">' . $i . '</span>';
+            } else {
+                $output .= '<a class="jankx-pagination-btn" href="' . esc_url(add_query_arg('page', $i, $baseUrl)) . '">' . $i . '</a>';
+            }
+        }
+
+        // Next
+        if ($currentPage < $totalPages) {
+            $output .= '<a class="jankx-pagination-btn jankx-pagination-next" href="' . esc_url(add_query_arg('page', $currentPage + 1, $baseUrl)) . '">'
+                . '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>'
+                . '</a>';
+        }
+
+        $output .= '</div>';
+        $output .= '</nav>';
+
+        return $output;
     }
 }
