@@ -67,8 +67,9 @@ class CartItem
     public function getName(): string
     {
         $product = $this->getProduct();
+        $name = $product ? $product->getName() : get_the_title($this->productId);
 
-        return $product ? $product->getName() : get_the_title($this->productId);
+        return html_entity_decode($name, ENT_QUOTES, 'UTF-8');
     }
 
     public function getUnitPrice(): float
