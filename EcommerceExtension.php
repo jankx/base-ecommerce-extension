@@ -569,7 +569,7 @@ class EcommerceExtension extends AbstractExtension
     /**
      * Send a "order created" notification when a new order is placed.
      */
-    public function on_order_created(Order $order, Cart $cart): void
+    public function on_order_created(Order $order, ?Cart $cart): void
     {
         $userId = $order->getCustomerId();
         if (!$userId) {
