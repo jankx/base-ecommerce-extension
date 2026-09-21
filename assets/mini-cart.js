@@ -186,7 +186,6 @@
         if (toggle) {
             toggle.setAttribute('aria-expanded', 'true');
         }
-        refreshCart();
     }
 
     function closePanel() {
@@ -272,8 +271,9 @@
 
     // Refresh the badge/panel whenever the cart changes elsewhere on the page.
     document.addEventListener('jankx:cart-updated', function () {
-        refreshCart();
-        openPanel();
+        refreshCart().then(function () {
+            openPanel();
+        });
     });
 
     /**

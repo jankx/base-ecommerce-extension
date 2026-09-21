@@ -327,6 +327,8 @@ class EcommerceExtension extends AbstractExtension
             'i18n' => [
                 'successTitle' => __('Order placed successfully!', 'jankx'),
                 'successMessage' => __('Your order number is %s.', 'jankx'),
+                'adding' => __('Đang thêm...', 'jankx'),
+                'added' => __('Đã thêm ✓', 'jankx'),
             ],
         ]);
     }

@@ -130,6 +130,9 @@
             statusBox.textContent = '';
         }
         button.disabled = true;
+        button.classList.add('is-loading');
+        var originalText = button.textContent;
+        button.textContent = window.jankxEcommerce.i18n ? window.jankxEcommerce.i18n.adding : 'Đang thêm...';
 
         getJson({
             url: window.jankxEcommerce.restUrl + '/cart/items',
@@ -141,12 +144,20 @@
                     statusBox.textContent = response.message || 'Failed to add item.';
                 }
                 button.disabled = false;
+                button.classList.remove('is-loading');
+                button.textContent = originalText;
                 return;
             }
 
+            button.classList.remove('is-loading');
+            button.textContent = window.jankxEcommerce.i18n ? window.jankxEcommerce.i18n.added : 'Đã thêm ✓';
+
             if (document.querySelector('.jankx-mini-cart-toggle')) {
                 document.dispatchEvent(new CustomEvent('jankx:cart-updated'));
-                button.disabled = false;
+                setTimeout(function () {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                }, 1500);
                 return;
             }
             if (window.jankxEcommerce.cartUrl) {
@@ -156,6 +167,7 @@
             if (statusBox) {
                 statusBox.textContent = 'Added to cart.';
             }
+            button.textContent = originalText;
             button.disabled = false;
         }).catch(function (error) {
             var message = error && error.message;
@@ -163,6 +175,8 @@
                 statusBox.textContent = (Array.isArray(message) ? message.join(', ') : message) || 'Failed to add item.';
             }
             button.disabled = false;
+            button.classList.remove('is-loading');
+            button.textContent = originalText;
         });
     });
 
