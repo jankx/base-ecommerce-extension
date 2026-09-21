@@ -65,6 +65,14 @@ class ManualFormOrderStrategy extends AbstractOrderCreationStrategy
             ? CurrencyManager::getDefaultCurrency()
             : 'VND';
 
+        $unitPrice = 0.00;
+        $product = ProductRegistry::get_instance()->createProduct($productId);
+        if ($product) {
+            $unitPrice = (float) $product->getPrice();
+        }
+
+        $total = $unitPrice * $quantity;
+
         $builder = OrderBuilder::create()
             ->setCustomer($name, $email, $phone, $address, $customerId)
             ->addItem(
@@ -72,13 +80,13 @@ class ManualFormOrderStrategy extends AbstractOrderCreationStrategy
                 $productTitle,
                 $postType,
                 $quantity,
-                0.00, // No price on form orders
+                $unitPrice,
                 [
                     'source'     => 'product_form',
-                    'order_type' => 'manual_quote',
+                    'order_type' => $unitPrice > 0 ? 'manual_order' : 'manual_quote',
                 ]
             )
-            ->setTotal(0.00)
+            ->setTotal($unitPrice * $quantity)
             ->setCurrency($currency)
             ->setPaymentMethod('manual')
             ->setStatus(Order::STATUS_PENDING);
@@ -87,13 +95,24 @@ class ManualFormOrderStrategy extends AbstractOrderCreationStrategy
             $builder->addNote($customerNote, true);
         }
 
-        $builder->addNote(
-            sprintf(
-                __('Đơn hàng được đặt qua form sản phẩm "%s". Không có giá tiền ban đầu, cần liên hệ và xử lý báo giá thủ công.', 'jankx'),
-                $productTitle
-            ),
-            false
-        );
+        if ($unitPrice > 0) {
+            $builder->addNote(
+                sprintf(
+                    __('Đơn hàng được đặt qua form sản phẩm "%s" với đơn giá %s.', 'jankx'),
+                    $productTitle,
+                    CurrencyManager::formatPrice($unitPrice)
+                ),
+                false
+            );
+        } else {
+            $builder->addNote(
+                sprintf(
+                    __('Đơn hàng được đặt qua form sản phẩm "%s". Sản phẩm chưa có giá, cần liên hệ và xử lý báo giá thủ công.', 'jankx'),
+                    $productTitle
+                ),
+                false
+            );
+        }
 
         $order = $builder->build();
 

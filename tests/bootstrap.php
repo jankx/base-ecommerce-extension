@@ -160,6 +160,14 @@ function stub_wp_ecommerce_functions()
         return $GLOBALS['__wp_options'][$key] ?? $default;
     });
     Monkey\Functions\when('dbDelta')->justReturn([]);
+    Monkey\Functions\when('is_email')->alias(function ($email) {
+        return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : false;
+    });
+    Monkey\Functions\when('sanitize_text_field')->returnArg();
+    Monkey\Functions\when('sanitize_email')->alias(function ($email) {
+        return trim(sanitize_text_field($email));
+    });
+    Monkey\Functions\when('sanitize_textarea_field')->returnArg();
 
     $GLOBALS['__wp_options'] = [];
 }
