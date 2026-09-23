@@ -851,12 +851,9 @@ class OrderAdmin
                 quickBtns.forEach(function(btn) {
                     btn.addEventListener('click', function() {
                         statusSelect.value = this.dataset.status;
-                        statusSelect.dispatchEvent(new Event('change'));
-                        // Submit form
-                        var form = statusSelect.closest('form');
-                        if (form) {
-                            form.submit();
-                        }
+                        // Highlight active button
+                        quickBtns.forEach(function(b) { b.style.outline = 'none'; });
+                        this.style.outline = '2px solid #007cba';
                     });
                 });
             }
