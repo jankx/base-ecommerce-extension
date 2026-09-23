@@ -68,6 +68,16 @@ class OrderAdmin
             $cssUrl = get_stylesheet_directory_uri() . '/extensions/base-ecommerce/assets/admin.css';
             wp_enqueue_style('jankx-ecommerce-admin', $cssUrl, [], filemtime($cssFile));
         }
+
+        // Quick status buttons CSS
+        wp_add_inline_style('jankx-ecommerce-admin', '
+            .jankx-quick-status { margin-top: 8px; }
+            .jankx-quick-status label { display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+            .jankx-quick-status__buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+            .jankx-quick-status__btn { border: none; border-radius: 4px; padding: 6px 12px; font-size: 12px; font-weight: 500; cursor: pointer; transition: opacity 0.15s, transform 0.1s; line-height: 1.4; }
+            .jankx-quick-status__btn:hover { opacity: 0.85; transform: translateY(-1px); }
+            .jankx-quick-status__btn:active { transform: translateY(0); }
+        ');
     }
 
     public function handleActions(): void
@@ -720,15 +730,48 @@ class OrderAdmin
                                 </div>
                                     <div class="jankx-status-form-inner">
                                         <div class="form-group">
-                                            <label for="order_status"><?php esc_html_e('MOVE TO', 'jankx'); ?></label>
+                                            <label for="order_status"><?php esc_html_e('TRẠNG THÁI', 'jankx'); ?></label>
                                             <select name="order_status" id="order_status">
+                                                <option value="<?php echo esc_attr($order->getStatus()); ?>" selected>
+                                                    <?php echo esc_html(sprintf(__('Giữ nguyên (%s)', 'jankx'), Order::getStatusLabel($order->getStatus()))); ?>
+                                                </option>
                                                 <?php foreach (Order::getAllowedStatusTransitionsFor($order->getStatus()) as $status): ?>
-                                                    <option value="<?php echo esc_attr($status); ?>" <?php selected($order->getStatus(), $status); ?>>
+                                                    <option value="<?php echo esc_attr($status); ?>">
                                                         <?php echo esc_html(Order::getStatusLabel($status)); ?>
                                                     </option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
+
+                                        <!-- Quick Status Buttons -->
+                                        <?php $transitions = Order::getAllowedStatusTransitionsFor($order->getStatus()); ?>
+                                        <?php if (!empty($transitions)): ?>
+                                        <div class="form-group jankx-quick-status">
+                                            <label><?php esc_html_e('CHUYỂN NGAY', 'jankx'); ?></label>
+                                            <div class="jankx-quick-status__buttons">
+                                                <?php
+                                                $buttonStyles = [
+                                                    Order::STATUS_PROCESSING => 'background:#2563eb;color:#fff;',
+                                                    Order::STATUS_SHIPPING   => 'background:#7c3aed;color:#fff;',
+                                                    Order::STATUS_COMPLETED  => 'background:#16a34a;color:#fff;',
+                                                    Order::STATUS_FAILED     => 'background:#dc2626;color:#fff;',
+                                                    Order::STATUS_CANCELLED  => 'background:#6b7280;color:#fff;',
+                                                    Order::STATUS_REFUNDED   => 'background:#d97706;color:#fff;',
+                                                    Order::STATUS_PENDING    => 'background:#0ea5e9;color:#fff;',
+                                                ];
+                                                foreach ($transitions as $status):
+                                                    $style = $buttonStyles[$status] ?? 'background:#334155;color:#fff;';
+                                                ?>
+                                                    <button type="button"
+                                                        class="jankx-quick-status__btn"
+                                                        data-status="<?php echo esc_attr($status); ?>"
+                                                        style="<?php echo esc_attr($style); ?>">
+                                                        <?php echo esc_html(Order::getStatusLabel($status)); ?>
+                                                    </button>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                        <?php endif; ?>
 
                                         <div class="form-group">
                                             <label for="order_total"><?php esc_html_e('BÁO GIÁ / TỔNG TIỀN (VND)', 'jankx'); ?></label>
@@ -801,8 +844,24 @@ class OrderAdmin
 
         <script>
         (function(){
-            // ── Tracking group visibility ──
+            // ── Quick Status Buttons ──
             var statusSelect = document.getElementById('order_status');
+            var quickBtns = document.querySelectorAll('.jankx-quick-status__btn');
+            if (statusSelect && quickBtns.length) {
+                quickBtns.forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        statusSelect.value = this.dataset.status;
+                        statusSelect.dispatchEvent(new Event('change'));
+                        // Submit form
+                        var form = statusSelect.closest('form');
+                        if (form) {
+                            form.submit();
+                        }
+                    });
+                });
+            }
+
+            // ── Tracking group visibility ──
             var trackingGroup = document.getElementById('tracking-number-group');
             if (statusSelect && trackingGroup) {
                 var showStatuses = ['shipping'];
