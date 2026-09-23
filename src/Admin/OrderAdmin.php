@@ -718,44 +718,47 @@ class OrderAdmin
                                         <?php echo esc_html(strtoupper(Order::getStatusLabel($order->getStatus()))); ?>
                                     </span>
                                 </div>
-                                    <div class="form-group">
-                                        <label for="order_status"><?php esc_html_e('MOVE TO', 'jankx'); ?></label>
-                                        <select name="order_status" id="order_status">
-                                            <?php foreach (Order::getAllowedStatusTransitionsFor($order->getStatus()) as $status): ?>
-                                                <option value="<?php echo esc_attr($status); ?>" <?php selected($order->getStatus(), $status); ?>>
-                                                    <?php echo esc_html(Order::getStatusLabel($status)); ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
+                                    <div class="jankx-status-form-inner">
+                                        <div class="form-group">
+                                            <label for="order_status"><?php esc_html_e('MOVE TO', 'jankx'); ?></label>
+                                            <select name="order_status" id="order_status">
+                                                <?php foreach (Order::getAllowedStatusTransitionsFor($order->getStatus()) as $status): ?>
+                                                    <option value="<?php echo esc_attr($status); ?>" <?php selected($order->getStatus(), $status); ?>>
+                                                        <?php echo esc_html(Order::getStatusLabel($status)); ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="order_total"><?php esc_html_e('BÁO GIÁ / TỔNG TIỀN (VND)', 'jankx'); ?></label>
+                                            <input type="number" step="any" min="0" name="order_total" id="order_total"
+                                                value="<?php echo esc_attr($order->getTotal()); ?>"
+                                                placeholder="<?php esc_attr_e('Nhập giá báo cho khách...', 'jankx'); ?>">
+                                            <?php if ($order->getPaymentMethod() === 'manual'): ?>
+                                                <small class="description" style="display:block;margin-top:4px;color:#64748b;"><?php esc_html_e('Cập nhật số tiền sau khi thỏa thuận báo giá với khách hàng.', 'jankx'); ?></small>
+                                            <?php endif; ?>
+                                        </div>
+
+                                        <!-- Tracking Number (visible when current status is shipping or target is shipping/completed) -->
+                                        <?php
+                                        $showTracking = $order->getStatus() === Order::STATUS_SHIPPING
+                                            || in_array(Order::STATUS_SHIPPING, Order::getAllowedStatusTransitionsFor($order->getStatus()), true);
+                                        ?>
+                                        <div class="form-group" id="tracking-number-group" style="<?php echo $showTracking ? '' : 'display:none;'; ?>">
+                                            <label for="tracking_number"><?php esc_html_e('MÃ VẬN ĐƠN', 'jankx'); ?></label>
+                                            <input type="text" name="tracking_number" id="tracking_number"
+                                                value="<?php echo esc_attr($order->getTrackingNumber()); ?>"
+                                                placeholder="<?php esc_attr_e('Nhập mã vận đơn...', 'jankx'); ?>">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="order_note"><?php esc_html_e('NOTE', 'jankx'); ?></label>
+                                            <textarea name="order_note" id="order_note" rows="4" placeholder="<?php esc_attr_e('Optional note...', 'jankx'); ?>"></textarea>
+                                        </div>
+                                        <button type="submit" name="jankx_update_order_status" class="button-update"><?php esc_html_e('Cập nhật đơn hàng', 'jankx'); ?></button>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label for="order_total"><?php esc_html_e('BÁO GIÁ / TỔNG TIỀN (VND)', 'jankx'); ?></label>
-                                        <input type="number" step="any" min="0" name="order_total" id="order_total"
-                                               value="<?php echo esc_attr($order->getTotal()); ?>"
-                                               placeholder="<?php esc_attr_e('Nhập giá báo cho khách...', 'jankx'); ?>">
-                                        <?php if ($order->getPaymentMethod() === 'manual'): ?>
-                                            <small class="description" style="display:block;margin-top:4px;color:#64748b;"><?php esc_html_e('Cập nhật số tiền sau khi thỏa thuận báo giá với khách hàng.', 'jankx'); ?></small>
-                                        <?php endif; ?>
-                                    </div>
-
-                                    <!-- Tracking Number (visible when current status is shipping or target is shipping/completed) -->
-                                    <?php
-                                    $showTracking = $order->getStatus() === Order::STATUS_SHIPPING
-                                        || in_array(Order::STATUS_SHIPPING, Order::getAllowedStatusTransitionsFor($order->getStatus()), true);
-                                    ?>
-                                    <div class="form-group" id="tracking-number-group" style="<?php echo $showTracking ? '' : 'display:none;'; ?>">
-                                        <label for="tracking_number"><?php esc_html_e('MÃ VẬN ĐƠN', 'jankx'); ?></label>
-                                        <input type="text" name="tracking_number" id="tracking_number"
-                                               value="<?php echo esc_attr($order->getTrackingNumber()); ?>"
-                                               placeholder="<?php esc_attr_e('Nhập mã vận đơn...', 'jankx'); ?>">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="order_note"><?php esc_html_e('NOTE', 'jankx'); ?></label>
-                                        <textarea name="order_note" id="order_note" rows="4" placeholder="<?php esc_attr_e('Optional note...', 'jankx'); ?>"></textarea>
-                                    </div>
-                                    <button type="submit" name="jankx_update_order_status" class="button-update"><?php esc_html_e('Cập nhật đơn hàng', 'jankx'); ?></button>
                             </div>
                         </div>
 
