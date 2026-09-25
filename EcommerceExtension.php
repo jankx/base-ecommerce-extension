@@ -25,6 +25,7 @@ use Jankx\Extensions\Ecommerce\Blocks\CheckoutCreditsBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CheckoutActionsBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CheckoutEmptyBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CurrencySwitcherBlock;
+use Jankx\Extensions\Ecommerce\Blocks\PostPriceBlock;
 use Jankx\Extensions\Ecommerce\Cart\Cart;
 use Jankx\Extensions\Ecommerce\Checkout\CheckoutManager;
 use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
@@ -131,10 +132,6 @@ class EcommerceExtension extends AbstractExtension
         // Frontend assets on the cart/checkout pages and single product pages.
         add_action('wp_enqueue_scripts', [$this, 'enqueue_frontend_assets']);
 
-        // Auto render an "Add to cart" area on single pages of supported
-        // product types (tour, product, ...).
-        add_filter('the_content', [$this, 'append_add_to_cart_to_content']);
-
         // Inject the "Orders" sub-page into My Account.
         add_action('jankx/my_account/register_sub_pages', [$this, 'register_my_account_sub_pages']);
 
@@ -173,6 +170,7 @@ class EcommerceExtension extends AbstractExtension
             'checkout-empty' => CheckoutEmptyBlock::class,
             'account-tab-orders' => AccountTabOrdersBlock::class,
             'add-to-cart' => AddToCartBlock::class,
+            'post-price' => PostPriceBlock::class,
             'currency-switcher' => CurrencySwitcherBlock::class,
         ];
 
@@ -230,6 +228,7 @@ class EcommerceExtension extends AbstractExtension
             'checkout-empty',
             'account-tab-orders',
             'add-to-cart',
+            'post-price',
             'currency-switcher',
         ];
         foreach ($blockSlugs as $slug) {
@@ -331,30 +330,6 @@ class EcommerceExtension extends AbstractExtension
                 'added' => __('Đã thêm ✓', 'jankx'),
             ],
         ]);
-    }
-
-    /**
-     * Append an "Add to cart" area after the content of single pages whose
-     * post type is registered into the ecommerce flow (tour, product, ...).
-     *
-     * Skipped when the jankx/add-to-cart block is already placed in content.
-     */
-    public function append_add_to_cart_to_content(string $content): string
-    {
-        if (is_admin() || !is_singular()) {
-            return $content;
-        }
-
-        $post = get_post();
-        if (!$post || !self::is_product($post)) {
-            return $content;
-        }
-
-        if (has_block(AddToCartBlock::BLOCK_ID, $post)) {
-            return $content;
-        }
-
-        return $content . (new AddToCartBlock())->render([]);
     }
 
     /**

@@ -1,8 +1,6 @@
 <?php
 namespace Jankx\Extensions\Ecommerce\Blocks\AddToCart;
 
-use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
-
 class ScrollToFormAddToCartStrategy implements AddToCartStrategyInterface
 {
     public function render(int $postId, $product, array $attributes): string
@@ -12,7 +10,6 @@ class ScrollToFormAddToCartStrategy implements AddToCartStrategyInterface
         ]);
 
         $formTarget = 'jankx-product-order-card-' . $postId;
-        $price = CurrencyManager::formatPrice($product->getPrice());
 
         $output = sprintf('<div %s>', $wrapperAttrs);
 
@@ -21,7 +18,6 @@ class ScrollToFormAddToCartStrategy implements AddToCartStrategyInterface
         }
 
         $output .= '<div class="jankx-add-to-cart__row">';
-        $output .= '<span class="jankx-add-to-cart__price">' . esc_html($price) . '</span>';
         $output .= sprintf(
             '<button type="button" class="jankx-btn jankx-btn-primary jankx-add-to-cart__btn jankx-scroll-to-order-form" data-target="%s">',
             esc_attr($formTarget)

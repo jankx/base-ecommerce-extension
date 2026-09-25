@@ -55,6 +55,7 @@ module.exports = {
         'blocks/checkout-empty/build/index': './blocks/checkout-empty/src/index.tsx',
         'blocks/account-tab-orders/build/index': './blocks/account-tab-orders/src/index.tsx',
         'blocks/add-to-cart/build/index': './blocks/add-to-cart/src/index.tsx',
+        'blocks/post-price/build/index': './blocks/post-price/src/index.tsx',
         'blocks/currency-switcher/build/index': './blocks/currency-switcher/src/index.tsx',
     },
 

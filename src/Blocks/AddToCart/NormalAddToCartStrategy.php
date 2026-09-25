@@ -1,8 +1,6 @@
 <?php
 namespace Jankx\Extensions\Ecommerce\Blocks\AddToCart;
 
-use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
-
 class NormalAddToCartStrategy implements AddToCartStrategyInterface
 {
     public function render(int $postId, $product, array $attributes): string
@@ -36,10 +34,6 @@ class NormalAddToCartStrategy implements AddToCartStrategyInterface
         }
 
         $formBody .= '<div class="jankx-add-to-cart__row">';
-        $formBody .= '<span class="jankx-add-to-cart__price">'
-            . esc_html(CurrencyManager::formatPrice($product->getPrice()))
-            . '</span>';
-
         if (!isset($attributes['show_quantity']) || !empty($attributes['show_quantity'])) {
             $formBody .= '<input type="number" name="quantity" value="1" min="1" class="jankx-input jankx-add-to-cart__qty"'
                 . ' aria-label="' . esc_attr__('Số lượng', 'jankx') . '">';

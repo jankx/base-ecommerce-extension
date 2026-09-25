@@ -327,13 +327,6 @@
     flex-wrap: wrap;
 }
 
-.jankx-add-to-cart__price {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #c0392b;
-    margin-right: auto;
-}
-
 .jankx-add-to-cart__qty {
     width: 80px;
 }

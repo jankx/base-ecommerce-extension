@@ -2,7 +2,6 @@
 namespace Jankx\Extensions\Ecommerce\Blocks;
 
 use Jankx\Extensions\Ecommerce\Block;
-use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
 use Jankx\Extensions\Ecommerce\EcommerceExtension;
 use Jankx\Extensions\Ecommerce\Registry\ProductRegistry;
 use Jankx\Extensions\Ecommerce\Blocks\AddToCart\AddToCartStrategyFactory;
@@ -69,8 +68,6 @@ class AddToCartBlock extends Block
 
         $output .= '<div class="jankx-add-to-cart__row">';
 
-        $output .= '<span class="jankx-add-to-cart__price">' . esc_html(CurrencyManager::formatPrice(1500000)) . '</span>';
-
         if (!isset($attributes['show_quantity']) || !empty($attributes['show_quantity'])) {
             $output .= '<input type="number" class="jankx-input jankx-add-to-cart__qty" value="1" min="1"'
                 . ' tabindex="-1" aria-hidden="true" disabled>';
@@ -83,7 +80,7 @@ class AddToCartBlock extends Block
         $output .= '</div>';
 
         $output .= '<p class="jankx-add-to-cart__status">'
-            . esc_html__('Bản xem trước trong trình soạn thảo — giá và mức giảm hiển thị theo sản phẩm hiện tại.', 'jankx')
+            . esc_html__('Bản xem trước trong trình soạn thảo — biểu mẫu thêm vào giỏ hàng cho sản phẩm hiện tại.', 'jankx')
             . '</p>';
 
         $output .= '</div>';
@@ -121,10 +118,5 @@ class AddToCartBlock extends Block
         $type = get_post_type($postId);
 
         return $type ?: '';
-    }
-
-    protected function formatPrice(float $price): string
-    {
-        return CurrencyManager::formatPrice($price);
     }
 }

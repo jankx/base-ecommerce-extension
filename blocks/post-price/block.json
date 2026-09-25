@@ -1,0 +1,74 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/post-price",
+  "title": "Post Price",
+  "category": "jankx",
+  "icon": "money-alt",
+  "description": "Hiển thị giá của sản phẩm hiện tại (tour, experience, product...) qua API Product dùng chung của base-ecommerce.",
+  "textdomain": "jankx",
+  "usesContext": [
+    "postId",
+    "postType"
+  ],
+  "attributes": {
+    "prefix": {
+      "type": "string",
+      "default": "Từ "
+    },
+    "suffix": {
+      "type": "string",
+      "default": "/ người"
+    },
+    "showWhenEmpty": {
+      "type": "boolean",
+      "default": true
+    },
+    "emptyText": {
+      "type": "string",
+      "default": "Liên hệ"
+    },
+    "tagName": {
+      "type": "string",
+      "default": "span"
+    }
+  },
+  "supports": {
+    "html": false,
+    "color": {
+      "text": true,
+      "background": true,
+      "enableBackground": true
+    },
+    "typography": {
+      "fontSize": true,
+      "lineHeight": true,
+      "__experimentalFontFamily": true,
+      "__experimentalFontWeight": true,
+      "__experimentalFontStyle": true,
+      "__experimentalTextTransform": true,
+      "__experimentalTextDecoration": true,
+      "__experimentalLetterSpacing": true,
+      "__experimentalDefaultControls": {
+        "fontSize": true
+      }
+    },
+    "spacing": {
+      "margin": true,
+      "padding": true
+    },
+    "border": {
+      "color": true,
+      "radius": true,
+      "style": true,
+      "width": true,
+      "__experimentalDefaultControls": {
+        "color": true,
+        "radius": true,
+        "style": true,
+        "width": true
+      }
+    }
+  },
+  "editorScript": "file:./build/index.js"
+}
