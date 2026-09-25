@@ -298,13 +298,6 @@
     to { transform: rotate(360deg); }
 }
 
-.jankx-add-to-cart {
-    border-radius: 8px;
-    padding: 1.25rem;
-    margin-top: 2rem;
-    background: #fff;
-}
-
 .jankx-add-to-cart__title {
     margin: 0 0 0.75rem;
 }
