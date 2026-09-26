@@ -22,7 +22,7 @@ class ScrollToFormAddToCartStrategy implements AddToCartStrategyInterface
             '<button type="button" class="jankx-btn jankx-btn-primary jankx-add-to-cart__btn jankx-scroll-to-order-form" data-target="%s">',
             esc_attr($formTarget)
         );
-        $output .= esc_html__('Liên hệ báo giá', 'jankx');
+        $output .= esc_html__('Gửi yêu cầu đặt hàng', 'jankx');
         $output .= '</button>';
         $output .= '</div>';
 

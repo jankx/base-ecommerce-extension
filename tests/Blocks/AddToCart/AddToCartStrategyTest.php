@@ -197,7 +197,7 @@ class AddToCartStrategyTest extends TestCase
 
         $this->assertStringContainsString('jankx-scroll-to-order-form', $html);
         $this->assertStringContainsString('data-target="jankx-product-order-card-42"', $html);
-        $this->assertStringContainsString('Liên hệ báo giá', $html);
+        $this->assertStringContainsString('Gửi yêu cầu đặt hàng', $html);
     }
 
     public function test_normal_strategy_renders_form(): void
