@@ -106,19 +106,21 @@ class CurrencySwitcherBlock extends Block
             $currentCurrency = [];
         }
 
-        $bgStyle = '';
-        $background = $attributes['style']['color']['background'] ?? '';
-        if (!empty($background) && 'transparent' !== $background) {
-            $bgStyle = ' style="background-color:' . esc_attr($background) . '"';
-        }
+        $panelId = 'jcs-dropdown-' . uniqid();
 
         $html = '<div class="jcs-dropdown-wrapper">';
-        $html .= '<button class="jcs-dropdown" type="button" aria-haspopup="true" aria-expanded="false"' . $bgStyle . '>';
+        $html .= '<button class="jcs-dropdown" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="' . esc_attr($panelId) . '">';
         $html .= $this->buildLabelHtml($currentCurrency, $showFlag, $showCode, $showSymbol, $showName);
         $html .= '<span class="jcs-arrow">▼</span>';
         $html .= '</button>';
 
-        $html .= '<ul class="jcs-dropdown-menu"' . $bgStyle . '>';
+        $html .= '<div class="jcs-dropdown-panel" id="' . esc_attr($panelId) . '" role="region" aria-label="' . esc_attr__('Chọn tiền tệ', 'jankx') . '">';
+        $html .= '<div class="jcs-dropdown-head">';
+        $html .= '<span class="jcs-dropdown-title">' . esc_html__('Tiền tệ', 'jankx') . '</span>';
+        $html .= '<button type="button" class="jcs-dropdown-close" data-jcs-close aria-label="' . esc_attr__('Close currency', 'jankx') . '">&times;</button>';
+        $html .= '</div>';
+        $html .= '<div class="jcs-dropdown-body">';
+        $html .= '<ul class="jcs-dropdown-menu">';
         foreach ($currencies as $code => $currency) {
             $isCurrent = $code === $current;
             $itemClasses = ['jcs-dropdown-item'];
@@ -133,7 +135,10 @@ class CurrencySwitcherBlock extends Block
             $html .= $this->buildLabelHtml($currency, $showFlag, $showCode, $showSymbol, $showName);
             $html .= '</a></li>';
         }
-        $html .= '</ul></div>';
+        $html .= '</ul>';
+        $html .= '</div>';
+        $html .= '</div>';
+        $html .= '</div>';
 
         return $html;
     }

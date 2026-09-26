@@ -82,6 +82,15 @@
         }
     }
 
+    // Close all open dropdowns (mirrors mini cart close behavior)
+    function closeAllDropdowns() {
+        document.querySelectorAll('.jcs-dropdown-wrapper.is-open').forEach(function (w) {
+            w.classList.remove('is-open');
+            var btn = w.querySelector('.jcs-dropdown');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        });
+    }
+
     // Handle dropdown button toggle (click to open/close)
     document.addEventListener('click', function (e) {
         var dropdownToggle = e.target.closest('.jcs-dropdown');
@@ -91,11 +100,7 @@
                 e.preventDefault();
                 var isOpen = wrapper.classList.contains('is-open');
                 // Close any other open dropdowns first
-                document.querySelectorAll('.jcs-dropdown-wrapper.is-open').forEach(function (w) {
-                    w.classList.remove('is-open');
-                    var btn = w.querySelector('.jcs-dropdown');
-                    if (btn) btn.setAttribute('aria-expanded', 'false');
-                });
+                closeAllDropdowns();
                 if (!isOpen) {
                     wrapper.classList.add('is-open');
                     dropdownToggle.setAttribute('aria-expanded', 'true');
@@ -104,13 +109,22 @@
             }
         }
 
+        // Close via the panel close button (like the mini cart close button)
+        if (e.target.closest('[data-jcs-close]')) {
+            closeAllDropdowns();
+            return;
+        }
+
         // Close dropdown when clicking outside
         if (!e.target.closest('.jcs-dropdown-wrapper')) {
-            document.querySelectorAll('.jcs-dropdown-wrapper.is-open').forEach(function (w) {
-                w.classList.remove('is-open');
-                var btn = w.querySelector('.jcs-dropdown');
-                if (btn) btn.setAttribute('aria-expanded', 'false');
-            });
+            closeAllDropdowns();
+        }
+    });
+
+    // Escape closes the dropdown (same as the mini cart)
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeAllDropdowns();
         }
     });
 
