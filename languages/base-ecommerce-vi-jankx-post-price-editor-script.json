@@ -1,0 +1,33 @@
+{
+    "translation-revision-date": "YEAR-MO-DA HO:MI+ZONE",
+    "generator": "WP-CLI\/2.12.0",
+    "source": "blocks\/post-price\/build\/index.js",
+    "domain": "messages",
+    "locale_data": {
+        "messages": {
+            "": {
+                "domain": "messages",
+                "lang": "vi",
+                "plural-forms": "nplurals=1; plural=0;"
+            },
+            "C\u00e0i \u0111\u1eb7t hi\u1ec3n th\u1ecb gi\u00e1": [
+                "C\u00e0i \u0111\u1eb7t hi\u1ec3n th\u1ecb gi\u00e1"
+            ],
+            "Ti\u1ec1n t\u1ed1": [
+                "Ti\u1ec1n t\u1ed1"
+            ],
+            "H\u1eadu t\u1ed1": [
+                "H\u1eadu t\u1ed1"
+            ],
+            "Hi\u1ec3n th\u1ecb khi ch\u01b0a c\u00f3 gi\u00e1": [
+                "Hi\u1ec3n th\u1ecb khi ch\u01b0a c\u00f3 gi\u00e1"
+            ],
+            "Ch\u1eef khi ch\u01b0a c\u00f3 gi\u00e1": [
+                "Ch\u1eef khi ch\u01b0a c\u00f3 gi\u00e1"
+            ],
+            "Th\u1ebb HTML": [
+                "Th\u1ebb HTML"
+            ]
+        }
+    }
+}

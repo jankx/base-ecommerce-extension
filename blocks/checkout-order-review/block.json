@@ -6,7 +6,7 @@
   "category": "jankx",
   "icon": "clipboard",
   "description": "Order review box of the checkout form: one row per cart item plus discount, credits and total rows.",
-  "textdomain": "jankx",
+  "textdomain": "base-ecommerce",
   "attributes": {
     "jankxCheckoutColumn": {
       "type": "string",

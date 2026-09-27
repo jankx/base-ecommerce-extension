@@ -6,7 +6,7 @@
   "category": "jankx",
   "icon": "money-alt",
   "description": "Cart totals section with subtotal, discount, coupon form, total and checkout button.",
-  "textdomain": "jankx",
+  "textdomain": "base-ecommerce",
   "attributes": {
     "jankxHideOnUltrawide": {
       "type": "boolean",

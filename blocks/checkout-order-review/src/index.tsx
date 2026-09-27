@@ -19,21 +19,21 @@ function Edit({ attributes, setAttributes }) {
     return (
         <>
             <InspectorControls>
-                <PanelBody title={__('Layout', 'jankx')}>
+                <PanelBody title={__('Layout', 'base-ecommerce')}>
                     <SelectControl
-                        label={__('Column', 'jankx')}
+                        label={__('Column', 'base-ecommerce')}
                         value={attributes.jankxCheckoutColumn}
                         options={[
-                            { value: 'customer', label: __('Customer column', 'jankx') },
-                            { value: 'summary', label: __('Summary column', 'jankx') },
-                            { value: '', label: __('Full width', 'jankx') },
+                            { value: 'customer', label: __('Customer column', 'base-ecommerce') },
+                            { value: 'summary', label: __('Summary column', 'base-ecommerce') },
+                            { value: '', label: __('Full width', 'base-ecommerce') },
                         ]}
                         onChange={(jankxCheckoutColumn) => setAttributes({ jankxCheckoutColumn })}
                     />
                 </PanelBody>
             </InspectorControls>
             <div {...blockProps}>
-                <h2 className="jankx-section-title">{__('Your order', 'jankx')}</h2>
+                <h2 className="jankx-section-title">{__('Your order', 'base-ecommerce')}</h2>
                 <div className="jankx-order-review">
                     <div className="jankx-review-item">
                         <InnerBlocks

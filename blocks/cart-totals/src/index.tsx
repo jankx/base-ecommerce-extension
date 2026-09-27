@@ -11,7 +11,7 @@ function Edit() {
     return (
         <div {...blockProps}>
             <h2 className="jankx-section-title">
-                {__('Cart totals', 'jankx')}
+                {__('Cart totals', 'base-ecommerce')}
             </h2>
 
             <div className="jankx-coupon-form">
@@ -19,7 +19,7 @@ function Edit() {
                     <input
                         type="text"
                         className="jankx-coupon-code"
-                        placeholder={__('Nhập mã giảm giá', 'jankx')}
+                        placeholder={__('Nhập mã giảm giá', 'base-ecommerce')}
                         disabled
                     />
                     <button
@@ -27,19 +27,19 @@ function Edit() {
                         className="jankx-btn jankx-btn-primary jankx-coupon-apply"
                         disabled
                     >
-                        {__('Áp dụng', 'jankx')}
+                        {__('Áp dụng', 'base-ecommerce')}
                     </button>
                 </div>
             </div>
 
             <div className="jankx-total-row">
-                <span>{__('Subtotal', 'jankx')}</span>
-                <span>{__('1.500.000₫', 'jankx')}</span>
+                <span>{__('Subtotal', 'base-ecommerce')}</span>
+                <span>{__('1.500.000₫', 'base-ecommerce')}</span>
             </div>
 
             <div className="jankx-total-row jankx-total-grand">
-                <span>{__('Total', 'jankx')}</span>
-                <span>{__('1.500.000₫', 'jankx')}</span>
+                <span>{__('Total', 'base-ecommerce')}</span>
+                <span>{__('1.500.000₫', 'base-ecommerce')}</span>
             </div>
 
             <div className="jankx-cart-actions">
@@ -48,7 +48,7 @@ function Edit() {
                     className="jankx-btn jankx-btn-primary jankx-btn-checkout"
                     disabled
                 >
-                    {__('Proceed to checkout', 'jankx')}
+                    {__('Proceed to checkout', 'base-ecommerce')}
                 </button>
             </div>
         </div>

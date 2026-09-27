@@ -6,7 +6,7 @@
   "category": "jankx",
   "icon": "heading",
   "description": "Product name and quantity of one checkout order review row.",
-  "textdomain": "jankx",
+  "textdomain": "base-ecommerce",
   "supports": {
     "html": false
   },

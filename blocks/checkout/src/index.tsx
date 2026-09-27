@@ -33,7 +33,7 @@ function Edit() {
     return (
         <div {...blockProps}>
             <div className="jankx-checkout-block__editor-note">
-                {__('Tùy chỉnh thanh toán: Section có cột "customer" hiển thị bên trái, cột "summary" hiển thị bên phải. Block checkout-empty hiển thị khi giỏ hàng trống.', 'jankx')}
+                {__('Tùy chỉnh thanh toán: Section có cột "customer" hiển thị bên trái, cột "summary" hiển thị bên phải. Block checkout-empty hiển thị khi giỏ hàng trống.', 'base-ecommerce')}
             </div>
             <div className="jankx-checkout-block__sections-preview">
                 <InnerBlocks

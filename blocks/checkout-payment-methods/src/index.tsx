@@ -12,14 +12,14 @@ function Edit({ attributes, setAttributes }) {
     return (
         <>
             <InspectorControls>
-                <PanelBody title={__('Layout', 'jankx')}>
+                <PanelBody title={__('Layout', 'base-ecommerce')}>
                     <SelectControl
-                        label={__('Column', 'jankx')}
+                        label={__('Column', 'base-ecommerce')}
                         value={attributes.jankxCheckoutColumn}
                         options={[
-                            { value: 'customer', label: __('Customer column', 'jankx') },
-                            { value: 'summary', label: __('Summary column', 'jankx') },
-                            { value: '', label: __('Full width', 'jankx') },
+                            { value: 'customer', label: __('Customer column', 'base-ecommerce') },
+                            { value: 'summary', label: __('Summary column', 'base-ecommerce') },
+                            { value: '', label: __('Full width', 'base-ecommerce') },
                         ]}
                         onChange={(jankxCheckoutColumn) => setAttributes({ jankxCheckoutColumn })}
                     />
@@ -29,11 +29,11 @@ function Edit({ attributes, setAttributes }) {
                 <div className="jankx-payment-methods">
                     <label className="jankx-payment-method">
                         <input type="radio" name="payment_method" value="bank_transfer" defaultChecked disabled />
-                        <span>{__('Chuyển khoản ngân hàng', 'jankx')}</span>
+                        <span>{__('Chuyển khoản ngân hàng', 'base-ecommerce')}</span>
                     </label>
                     <label className="jankx-payment-method">
                         <input type="radio" name="payment_method" value="cod" disabled />
-                        <span>{__('Thanh toán khi nhận hàng (COD)', 'jankx')}</span>
+                        <span>{__('Thanh toán khi nhận hàng (COD)', 'base-ecommerce')}</span>
                     </label>
                 </div>
             </div>

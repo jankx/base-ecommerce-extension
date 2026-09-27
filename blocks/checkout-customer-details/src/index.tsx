@@ -12,35 +12,35 @@ function Edit({ attributes, setAttributes }) {
     return (
         <>
             <InspectorControls>
-                <PanelBody title={__('Layout', 'jankx')}>
+                <PanelBody title={__('Layout', 'base-ecommerce')}>
                     <SelectControl
-                        label={__('Column', 'jankx')}
+                        label={__('Column', 'base-ecommerce')}
                         value={attributes.jankxCheckoutColumn}
                         options={[
-                            { value: 'customer', label: __('Customer column', 'jankx') },
-                            { value: 'summary', label: __('Summary column', 'jankx') },
-                            { value: '', label: __('Full width', 'jankx') },
+                            { value: 'customer', label: __('Customer column', 'base-ecommerce') },
+                            { value: 'summary', label: __('Summary column', 'base-ecommerce') },
+                            { value: '', label: __('Full width', 'base-ecommerce') },
                         ]}
                         onChange={(jankxCheckoutColumn) => setAttributes({ jankxCheckoutColumn })}
                     />
                 </PanelBody>
             </InspectorControls>
             <div {...blockProps}>
-                <h2 className="jankx-section-title">{__('Billing details', 'jankx')}</h2>
+                <h2 className="jankx-section-title">{__('Billing details', 'base-ecommerce')}</h2>
                 <div className="jankx-field">
-                    <label>{__('Full name', 'jankx')} <span className="jankx-required">*</span></label>
-                    <input type="text" className="jankx-input" placeholder={__('Full name', 'jankx')} disabled />
+                    <label>{__('Full name', 'base-ecommerce')} <span className="jankx-required">*</span></label>
+                    <input type="text" className="jankx-input" placeholder={__('Full name', 'base-ecommerce')} disabled />
                 </div>
                 <div className="jankx-field">
-                    <label>{__('Email', 'jankx')} <span className="jankx-required">*</span></label>
-                    <input type="email" className="jankx-input" placeholder={__('Email', 'jankx')} disabled />
+                    <label>{__('Email', 'base-ecommerce')} <span className="jankx-required">*</span></label>
+                    <input type="email" className="jankx-input" placeholder={__('Email', 'base-ecommerce')} disabled />
                 </div>
                 <div className="jankx-field">
-                    <label>{__('Phone', 'jankx')}</label>
-                    <input type="tel" className="jankx-input" placeholder={__('Phone', 'jankx')} disabled />
+                    <label>{__('Phone', 'base-ecommerce')}</label>
+                    <input type="tel" className="jankx-input" placeholder={__('Phone', 'base-ecommerce')} disabled />
                 </div>
                 <div className="jankx-field">
-                    <label>{__('Address', 'jankx')}</label>
+                    <label>{__('Address', 'base-ecommerce')}</label>
                     <textarea className="jankx-input" rows="3" disabled></textarea>
                 </div>
             </div>

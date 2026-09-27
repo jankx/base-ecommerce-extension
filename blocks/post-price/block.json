@@ -6,7 +6,7 @@
   "category": "jankx",
   "icon": "money-alt",
   "description": "Hiển thị giá của sản phẩm hiện tại (tour, experience, product...) qua API Product dùng chung của base-ecommerce.",
-  "textdomain": "jankx",
+  "textdomain": "base-ecommerce",
   "usesContext": [
     "postId",
     "postType"

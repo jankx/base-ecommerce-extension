@@ -6,7 +6,7 @@
   "category": "jankx",
   "icon": "button",
   "description": "Error box and the place order button of the checkout form.",
-  "textdomain": "jankx",
+  "textdomain": "base-ecommerce",
   "attributes": {
     "jankxCheckoutColumn": {
       "type": "string",

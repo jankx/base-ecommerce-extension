@@ -12,14 +12,14 @@ function Edit({ attributes, setAttributes }) {
     return (
         <>
             <InspectorControls>
-                <PanelBody title={__('Layout', 'jankx')}>
+                <PanelBody title={__('Layout', 'base-ecommerce')}>
                     <SelectControl
-                        label={__('Column', 'jankx')}
+                        label={__('Column', 'base-ecommerce')}
                         value={attributes.jankxCheckoutColumn}
                         options={[
-                            { value: 'customer', label: __('Customer column', 'jankx') },
-                            { value: 'summary', label: __('Summary column', 'jankx') },
-                            { value: '', label: __('Full width', 'jankx') },
+                            { value: 'customer', label: __('Customer column', 'base-ecommerce') },
+                            { value: 'summary', label: __('Summary column', 'base-ecommerce') },
+                            { value: '', label: __('Full width', 'base-ecommerce') },
                         ]}
                         onChange={(jankxCheckoutColumn) => setAttributes({ jankxCheckoutColumn })}
                     />
@@ -27,14 +27,14 @@ function Edit({ attributes, setAttributes }) {
             </InspectorControls>
             <div {...blockProps}>
                 <div className="jankx-checkout-error" role="alert">
-                    {__('Place order', 'jankx')}
+                    {__('Place order', 'base-ecommerce')}
                 </div>
                 <button
                     type="button"
                     className="jankx-btn jankx-btn-primary jankx-btn-place-order"
                     disabled
                 >
-                    {__('Place order', 'jankx')}
+                    {__('Place order', 'base-ecommerce')}
                 </button>
             </div>
         </>

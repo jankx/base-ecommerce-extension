@@ -6,7 +6,7 @@
   "category": "jankx",
   "icon": "id",
   "description": "Billing fields of the checkout form: full name, email, phone, address and optional account creation.",
-  "textdomain": "jankx",
+  "textdomain": "base-ecommerce",
   "attributes": {
     "jankxCheckoutColumn": {
       "type": "string",

@@ -12,14 +12,14 @@ function Edit({ attributes, setAttributes }) {
     return (
         <>
             <InspectorControls>
-                <PanelBody title={__('Layout', 'jankx')}>
+                <PanelBody title={__('Layout', 'base-ecommerce')}>
                     <SelectControl
-                        label={__('Column', 'jankx')}
+                        label={__('Column', 'base-ecommerce')}
                         value={attributes.jankxCheckoutColumn}
                         options={[
-                            { value: 'customer', label: __('Customer column', 'jankx') },
-                            { value: 'summary', label: __('Summary column', 'jankx') },
-                            { value: '', label: __('Full width', 'jankx') },
+                            { value: 'customer', label: __('Customer column', 'base-ecommerce') },
+                            { value: 'summary', label: __('Summary column', 'base-ecommerce') },
+                            { value: '', label: __('Full width', 'base-ecommerce') },
                         ]}
                         onChange={(jankxCheckoutColumn) => setAttributes({ jankxCheckoutColumn })}
                     />
@@ -29,10 +29,10 @@ function Edit({ attributes, setAttributes }) {
                 <div className="jankx-credits-form">
                     <label className="jankx-credits-toggle-label">
                         <input type="checkbox" className="jankx-credits-toggle" value="1" disabled />
-                        <span>{__('Dùng số dư tín dụng để thanh toán', 'jankx')}</span>
+                        <span>{__('Dùng số dư tín dụng để thanh toán', 'base-ecommerce')}</span>
                     </label>
                     <p className="jankx-credits-balance">
-                        {__('Số dư tín dụng:', 'jankx')} <strong className="jankx-credits-balance-value">0₫</strong>
+                        {__('Số dư tín dụng:', 'base-ecommerce')} <strong className="jankx-credits-balance-value">0₫</strong>
                     </p>
                 </div>
             </div>

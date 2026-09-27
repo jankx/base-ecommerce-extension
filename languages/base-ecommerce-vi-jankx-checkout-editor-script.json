@@ -1,0 +1,18 @@
+{
+    "translation-revision-date": "YEAR-MO-DA HO:MI+ZONE",
+    "generator": "WP-CLI\/2.12.0",
+    "source": "blocks\/checkout\/build\/index.js",
+    "domain": "messages",
+    "locale_data": {
+        "messages": {
+            "": {
+                "domain": "messages",
+                "lang": "vi",
+                "plural-forms": "nplurals=1; plural=0;"
+            },
+            "T\u00f9y ch\u1ec9nh thanh to\u00e1n: Section c\u00f3 c\u1ed9t \"customer\" hi\u1ec3n th\u1ecb b\u00ean tr\u00e1i, c\u1ed9t \"summary\" hi\u1ec3n th\u1ecb b\u00ean ph\u1ea3i. Block checkout-empty hi\u1ec3n th\u1ecb khi gi\u1ecf h\u00e0ng tr\u1ed1ng.": [
+                "T\u00f9y ch\u1ec9nh thanh to\u00e1n: Section c\u00f3 c\u1ed9t \"customer\" hi\u1ec3n th\u1ecb b\u00ean tr\u00e1i, c\u1ed9t \"summary\" hi\u1ec3n th\u1ecb b\u00ean ph\u1ea3i. Block checkout-empty hi\u1ec3n th\u1ecb khi gi\u1ecf h\u00e0ng tr\u1ed1ng."
+            ]
+        }
+    }
+}

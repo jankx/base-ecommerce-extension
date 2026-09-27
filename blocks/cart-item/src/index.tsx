@@ -37,94 +37,94 @@ function Edit({ attributes, setAttributes, clientId }) {
     return (
         <>
             <InspectorControls>
-                <PanelBody title={__('Mini Cart Settings', 'jankx')}>
+                <PanelBody title={__('Mini Cart Settings', 'base-ecommerce')}>
                     <ToggleControl
-                        label={__('Hide on Desktop', 'jankx')}
+                        label={__('Hide on Desktop', 'base-ecommerce')}
                         checked={attributes.jankxHideOnPc}
                         onChange={(val) => setAttributes({ jankxHideOnPc: val })}
                     />
                     <ToggleControl
-                        label={__('Hide on Tablet', 'jankx')}
+                        label={__('Hide on Tablet', 'base-ecommerce')}
                         checked={attributes.jankxHideOnTablet}
                         onChange={(val) => setAttributes({ jankxHideOnTablet: val })}
                     />
                     <ToggleControl
-                        label={__('Hide on Mobile', 'jankx')}
+                        label={__('Hide on Mobile', 'base-ecommerce')}
                         checked={attributes.jankxHideOnMobile}
                         onChange={(val) => setAttributes({ jankxHideOnMobile: val })}
                     />
                     {String(attributes.className || '').includes('is-style-dropdown') && (
                         <NumberControl
-                            label={__('Dropdown max items', 'jankx')}
+                            label={__('Dropdown max items', 'base-ecommerce')}
                             value={typeof attributes.limit === 'number' ? attributes.limit : 3}
                             min={1}
                             max={20}
                             onChange={(val) => setAttributes({ limit: val === '' ? 3 : Number(val) })}
-                            help={__('Hiển thị tối đa số sản phẩm trong dropdown. Số còn lại mở bằng nút "Xem tất cả".', 'jankx')}
+                            help={__('Hiển thị tối đa số sản phẩm trong dropdown. Số còn lại mở bằng nút "Xem tất cả".', 'base-ecommerce')}
                         />
                     )}
                 </PanelBody>
 
                 <PanelColorSettings
-                    title={__('Badge Colors', 'jankx')}
+                    title={__('Badge Colors', 'base-ecommerce')}
                     colorSettings={[
                         {
                             value: attributes.badgeColor,
                             onChange: (colorValue) => setAttributes({ badgeColor: colorValue }),
-                            label: __('Text Color', 'jankx'),
+                            label: __('Text Color', 'base-ecommerce'),
                         },
                         {
                             value: attributes.badgeBgColor,
                             onChange: (colorValue) => setAttributes({ badgeBgColor: colorValue }),
-                            label: __('Background Color', 'jankx'),
+                            label: __('Background Color', 'base-ecommerce'),
                         },
                         {
                             value: attributes.badgeBorderColor,
                             onChange: (colorValue) => setAttributes({ badgeBorderColor: colorValue }),
-                            label: __('Border Color', 'jankx'),
+                            label: __('Border Color', 'base-ecommerce'),
                         },
                     ]}
                 />
 
-                <PanelBody title={__('Badge Styles', 'jankx')} initialOpen={false}>
+                <PanelBody title={__('Badge Styles', 'base-ecommerce')} initialOpen={false}>
                     <TextControl
-                        label={__('Top Position', 'jankx')}
+                        label={__('Top Position', 'base-ecommerce')}
                         value={attributes.badgeTop || ''}
                         onChange={(val) => setAttributes({ badgeTop: val })}
                         help="e.g. -4px or 0"
                     />
                     <TextControl
-                        label={__('Right Position', 'jankx')}
+                        label={__('Right Position', 'base-ecommerce')}
                         value={attributes.badgeRight || ''}
                         onChange={(val) => setAttributes({ badgeRight: val })}
                         help="e.g. -4px or 0"
                     />
                     <TextControl
-                        label={__('Width', 'jankx')}
+                        label={__('Width', 'base-ecommerce')}
                         value={attributes.badgeWidth || ''}
                         onChange={(val) => setAttributes({ badgeWidth: val })}
                         help="e.g. 18px"
                     />
                     <TextControl
-                        label={__('Height', 'jankx')}
+                        label={__('Height', 'base-ecommerce')}
                         value={attributes.badgeHeight || ''}
                         onChange={(val) => setAttributes({ badgeHeight: val })}
                         help="e.g. 18px"
                     />
                     <TextControl
-                        label={__('Font Size', 'jankx')}
+                        label={__('Font Size', 'base-ecommerce')}
                         value={attributes.badgeFontSize || ''}
                         onChange={(val) => setAttributes({ badgeFontSize: val })}
                         help="e.g. 11px or 0.8rem"
                     />
                     <TextControl
-                        label={__('Border Width', 'jankx')}
+                        label={__('Border Width', 'base-ecommerce')}
                         value={attributes.badgeBorderWidth || ''}
                         onChange={(val) => setAttributes({ badgeBorderWidth: val })}
                         help="e.g. 1px"
                     />
                     <TextControl
-                        label={__('Border Radius', 'jankx')}
+                        label={__('Border Radius', 'base-ecommerce')}
                         value={attributes.badgeBorderRadius || ''}
                         onChange={(val) => setAttributes({ badgeBorderRadius: val })}
                         help="e.g. 99px"
@@ -134,7 +134,7 @@ function Edit({ attributes, setAttributes, clientId }) {
 
             <div {...blockProps}>
                 <button type="button" className="jankx-mini-cart-toggle" aria-expanded="false"
-                    aria-label={__('Open cart', 'jankx')} style={{ pointerEvents: 'none' }}>
+                    aria-label={__('Open cart', 'base-ecommerce')} style={{ pointerEvents: 'none' }}>
                     <span className="jankx-mini-cart-icon" aria-hidden="true">
                         {!hasInnerBlocks && (
                             <svg width="24" height="40" viewBox="0 0 24 40" fill="none" xmlns="http://www.w3.org/2000/svg">
