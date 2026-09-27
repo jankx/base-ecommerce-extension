@@ -67,7 +67,15 @@ class CartItemMetaBlock extends Block
             $lines[] = esc_html(date_i18n(get_option('date_format'), strtotime($departureDate)));
         }
 
-        // Passenger group quantities
+        // Variation (ticket group) – one passenger group per cart line.
+        if ($item->hasVariation()) {
+            $variationLabel = $item->getVariationLabel();
+            if ($variationLabel !== '') {
+                $lines[] = esc_html($variationLabel);
+            }
+        }
+
+        // Passenger group quantities (legacy single-line model)
         $groupQty = is_array($args['group_qty'] ?? null) ? $args['group_qty'] : [];
         if (!empty($groupQty)) {
             $groupLabels = $this->getGroupLabels();

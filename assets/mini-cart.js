@@ -52,11 +52,24 @@
         var unitPriceDisplay = item.formatted_unit_price || formatPrice(item.unit_price);
         var subtotalDisplay = item.formatted_subtotal || formatPrice(item.subtotal);
 
+        var extra = [];
+        if (item.args && item.args.departure_date) {
+            extra.push(item.args.departure_date);
+        }
+        if (item.variation_label) {
+            extra.push(item.variation_label);
+        }
+        var extraLine = extra.length
+            ? '<span class="jankx-mini-cart-meta jankx-mini-cart-meta--extra">'
+                + escapeHtml(extra.join(' – ')) + '</span>'
+            : '';
+
         return '<div class="jankx-mini-cart-row" data-item-key="' + escapeHtml(item.item_key) + '">'
             + '<div class="jankx-mini-cart-info">'
             + '<span class="jankx-mini-cart-name">' + escapeHtml(item.name) + '</span>'
             + '<span class="jankx-mini-cart-meta">' + (Number(item.quantity) || 0) + ' &times; '
             + escapeHtml(unitPriceDisplay) + '</span>'
+            + extraLine
             + '</div>'
             + '<div class="jankx-mini-cart-side">'
             + '<span class="jankx-mini-cart-price">' + escapeHtml(subtotalDisplay) + '</span>'

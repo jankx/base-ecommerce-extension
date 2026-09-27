@@ -64,10 +64,38 @@ class CartItem
         return ProductRegistry::get_instance()->createProduct($this->productId);
     }
 
+    public function getVariationId(): string
+    {
+        return (string) ($this->args['variation_id'] ?? '');
+    }
+
+    public function getVariationLabel(): string
+    {
+        $label = (string) ($this->args['variation_label'] ?? '');
+        if ($label === '') {
+            $variationId = $this->getVariationId();
+            if ($variationId !== '') {
+                $label = (string) apply_filters('jankx/ecommerce/cart/item/variation_label', '', $variationId, $this);
+            }
+        }
+
+        return $label;
+    }
+
+    public function hasVariation(): bool
+    {
+        return $this->getVariationId() !== '';
+    }
+
     public function getName(): string
     {
         $product = $this->getProduct();
         $name = $product ? $product->getName() : get_the_title($this->productId);
+
+        $label = $this->getVariationLabel();
+        if ($label !== '') {
+            $name .= ' – ' . $label;
+        }
 
         return html_entity_decode($name, ENT_QUOTES, 'UTF-8');
     }
@@ -95,6 +123,8 @@ class CartItem
             'item_key' => $this->itemKey,
             'product_id' => $this->productId,
             'name' => $this->getName(),
+            'variation_id' => $this->getVariationId(),
+            'variation_label' => $this->getVariationLabel(),
             'quantity' => $this->quantity,
             'unit_price' => $this->getUnitPrice(),
             'subtotal' => $this->getSubtotal(),

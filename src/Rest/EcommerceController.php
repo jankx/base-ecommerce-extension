@@ -50,6 +50,27 @@ class EcommerceController
             ],
         ]);
 
+        register_rest_route(self::REST_NAMESPACE, '/cart/items/batch', [
+            'methods'             => \WP_REST_Server::CREATABLE,
+            'callback'            => [$this, 'addCartItemBatch'],
+            'permission_callback' => '__return_true',
+            'args'                => [
+                'lines' => [
+                    'required'          => true,
+                    'type'              => 'array',
+                    'sanitize_callback' => function ($value) {
+                        return is_array($value) ? $value : [];
+                    },
+                ],
+                'args' => [
+                    'type'              => 'object',
+                    'sanitize_callback' => function ($value) {
+                        return is_array($value) ? $this->sanitizeArgs($value) : [];
+                    },
+                ],
+            ],
+        ]);
+
         register_rest_route(self::REST_NAMESPACE, '/cart/items/(?P<item_key>[a-zA-Z0-9]+)', [
             'methods'             => \WP_REST_Server::DELETABLE,
             'callback'            => [$this, 'removeCartItem'],
@@ -200,6 +221,58 @@ class EcommerceController
         }
 
         return $clean;
+    }
+
+    /**
+     * Add multiple cart lines in a single request – each variation (e.g.
+     * adult/child ticket on a tour date) becomes its own line item.
+     *
+     * @param \WP_REST_Request $request
+     */
+    public function addCartItemBatch(\WP_REST_Request $request): \WP_REST_Response
+    {
+        $lines = (array) $request->get_param('lines');
+        $commonArgs = $request->get_param('args');
+        $commonArgs = is_array($commonArgs) ? $this->sanitizeArgs($commonArgs) : [];
+
+        $normalized = [];
+        foreach ($lines as $line) {
+            if (!is_array($line)) {
+                continue;
+            }
+            $productId = (int) ($line['product_id'] ?? 0);
+            if ($productId <= 0) {
+                continue;
+            }
+            $normalized[] = [
+                'product_id'      => $productId,
+                'quantity'        => max(0, (int) ($line['quantity'] ?? $line['qty'] ?? 1)),
+                'variation_id'    => sanitize_text_field((string) ($line['variation_id'] ?? '')),
+                'variation_label' => sanitize_text_field((string) ($line['variation_label'] ?? '')),
+            ];
+        }
+
+        if (empty($normalized)) {
+            return new \WP_REST_Response([
+                'success' => false,
+                'message' => __('Không có sản phẩm nào để thêm vào giỏ hàng.', 'jankx'),
+            ], 400);
+        }
+
+        $added = Cart::get_instance()->addItems($normalized, $commonArgs);
+
+        if ($added === 0) {
+            return new \WP_REST_Response([
+                'success' => false,
+                'message' => __('Sản phẩm không hợp lệ hoặc không thể mua.', 'jankx'),
+            ], 400);
+        }
+
+        return rest_ensure_response([
+            'success' => true,
+            'added'   => $added,
+            'cart'    => Cart::get_instance()->toArray(),
+        ]);
     }
 
     public function removeCartItem(\WP_REST_Request $request): \WP_REST_Response

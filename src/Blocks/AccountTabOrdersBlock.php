@@ -162,6 +162,13 @@ class AccountTabOrdersBlock extends Block
                 $output .= '<div class="jankx-od-item-body">';
                 $output .= '<span class="jankx-od-item-name">' . esc_html($item->getName()) . '</span>';
                 $output .= '<span class="jankx-od-item-meta">' . esc_html__('Qty', 'jankx') . ': ' . esc_html($item->getQuantity()) . '</span>';
+
+                $itemMetaLines = $this->getOrderItemMetaLines($item);
+                if (!empty($itemMetaLines)) {
+                    foreach ($itemMetaLines as $metaLine) {
+                        $output .= '<span class="jankx-od-item-meta jankx-od-item-meta--extra">' . esc_html($metaLine) . '</span>';
+                    }
+                }
                 $output .= '</div>';
                 $output .= '<div class="jankx-od-item-price">' . esc_html($this->formatPrice($item->getTotal())) . '</div>';
                 $output .= '</div>';
@@ -515,6 +522,32 @@ class AccountTabOrdersBlock extends Block
         }
 
         return implode(', ', $summary);
+    }
+
+    /**
+     * Extra order item metadata lines (departure date / variation / group).
+     */
+    protected function getOrderItemMetaLines(OrderItem $item): array
+    {
+        $meta = $item->getMeta();
+        $lines = [];
+
+        if (!empty($meta['departure_date'])) {
+            $lines[] = date_i18n(get_option('date_format'), strtotime((string) $meta['departure_date']));
+        }
+        if (!empty($meta['variation_id'])) {
+            $lines[] = (string) ($meta['variation_label'] ?? $meta['variation_id']);
+        } elseif (!empty($meta['price_breakdown']['line_items']) && is_array($meta['price_breakdown']['line_items'])) {
+            foreach ($meta['price_breakdown']['line_items'] as $lineItem) {
+                $label = $lineItem['label'] ?? $lineItem['group'] ?? '';
+                $qty = (int) ($lineItem['qty'] ?? 0);
+                if ($label !== '' && $qty > 0) {
+                    $lines[] = $label . ' x ' . $qty;
+                }
+            }
+        }
+
+        return $lines;
     }
 
     protected function getStatusLabel(string $status): string

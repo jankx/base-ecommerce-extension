@@ -125,6 +125,55 @@ class Cart implements CartInterface
         return true;
     }
 
+    /**
+     * Add several cart lines at once (used when one selection maps to
+     * multiple variations e.g. adult + child tickets on one tour date).
+     *
+     * Each line:
+     *   [
+     *     'product_id'      => int,
+     *     'quantity'        => int,
+     *     'variation_id'    => string,   (optional)
+     *     'variation_label' => string,   (optional)
+     *     'args'            => array,    (optional per-line args)
+     *   ]
+     *
+     * Because the line args (including variation_id) are part of the item
+     * key, every variation becomes its own cart line.
+     *
+     * @return int Number of lines successfully added
+     */
+    public function addItems(array $lines, array $commonArgs = []): int
+    {
+        $this->load();
+
+        $added = 0;
+        foreach ($lines as $line) {
+            if (!is_array($line)) {
+                continue;
+            }
+
+            $args = array_merge($commonArgs, is_array($line['args'] ?? null) ? $line['args'] : []);
+            $variationId = (string) ($line['variation_id'] ?? '');
+            if ($variationId !== '') {
+                $args['variation_id'] = $variationId;
+                if (empty($args['variation_label'])) {
+                    $args['variation_label'] = apply_filters('jankx/ecommerce/cart/item/variation_label', '', $variationId, null);
+                }
+            }
+
+            if ($this->addItem(
+                (int) ($line['product_id'] ?? 0),
+                (int) ($line['quantity'] ?? 1),
+                $args
+            )) {
+                $added++;
+            }
+        }
+
+        return $added;
+    }
+
     public function updateItem(string $itemKey, int $quantity): bool
     {
         $this->load();

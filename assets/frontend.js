@@ -96,16 +96,12 @@
             quantity: quantityInput ? parseInt(quantityInput.value, 10) || 1 : 1
         };
 
-        var args = {};
-        if (departureInput && departureInput.value) {
-            args.departure_date = departureInput.value;
-        }
-
         // Group-wise quantities (e.g. date-based tour pricing): read every
         // input named group_qty[<group_id>] and pack them into args.group_qty.
         var groupQtyInputs = form.querySelectorAll('input[name^="group_qty["]');
         if (groupQtyInputs.length) {
-            var groupQty = {};
+            // Variation model: each passenger group becomes its own cart line.
+            var lines = [];
             var totalGuests = 0;
             groupQtyInputs.forEach(function (input) {
                 var match = input.name.match(/^group_qty\[([^\]]+)\]/);
@@ -113,17 +109,85 @@
                     return;
                 }
                 var qty = parseInt(input.value, 10) || 0;
-                groupQty[match[1]] = Math.max(0, qty);
-                totalGuests += Math.max(0, qty);
+                qty = Math.max(0, qty);
+                if (qty <= 0) {
+                    return;
+                }
+                lines.push({
+                    product_id: parseInt(productId, 10) || 0,
+                    variation_id: match[1],
+                    quantity: qty
+                });
+                totalGuests += qty;
             });
-            args.group_qty = groupQty;
-            if (!quantityInput) {
-                body.quantity = totalGuests || 1;
+
+            if (totalGuests > 0) {
+                var batchBody = {
+                    lines: lines,
+                    args: (departureInput && departureInput.value)
+                        ? { departure_date: departureInput.value }
+                        : {}
+                };
+
+                if (statusBox) {
+                    statusBox.textContent = '';
+                }
+                button.disabled = true;
+                button.classList.add('is-loading');
+                var batchOriginalText = button.textContent;
+                button.textContent = window.jankxEcommerce.i18n ? window.jankxEcommerce.i18n.adding : 'Đang thêm...';
+
+                getJson({
+                    url: window.jankxEcommerce.restUrl + '/cart/items/batch',
+                    method: 'POST',
+                    body: batchBody
+                }).then(function (response) {
+                    if (!response.success) {
+                        if (statusBox) {
+                            statusBox.textContent = response.message || 'Failed to add item.';
+                        }
+                        button.disabled = false;
+                        button.classList.remove('is-loading');
+                        button.textContent = batchOriginalText;
+                        return;
+                    }
+
+                    button.classList.remove('is-loading');
+                    button.textContent = window.jankxEcommerce.i18n ? window.jankxEcommerce.i18n.added : 'Đã thêm ✓';
+
+                    if (document.querySelector('.jankx-mini-cart-toggle')) {
+                        document.dispatchEvent(new CustomEvent('jankx:cart-updated'));
+                        setTimeout(function () {
+                            button.textContent = batchOriginalText;
+                            button.disabled = false;
+                        }, 1500);
+                        return;
+                    }
+                    if (window.jankxEcommerce.cartUrl) {
+                        window.location.href = window.jankxEcommerce.cartUrl;
+                        return;
+                    }
+                    if (statusBox) {
+                        statusBox.textContent = 'Added to cart.';
+                    }
+                    button.textContent = batchOriginalText;
+                    button.disabled = false;
+                }).catch(function (error) {
+                    var batchMessage = error && error.message;
+                    if (statusBox) {
+                        statusBox.textContent = (Array.isArray(batchMessage) ? batchMessage.join(', ') : batchMessage) || 'Failed to add item.';
+                    }
+                    button.disabled = false;
+                    button.classList.remove('is-loading');
+                    button.textContent = batchOriginalText;
+                });
+                return;
             }
         }
 
-        if (Object.keys(args).length) {
-            body.args = args;
+        var args = {};
+        if (departureInput && departureInput.value) {
+            args.departure_date = departureInput.value;
         }
 
         if (statusBox) {
