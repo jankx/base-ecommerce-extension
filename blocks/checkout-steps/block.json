@@ -1,0 +1,25 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/checkout-steps",
+  "title": "Checkout Steps",
+  "category": "jankx",
+  "icon": "editor-ol",
+  "description": "Progress indicator showing the checkout flow stages: cart → details → payment.",
+  "textdomain": "base-ecommerce",
+  "attributes": {
+    "currentStep": {
+      "type": "integer",
+      "default": 2
+    }
+  },
+  "supports": {
+    "html": false,
+    "align": ["wide", "full"],
+    "spacing": {
+      "margin": true,
+      "padding": true
+    }
+  },
+  "editorScript": "file:./build/index.js"
+}

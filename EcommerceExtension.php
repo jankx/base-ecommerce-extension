@@ -24,6 +24,7 @@ use Jankx\Extensions\Ecommerce\Blocks\CheckoutReviewItemPriceBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CheckoutCreditsBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CheckoutActionsBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CheckoutEmptyBlock;
+use Jankx\Extensions\Ecommerce\Blocks\CheckoutStepsBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CurrencySwitcherBlock;
 use Jankx\Extensions\Ecommerce\Blocks\PostPriceBlock;
 use Jankx\Extensions\Ecommerce\Cart\Cart;
@@ -209,6 +210,7 @@ class EcommerceExtension extends AbstractExtension
             'checkout-credits' => CheckoutCreditsBlock::class,
             'checkout-actions' => CheckoutActionsBlock::class,
             'checkout-empty' => CheckoutEmptyBlock::class,
+            'checkout-steps' => CheckoutStepsBlock::class,
             'account-tab-orders' => AccountTabOrdersBlock::class,
             'add-to-cart' => AddToCartBlock::class,
             'post-price' => PostPriceBlock::class,
