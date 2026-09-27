@@ -6,7 +6,7 @@
   "category": "jankx",
   "icon": "cart",
   "description": "Notice and continue shopping button displayed when the shopping cart is empty.",
-  "textdomain": "jankx",
+  "textdomain": "base-ecommerce",
   "attributes": {
     "title": {
       "type": "string",

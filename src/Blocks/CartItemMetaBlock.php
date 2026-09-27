@@ -102,19 +102,19 @@ class CartItemMetaBlock extends Block
     protected function getTourTypeLabel(string $type): string
     {
         $types = [
-            'adventure'  => __('Phiêu lưu', 'jankx'),
-            'cultural'   => __('Văn hóa', 'jankx'),
-            'nature'     => __('Thiên nhiên', 'jankx'),
-            'beach'      => __('Biển đảo', 'jankx'),
-            'city'       => __('Thành phố', 'jankx'),
-            'food'       => __('Ẩm thực', 'jankx'),
-            'wellness'   => __('Sức khỏe', 'jankx'),
-            'family'     => __('Gia đình', 'jankx'),
-            'luxury'     => __('Sang trọng', 'jankx'),
-            'budget'     => __('Tiết kiệm', 'jankx'),
-            'group'      => __('Nhóm', 'jankx'),
-            'solo'       => __('Đơn thân', 'jankx'),
-            'honeymoon'  => __('Trăng mật', 'jankx'),
+            'adventure'  => __('Phiêu lưu', 'base-ecommerce'),
+            'cultural'   => __('Văn hóa', 'base-ecommerce'),
+            'nature'     => __('Thiên nhiên', 'base-ecommerce'),
+            'beach'      => __('Biển đảo', 'base-ecommerce'),
+            'city'       => __('Thành phố', 'base-ecommerce'),
+            'food'       => __('Ẩm thực', 'base-ecommerce'),
+            'wellness'   => __('Sức khỏe', 'base-ecommerce'),
+            'family'     => __('Gia đình', 'base-ecommerce'),
+            'luxury'     => __('Sang trọng', 'base-ecommerce'),
+            'budget'     => __('Tiết kiệm', 'base-ecommerce'),
+            'group'      => __('Nhóm', 'base-ecommerce'),
+            'solo'       => __('Đơn thân', 'base-ecommerce'),
+            'honeymoon'  => __('Trăng mật', 'base-ecommerce'),
         ];
 
         return $types[$type] ?? ucfirst($type);

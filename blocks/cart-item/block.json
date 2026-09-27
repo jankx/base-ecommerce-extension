@@ -6,7 +6,7 @@
   "category": "jankx",
   "icon": "cart",
   "description": "Cart icon with item counter. Variants: slide-out drawer or dropdown mini cart in the menu.",
-  "textdomain": "jankx",
+  "textdomain": "base-ecommerce",
   "styles": [
     {
       "name": "drawer",

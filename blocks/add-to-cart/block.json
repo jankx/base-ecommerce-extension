@@ -6,7 +6,7 @@
   "category": "jankx",
   "icon": "cart",
   "description": "Add the current product/tour to the cart. Place it on single product or tour pages.",
-  "textdomain": "jankx",
+  "textdomain": "base-ecommerce",
   "usesContext": [
     "postId",
     "postType"

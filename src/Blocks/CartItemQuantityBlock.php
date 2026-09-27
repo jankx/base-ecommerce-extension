@@ -20,9 +20,9 @@ class CartItemQuantityBlock extends Block
         $qty = $item->getQuantity();
 
         $output = '<div class="jankx-cart-item__qty">';
-        $output .= '<button type="button" class="jankx-cart-item__qty-btn" data-step="-1" data-item-key="' . $key . '" aria-label="' . esc_attr__('Giảm số lượng', 'jankx') . '">&minus;</button>';
+        $output .= '<button type="button" class="jankx-cart-item__qty-btn" data-step="-1" data-item-key="' . $key . '" aria-label="' . esc_attr__('Giảm số lượng', 'base-ecommerce') . '">&minus;</button>';
         $output .= '<span class="jankx-cart-item__qty-value" data-item-key="' . $key . '">' . (int) $qty . '</span>';
-        $output .= '<button type="button" class="jankx-cart-item__qty-btn" data-step="1" data-item-key="' . $key . '" aria-label="' . esc_attr__('Tăng số lượng', 'jankx') . '">+</button>';
+        $output .= '<button type="button" class="jankx-cart-item__qty-btn" data-step="1" data-item-key="' . $key . '" aria-label="' . esc_attr__('Tăng số lượng', 'base-ecommerce') . '">+</button>';
         $output .= '</div>';
 
         return $output;

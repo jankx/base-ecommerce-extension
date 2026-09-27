@@ -39,11 +39,11 @@ class NoOpConverter implements CurrencyConverterInterface
 
     public function getName(): string
     {
-        return __('No Conversion (Default)', 'jankx');
+        return __('No Conversion (Default)', 'base-ecommerce');
     }
 
     public function getDescription(): string
     {
-        return __('Prices are displayed in their original currency without conversion. Useful for single-currency sites or development.', 'jankx');
+        return __('Prices are displayed in their original currency without conversion. Useful for single-currency sites or development.', 'base-ecommerce');
     }
 }

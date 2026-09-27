@@ -6,7 +6,7 @@
   "category": "jankx",
   "icon": "list-view",
   "description": "Lists the orders of the logged-in customer inside the My Account area.",
-  "textdomain": "jankx",
+  "textdomain": "base-ecommerce",
   "attributes": {
     "jankxHideOnUltrawide": {
       "type": "boolean",

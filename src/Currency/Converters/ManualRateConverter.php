@@ -86,12 +86,12 @@ class ManualRateConverter implements CurrencyConverterInterface
 
     public function getName(): string
     {
-        return __('Tỷ giá thủ công (Manual Exchange Rates)', 'jankx');
+        return __('Tỷ giá thủ công (Manual Exchange Rates)', 'base-ecommerce');
     }
 
     public function getDescription(): string
     {
-        return __('Nhập tỷ giá hối đoái thủ công. Phù hợp với site kiểm soát giá cố định, không cần API bên ngoài.', 'jankx');
+        return __('Nhập tỷ giá hối đoái thủ công. Phù hợp với site kiểm soát giá cố định, không cần API bên ngoài.', 'base-ecommerce');
     }
 
     // ── Static helpers ────────────────────────────────────────────────

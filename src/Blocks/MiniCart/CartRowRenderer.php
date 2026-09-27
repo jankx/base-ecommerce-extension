@@ -26,7 +26,7 @@ final class CartRowRenderer
         $output .= '<div class="jankx-mini-cart-side">';
         $output .= '<span class="jankx-mini-cart-price">' . esc_html(self::formatPrice($item->getSubtotal())) . '</span>';
         $output .= '<button type="button" class="jankx-mini-cart-remove" data-item-key="' . esc_attr($itemKey)
-            . '" aria-label="' . esc_attr__('Remove', 'jankx') . '">&times;</button>';
+            . '" aria-label="' . esc_attr__('Remove', 'base-ecommerce') . '">&times;</button>';
         $output .= '</div>';
         $output .= '</div>';
 

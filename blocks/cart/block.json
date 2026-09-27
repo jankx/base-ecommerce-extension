@@ -6,7 +6,7 @@
   "category": "jankx",
   "icon": "cart",
   "description": "Shopping cart page. Lists the items in the customer's cart with totals and checkout action.",
-  "textdomain": "jankx",
+  "textdomain": "base-ecommerce",
   "attributes": {
     "jankxHideOnUltrawide": {
       "type": "boolean",

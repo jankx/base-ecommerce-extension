@@ -27,7 +27,7 @@ class CartCheckoutStrategy extends AbstractOrderCreationStrategy
 
         $cart = $data['cart'] ?? Cart::get_instance();
         if ($cart instanceof Cart && $cart->isEmpty()) {
-            $errors[] = __('Giỏ hàng của bạn đang trống.', 'jankx');
+            $errors[] = __('Giỏ hàng của bạn đang trống.', 'base-ecommerce');
         }
 
         return $errors;

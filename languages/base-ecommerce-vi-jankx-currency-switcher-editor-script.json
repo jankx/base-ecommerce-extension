@@ -1,0 +1,60 @@
+{
+    "translation-revision-date": "YEAR-MO-DA HO:MI+ZONE",
+    "generator": "WP-CLI\/2.12.0",
+    "source": "blocks\/currency-switcher\/build\/index.js",
+    "domain": "messages",
+    "locale_data": {
+        "messages": {
+            "": {
+                "domain": "messages",
+                "lang": "vi",
+                "plural-forms": "nplurals=1; plural=0;"
+            },
+            "Layout": [
+                "B\u1ed1 c\u1ee5c"
+            ],
+            "Currency Switcher Settings": [
+                "C\u00e0i \u0111\u1eb7t b\u1ed9 ch\u1ecdn ti\u1ec1n t\u1ec7"
+            ],
+            "Display Mode": [
+                "Ch\u1ebf \u0111\u1ed9 hi\u1ec3n th\u1ecb"
+            ],
+            "Dropdown": [
+                "Th\u1ea3 xu\u1ed1ng"
+            ],
+            "Inline List": [
+                "Danh s\u00e1ch ngang"
+            ],
+            "Horizontal": [
+                "Ngang"
+            ],
+            "Vertical": [
+                "D\u1ecdc"
+            ],
+            "Icon Size": [
+                "K\u00edch th\u01b0\u1edbc bi\u1ec3u t\u01b0\u1ee3ng"
+            ],
+            "Small": [
+                "Nh\u1ecf"
+            ],
+            "Medium": [
+                "V\u1eeba"
+            ],
+            "Large": [
+                "L\u1edbn"
+            ],
+            "Show Flag": [
+                "Hi\u1ec3n th\u1ecb c\u1edd"
+            ],
+            "Show Code": [
+                "Hi\u1ec3n th\u1ecb m\u00e3"
+            ],
+            "Show Symbol": [
+                "Hi\u1ec3n th\u1ecb k\u00fd hi\u1ec7u"
+            ],
+            "Show Name": [
+                "Hi\u1ec3n th\u1ecb t\u00ean"
+            ]
+        }
+    }
+}

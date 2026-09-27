@@ -35,19 +35,19 @@ class OrderPostType
         }
 
         $labels = [
-            'name'                  => __('Orders', 'jankx'),
-            'singular_name'         => __('Order', 'jankx'),
-            'menu_name'             => __('Orders', 'jankx'),
-            'all_items'             => __('All Orders', 'jankx'),
-            'add_new'               => __('Add Order', 'jankx'),
-            'add_new_item'          => __('Add New Order', 'jankx'),
-            'edit_item'             => __('Edit Order', 'jankx'),
-            'new_item'              => __('New Order', 'jankx'),
-            'view_item'             => __('View Order', 'jankx'),
-            'view_items'            => __('View Orders', 'jankx'),
-            'search_items'          => __('Search Orders', 'jankx'),
-            'not_found'             => __('No orders found.', 'jankx'),
-            'not_found_in_trash'    => __('No orders found in Trash.', 'jankx'),
+            'name'                  => __('Orders', 'base-ecommerce'),
+            'singular_name'         => __('Order', 'base-ecommerce'),
+            'menu_name'             => __('Orders', 'base-ecommerce'),
+            'all_items'             => __('All Orders', 'base-ecommerce'),
+            'add_new'               => __('Add Order', 'base-ecommerce'),
+            'add_new_item'          => __('Add New Order', 'base-ecommerce'),
+            'edit_item'             => __('Edit Order', 'base-ecommerce'),
+            'new_item'              => __('New Order', 'base-ecommerce'),
+            'view_item'             => __('View Order', 'base-ecommerce'),
+            'view_items'            => __('View Orders', 'base-ecommerce'),
+            'search_items'          => __('Search Orders', 'base-ecommerce'),
+            'not_found'             => __('No orders found.', 'base-ecommerce'),
+            'not_found_in_trash'    => __('No orders found in Trash.', 'base-ecommerce'),
         ];
 
         register_post_type(self::POST_TYPE, [

@@ -81,12 +81,12 @@ class FixerIOConverter implements CurrencyConverterInterface
 
     public function getName(): string
     {
-        return __('Fixer.io', 'jankx');
+        return __('Fixer.io', 'base-ecommerce');
     }
 
     public function getDescription(): string
     {
-        return __('Live exchange rates from Fixer.io API. Requires API key (free tier available, EUR base only).', 'jankx');
+        return __('Live exchange rates from Fixer.io API. Requires API key (free tier available, EUR base only).', 'base-ecommerce');
     }
 
     /**
@@ -124,7 +124,7 @@ class FixerIOConverter implements CurrencyConverterInterface
         $statusCode = wp_remote_retrieve_response_code($response);
         if ($statusCode !== 200) {
             $this->fetchError = sprintf(
-                __('Fixer.io API error: HTTP %d', 'jankx'),
+                __('Fixer.io API error: HTTP %d', 'base-ecommerce'),
                 $statusCode
             );
             return null;
@@ -134,7 +134,7 @@ class FixerIOConverter implements CurrencyConverterInterface
         $data = json_decode($body, true);
 
         if (!is_array($data)) {
-            $this->fetchError = __('Invalid response from Fixer.io API', 'jankx');
+            $this->fetchError = __('Invalid response from Fixer.io API', 'base-ecommerce');
             return null;
         }
 
@@ -145,7 +145,7 @@ class FixerIOConverter implements CurrencyConverterInterface
         }
 
         if (!isset($data['rates'])) {
-            $this->fetchError = __('Invalid response from Fixer.io API', 'jankx');
+            $this->fetchError = __('Invalid response from Fixer.io API', 'base-ecommerce');
             return null;
         }
 

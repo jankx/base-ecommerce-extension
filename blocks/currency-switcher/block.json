@@ -78,7 +78,7 @@
       }
     }
   },
-  "textdomain": "jankx",
+  "textdomain": "base-ecommerce",
   "editorScript": "file:./build/index.js",
   "style": "file:./build/style-index.css"
 }

@@ -1,475 +1,465 @@
+# Copyright (C) 2026 base-ecommerce
+# This file is distributed under the same license as the base-ecommerce package.
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: \n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Project-Id-Version: base-ecommerce\n"
+"Report-Msgid-Bugs-To: https://nibitour.vn\n"
+"POT-Creation-Date: 2026-09-27 04:03:43+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-27T03:50:00+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.12.0\n"
-"X-Domain: jankx\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: vi\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: base-ecommerce i18n build\n"
 
 #: EcommerceExtension.php:327
 msgid "Order placed successfully!"
-msgstr ""
+msgstr "Đặt hàng thành công!"
 
 #: EcommerceExtension.php:328
 #, php-format
 msgid "Your order number is %s."
-msgstr ""
+msgstr "Mã đơn hàng của bạn là %s."
 
 #: EcommerceExtension.php:329
 msgid "Đang thêm..."
-msgstr ""
+msgstr "Đang thêm..."
 
 #: EcommerceExtension.php:330
 msgid "Đã thêm ✓"
-msgstr ""
+msgstr "Đã thêm ✓"
 
 #: EcommerceExtension.php:368 src/Blocks/CartItemBlock.php:59
 #: src/Blocks/MiniCart/AbstractMiniCartRenderer.php:9
 msgid "Giỏ hàng"
-msgstr ""
+msgstr "Giỏ hàng"
 
 #: EcommerceExtension.php:388 src/Admin/EcommerceSettingsPage.php:43
 #: src/Admin/EcommerceSettingsPage.php:326 src/Blocks/CartItemBlock.php:62
 #: src/Blocks/MiniCart/CartFooterRenderer.php:22
 msgid "Thanh toán"
-msgstr ""
+msgstr "Thanh toán"
 
 #: EcommerceExtension.php:564
 #, php-format
 msgid "Đơn hàng #%s đã được tạo"
-msgstr ""
+msgstr "Đơn hàng #%s đã được tạo"
 
 #: EcommerceExtension.php:566
 #, php-format
 msgid "Đơn hàng của bạn với tổng %s đã được tiếp nhận và đang chờ xử lý."
-msgstr ""
+msgstr "Đơn hàng của bạn với tổng %s đã được tiếp nhận và đang chờ xử lý."
 
 #: EcommerceExtension.php:598
 #, php-format
 msgid "Trạng thái đơn hàng #%s đã chuyển từ \"%s\" sang \"%s\"."
-msgstr ""
+msgstr "Trạng thái đơn hàng #%s đã chuyển từ \"%s\" sang \"%s\"."
 
 #: EcommerceExtension.php:617
 #, php-format
 msgid " Mã vận đơn: %s"
-msgstr ""
+msgstr " Mã vận đơn: %s"
 
 #: EcommerceExtension.php:627
 #, php-format
 msgid "Đơn hàng #%s: %s"
-msgstr ""
+msgstr "Đơn hàng #%s: %s"
 
 #: src/Admin/CurrencyDebugPage.php:34 src/Admin/CurrencyDebugPage.php:35
 msgid "Currency Debug"
-msgstr ""
+msgstr "Gỡ lỗi tiền tệ"
 
 #: src/Admin/CurrencyDebugPage.php:63
 msgid "Currency Conversion Debug"
-msgstr ""
+msgstr "Gỡ lỗi chuyển đổi tiền tệ"
 
 #: src/Admin/CurrencyDebugPage.php:66
 msgid "Status Overview"
-msgstr ""
+msgstr "Tổng quan trạng thái"
 
 #: src/Admin/CurrencyDebugPage.php:69
 msgid "Default Currency"
-msgstr ""
+msgstr "Tiền tệ mặc định"
 
 #: src/Admin/CurrencyDebugPage.php:73
 msgid "Current User Currency"
-msgstr ""
+msgstr "Tiền tệ hiện tại của người dùng"
 
 #: src/Admin/CurrencyDebugPage.php:77
 msgid "Active Converter"
-msgstr ""
+msgstr "Bộ chuyển đổi đang hoạt động"
 
 #: src/Admin/CurrencyDebugPage.php:81
 msgid "✓ Ready"
-msgstr ""
+msgstr "✓ Sẵn sàng"
 
 #: src/Admin/CurrencyDebugPage.php:81
 msgid "✗ Not Ready"
-msgstr ""
+msgstr "✗ Chưa sẵn sàng"
 
 #: src/Admin/CurrencyDebugPage.php:89
 msgid "Test Conversion"
-msgstr ""
+msgstr "Kiểm tra chuyển đổi"
 
 #: src/Admin/CurrencyDebugPage.php:91
 #, php-format
 msgid "Converting %d %s to %s:"
-msgstr ""
+msgstr "Đang chuyển đổi %d %s sang %s:"
 
 #: src/Admin/CurrencyDebugPage.php:98
 msgid "Exchange Rate"
-msgstr ""
+msgstr "Tỷ giá"
 
 #: src/Admin/CurrencyDebugPage.php:103
 msgid "Unable to fetch (converter not ready or API error)"
-msgstr ""
+msgstr "Không thể lấy dữ liệu (bộ chuyển đổi chưa sẵn sàng hoặc lỗi API)"
 
 #: src/Admin/CurrencyDebugPage.php:108
 msgid "Converted Amount"
-msgstr ""
+msgstr "Số tiền đã chuyển đổi"
 
 #: src/Admin/CurrencyDebugPage.php:112
 msgid "No conversion occurred (same as input)"
-msgstr ""
+msgstr "Không phát sinh chuyển đổi (giống giá trị đầu vào)"
 
 #: src/Admin/CurrencyDebugPage.php:120
 msgid "Available Converters"
-msgstr ""
+msgstr "Các bộ chuyển đổi khả dụng"
 
 #: src/Admin/CurrencyDebugPage.php:124 src/Blocks/AccountTabOrdersBlock.php:222
 msgid "Name"
-msgstr ""
+msgstr "Tên"
 
 #: src/Admin/CurrencyDebugPage.php:125
 msgid "Type"
-msgstr ""
+msgstr "Loại"
 
 #: src/Admin/CurrencyDebugPage.php:126 src/Blocks/AccountTabOrdersBlock.php:250
 #: src/Currency/Admin/ConverterSettingsPage.php:276
 msgid "Status"
-msgstr ""
+msgstr "Trạng thái"
 
 #: src/Admin/CurrencyDebugPage.php:127
 msgid "Description"
-msgstr ""
+msgstr "Mô tả"
 
 #: src/Admin/CurrencyDebugPage.php:137
 #: src/Currency/Admin/ConverterSettingsPage.php:288
 msgid "Ready"
-msgstr ""
+msgstr "Sẵn sàng"
 
 #: src/Admin/CurrencyDebugPage.php:137
 #: src/Currency/Admin/ConverterSettingsPage.php:291
 msgid "Not Ready"
-msgstr ""
+msgstr "Chưa sẵn sàng"
 
 #: src/Admin/CurrencyDebugPage.php:148
 msgid "Troubleshooting"
-msgstr ""
+msgstr "Xử lý sự cố"
 
 #: src/Admin/CurrencyDebugPage.php:150
 msgid "Converted amount equals input amount?"
-msgstr ""
+msgstr "Số tiền chuyển đổi bằng số tiền đầu vào?"
 
 #: src/Admin/CurrencyDebugPage.php:151
 msgid "This means the converter returned the original amount. Possible causes:"
-msgstr ""
+msgstr "Điều này nghĩa là bộ chuyển đổi trả về số tiền ban đầu. Các nguyên nhân có thể:"
 
 #: src/Admin/CurrencyDebugPage.php:153
 msgid "NoOpConverter is active (default, no conversion)"
-msgstr ""
+msgstr "NoOpConverter đang hoạt động (mặc định, không chuyển đổi)"
 
 #: src/Admin/CurrencyDebugPage.php:154
 msgid "Active converter is not ready (missing API key)"
-msgstr ""
+msgstr "Bộ chuyển đổi đang hoạt động chưa sẵn sàng (thiếu API key)"
 
 #: src/Admin/CurrencyDebugPage.php:155
 msgid "API call failed (network error, invalid key, rate limit)"
-msgstr ""
+msgstr "Gọi API thất bại (lỗi mạng, key không hợp lệ, vượt giới hạn)"
 
 #: src/Admin/CurrencyDebugPage.php:158
 msgid "How to enable conversion?"
-msgstr ""
+msgstr "Làm thế nào để bật chuyển đổi?"
 
 #: src/Admin/CurrencyDebugPage.php:159
 msgid "Go to WP Admin > E-Commerce > Settings > Currency Converter, then:"
-msgstr ""
+msgstr "Vào WP Admin > E-Commerce > Settings > Currency Converter, sau đó:"
 
 #: src/Admin/CurrencyDebugPage.php:162
 #, php-format
-msgid ""
-"1. Sign up at <a href=\"%s\" target=\"_blank\">OpenExchangeRates.io</a> or "
-"<a href=\"%s\" target=\"_blank\">Fixer.io</a>"
-msgstr ""
+msgid "1. Sign up at <a href=\"%s\" target=\"_blank\">OpenExchangeRates.io</a> or <a href=\"%s\" target=\"_blank\">Fixer.io</a>"
+msgstr "1. Đăng ký tại <a href=\"%s\" target=\"_blank\">OpenExchangeRates.io</a> hoặc <a href=\"%s\" target=\"_blank\">Fixer.io</a>"
 
 #: src/Admin/CurrencyDebugPage.php:166
 msgid "2. Copy your API key"
-msgstr ""
+msgstr "2. Sao chép API key của bạn"
 
 #: src/Admin/CurrencyDebugPage.php:167
 msgid "3. Select converter type in settings"
-msgstr ""
+msgstr "3. Chọn loại bộ chuyển đổi trong cài đặt"
 
 #: src/Admin/CurrencyDebugPage.php:168
 msgid "4. Paste API key"
-msgstr ""
+msgstr "4. Dán API key"
 
 #: src/Admin/CurrencyDebugPage.php:169
 msgid "5. Click \"Test Connection\" to verify"
-msgstr ""
+msgstr "5. Nhấp \"Test Connection\" để xác minh"
 
 #: src/Admin/CurrencyDebugPage.php:172
 msgid "Check API key?"
-msgstr ""
+msgstr "Kiểm tra API key?"
 
 #: src/Admin/CurrencyDebugPage.php:173
-msgid ""
-"Go to WP Admin > E-Commerce > Settings > Currency Converter to view/edit "
-"configuration."
-msgstr ""
+msgid "Go to WP Admin > E-Commerce > Settings > Currency Converter to view/edit configuration."
+msgstr "Vào WP Admin > E-Commerce > Settings > Currency Converter để xem/chỉnh sửa cấu hình."
 
 #: src/Admin/CurrencyDebugPage.php:178
 msgid "How Currency Switching Works"
-msgstr ""
+msgstr "Cách chuyển đổi tiền tệ hoạt động"
 
 #: src/Admin/CurrencyDebugPage.php:180
 msgid "User selects new currency in Currency Switcher block"
-msgstr ""
+msgstr "Người dùng chọn tiền tệ mới trong khối Currency Switcher"
 
 #: src/Admin/CurrencyDebugPage.php:181
-msgid ""
-"Frontend JavaScript POSTs to /wp-json/jankx/ecommerce/v1/currency/switch"
-msgstr ""
+msgid "Frontend JavaScript POSTs to /wp-json/jankx/ecommerce/v1/currency/switch"
+msgstr "JavaScript phía client gửi POST tới /wp-json/jankx/ecommerce/v1/currency/switch"
 
 #: src/Admin/CurrencyDebugPage.php:182
 msgid "Backend saves currency to session/user meta"
-msgstr ""
+msgstr "Máy chủ lưu tiền tệ vào session/user meta"
 
 #: src/Admin/CurrencyDebugPage.php:183
 msgid "Page reloads"
-msgstr ""
+msgstr "Trang được tải lại"
 
 #: src/Admin/CurrencyDebugPage.php:184
 msgid "Block reads price from post meta (stored in default currency)"
-msgstr ""
+msgstr "Khối đọc giá từ post meta (lưu ở tiền tệ mặc định)"
 
 #: src/Admin/CurrencyDebugPage.php:185
 msgid "Block calls formatPriceWithConversion() with new currency"
-msgstr ""
+msgstr "Khối gọi formatPriceWithConversion() với tiền tệ mới"
 
 #: src/Admin/CurrencyDebugPage.php:186
 msgid "Converter converts price using active converter"
-msgstr ""
+msgstr "Bộ chuyển đổi chuyển giá bằng bộ chuyển đổi đang hoạt động"
 
 #: src/Admin/CurrencyDebugPage.php:187
 msgid "Formatted price displayed to user"
-msgstr ""
+msgstr "Giá đã định dạng hiển thị cho người dùng"
 
 #: src/Admin/CurrencyDebugPage.php:190
 msgid "Key Point:"
-msgstr ""
+msgstr "Điểm quan trọng:"
 
 #: src/Admin/CurrencyDebugPage.php:191
-msgid ""
-"If step 7 returns the original amount (no conversion), prices will appear "
-"unchanged. Check converter status above!"
-msgstr ""
+msgid "If step 7 returns the original amount (no conversion), prices will appear unchanged. Check converter status above!"
+msgstr "Nếu bước 7 trả về số tiền ban đầu (không chuyển đổi), giá sẽ không thay đổi. Hãy kiểm tra trạng thái bộ chuyển đổi ở trên!"
 
 #: src/Admin/EcommerceSettingsPage.php:27
 #: src/Admin/EcommerceSettingsPage.php:268
 msgid "Cài đặt Ecommerce"
-msgstr ""
+msgstr "Cài đặt Ecommerce"
 
 #: src/Admin/EcommerceSettingsPage.php:28
 msgid "Ecommerce"
-msgstr ""
+msgstr "Thương mại điện tử"
 
 #: src/Admin/EcommerceSettingsPage.php:41
 msgid "Cài đặt chung"
-msgstr ""
+msgstr "Cài đặt chung"
 
 #: src/Admin/EcommerceSettingsPage.php:42
 #: src/Admin/EcommerceSettingsPage.php:325
 #: src/Blocks/CurrencySwitcherBlock.php:119
 msgid "Tiền tệ"
-msgstr ""
+msgstr "Tiền tệ"
 
 #: src/Admin/EcommerceSettingsPage.php:43
 #: src/Admin/EcommerceSettingsPage.php:557
 msgid "Phương thức thanh toán"
-msgstr ""
+msgstr "Phương thức thanh toán"
 
 #: src/Admin/EcommerceSettingsPage.php:44
 #: src/Admin/EcommerceSettingsPage.php:327
 #: src/Admin/EcommerceSettingsPage.php:994
 msgid "Mã giảm giá"
-msgstr ""
+msgstr "Mã giảm giá"
 
 #: src/Admin/EcommerceSettingsPage.php:45
 #: src/Admin/EcommerceSettingsPage.php:328
 msgid "Thuế"
-msgstr ""
+msgstr "Thuế"
 
 #: src/Admin/EcommerceSettingsPage.php:324
 msgid "Chung"
-msgstr ""
+msgstr "Chung"
 
 #: src/Admin/EcommerceSettingsPage.php:355
 msgid "Tên cửa hàng"
-msgstr ""
+msgstr "Tên cửa hàng"
 
 #: src/Admin/EcommerceSettingsPage.php:363
 msgid "Địa chỉ"
-msgstr ""
+msgstr "Địa chỉ"
 
 #: src/Admin/EcommerceSettingsPage.php:371
 msgid "Số điện thoại"
-msgstr ""
+msgstr "Số điện thoại"
 
 #: src/Admin/EcommerceSettingsPage.php:379
 msgid "Email liên hệ"
-msgstr ""
+msgstr "Email liên hệ"
 
 #: src/Admin/EcommerceSettingsPage.php:410
 msgid "Quản lý tiền tệ"
-msgstr ""
+msgstr "Quản lý tiền tệ"
 
 #: src/Admin/EcommerceSettingsPage.php:411
-msgid ""
-"Chọn các loại tiền tệ muốn hiển thị trên trang web. Đánh dấu vào ô bên cạnh "
-"để bật/tắt."
-msgstr ""
+msgid "Chọn các loại tiền tệ muốn hiển thị trên trang web. Đánh dấu vào ô bên cạnh để bật/tắt."
+msgstr "Chọn các loại tiền tệ muốn hiển thị trên trang web. Đánh dấu vào ô bên cạnh để bật/tắt."
 
 #: src/Admin/EcommerceSettingsPage.php:419
 #: src/Admin/EcommerceSettingsPage.php:566
 msgid "Bật"
-msgstr ""
+msgstr "Bật"
 
 #: src/Admin/EcommerceSettingsPage.php:420
 msgid "Mã"
-msgstr ""
+msgstr "Mã"
 
 #: src/Admin/EcommerceSettingsPage.php:422
 msgid "Tên tiền tệ"
-msgstr ""
+msgstr "Tên tiền tệ"
 
 #: src/Admin/EcommerceSettingsPage.php:423
 msgid "Ký hiệu"
-msgstr ""
+msgstr "Ký hiệu"
 
 #: src/Admin/EcommerceSettingsPage.php:424
 msgid "Mặc định"
-msgstr ""
+msgstr "Mặc định"
 
 #: src/Admin/EcommerceSettingsPage.php:425
 msgid "Số chữ số thập phân"
-msgstr ""
+msgstr "Số chữ số thập phân"
 
 #: src/Admin/EcommerceSettingsPage.php:425
 msgid "Thập phân"
-msgstr ""
+msgstr "Thập phân"
 
 #: src/Admin/EcommerceSettingsPage.php:426
 msgid "Vị trí ký hiệu"
-msgstr ""
+msgstr "Vị trí ký hiệu"
 
 #: src/Admin/EcommerceSettingsPage.php:427
 msgid "Dấu phân cách hàng nghìn"
-msgstr ""
+msgstr "Dấu phân cách hàng nghìn"
 
 #: src/Admin/EcommerceSettingsPage.php:427
 msgid "Dấu nghìn"
-msgstr ""
+msgstr "Dấu nghìn"
 
 #: src/Admin/EcommerceSettingsPage.php:428
 msgid "Dấu phân cách thập phân"
-msgstr ""
+msgstr "Dấu phân cách thập phân"
 
 #: src/Admin/EcommerceSettingsPage.php:428
 msgid "Dấu T.phân"
-msgstr ""
+msgstr "Dấu T.phân"
 
 #: src/Admin/EcommerceSettingsPage.php:465
 msgid "— Mặc định —"
-msgstr ""
+msgstr "— Mặc định —"
 
 #: src/Admin/EcommerceSettingsPage.php:466
 msgid "Trước ($100)"
-msgstr ""
+msgstr "Trước ($100)"
 
 #: src/Admin/EcommerceSettingsPage.php:467
 msgid "Sau (100$)"
-msgstr ""
+msgstr "Sau (100$)"
 
 #: src/Admin/EcommerceSettingsPage.php:468
 msgid "Trước, cách ($ 100)"
-msgstr ""
+msgstr "Trước, cách ($ 100)"
 
 #: src/Admin/EcommerceSettingsPage.php:469
 msgid "Sau, cách (100 $)"
-msgstr ""
+msgstr "Sau, cách (100 $)"
 
 #: src/Admin/EcommerceSettingsPage.php:489
 msgid "Định dạng mặc định (Fallback)"
-msgstr ""
+msgstr "Định dạng mặc định (Fallback)"
 
 #: src/Admin/EcommerceSettingsPage.php:490
-msgid ""
-"Áp dụng khi đồng tiền không có tuỳ chỉnh riêng hoặc vị trí ký hiệu chọn \"— "
-"Mặc định —\"."
-msgstr ""
+msgid "Áp dụng khi đồng tiền không có tuỳ chỉnh riêng hoặc vị trí ký hiệu chọn \"— Mặc định —\"."
+msgstr "Áp dụng khi đồng tiền không có tuỳ chỉnh riêng hoặc vị trí ký hiệu chọn \"— Mặc định —\"."
 
 #: src/Admin/EcommerceSettingsPage.php:493
 msgid "Vị trí ký hiệu mặc định"
-msgstr ""
+msgstr "Vị trí ký hiệu mặc định"
 
 #: src/Admin/EcommerceSettingsPage.php:496
 msgid "Trước số tiền ($100)"
-msgstr ""
+msgstr "Trước số tiền ($100)"
 
 #: src/Admin/EcommerceSettingsPage.php:497
 msgid "Sau số tiền (100$)"
-msgstr ""
+msgstr "Sau số tiền (100$)"
 
 #: src/Admin/EcommerceSettingsPage.php:498
 msgid "Trước số tiền, cách ($ 100)"
-msgstr ""
+msgstr "Trước số tiền, cách ($ 100)"
 
 #: src/Admin/EcommerceSettingsPage.php:499
 msgid "Sau số tiền, cách (100 $)"
-msgstr ""
+msgstr "Sau số tiền, cách (100 $)"
 
 #: src/Admin/EcommerceSettingsPage.php:504
 msgid "Dấu phân cách hàng nghìn mặc định"
-msgstr ""
+msgstr "Dấu phân cách hàng nghìn mặc định"
 
 #: src/Admin/EcommerceSettingsPage.php:511
 msgid "Dấu phân cách thập phân mặc định"
-msgstr ""
+msgstr "Dấu phân cách thập phân mặc định"
 
 #: src/Admin/EcommerceSettingsPage.php:519
 msgid "Xem trước"
-msgstr ""
+msgstr "Xem trước"
 
 #: src/Admin/EcommerceSettingsPage.php:520
-msgid ""
-"Minh hoạ hiển thị số tiền \"1.000.000\" của đồng tiền mặc định (Base) sau "
-"khi áp dụng Format và Tỷ giá (nếu có cấu hình Converter)."
-msgstr ""
+msgid "Minh hoạ hiển thị số tiền \"1.000.000\" của đồng tiền mặc định (Base) sau khi áp dụng Format và Tỷ giá (nếu có cấu hình Converter)."
+msgstr "Minh hoạ hiển thị số tiền \"1.000.000\" của đồng tiền mặc định (Base) sau khi áp dụng Format và Tỷ giá (nếu có cấu hình Converter)."
 
 #: src/Admin/EcommerceSettingsPage.php:558
 msgid "Kích hoạt và cấu hình các phương thức thanh toán từ các extension."
-msgstr ""
+msgstr "Kích hoạt và cấu hình các phương thức thanh toán từ các extension."
 
 #: src/Admin/EcommerceSettingsPage.php:568
 msgid "Phương thức"
-msgstr ""
+msgstr "Phương thức"
 
 #: src/Admin/EcommerceSettingsPage.php:569
 msgid "Mô tả"
-msgstr ""
+msgstr "Mô tả"
 
 #: src/Admin/EcommerceSettingsPage.php:570 src/Admin/OrderAdmin.php:304
 msgid "Trạng thái"
-msgstr ""
+msgstr "Trạng thái"
 
 #: src/Admin/EcommerceSettingsPage.php:571
 msgid "Chế độ"
-msgstr ""
+msgstr "Chế độ"
 
 #: src/Admin/EcommerceSettingsPage.php:572
 msgid "Thao tác"
-msgstr ""
+msgstr "Thao tác"
 
 #: src/Admin/EcommerceSettingsPage.php:583
 #: src/Admin/EcommerceSettingsPage.php:803
@@ -477,1704 +467,1635 @@ msgstr ""
 #: src/Blocks/CheckoutSectionBlock.php:23
 #: blocks/checkout-payment-methods/build/index.js:1
 msgid "Thanh toán khi nhận hàng (COD)"
-msgstr ""
+msgstr "Thanh toán khi nhận hàng (COD)"
 
 #: src/Admin/EcommerceSettingsPage.php:584
 msgid "Khách hàng thanh toán bằng tiền mặt khi nhận hàng."
-msgstr ""
+msgstr "Khách hàng thanh toán bằng tiền mặt khi nhận hàng."
 
 #: src/Admin/EcommerceSettingsPage.php:591
 #: src/Admin/EcommerceSettingsPage.php:804
 #: src/Blocks/CheckoutSectionBlock.php:22
 #: blocks/checkout-payment-methods/build/index.js:1
 msgid "Chuyển khoản ngân hàng"
-msgstr ""
+msgstr "Chuyển khoản ngân hàng"
 
 #: src/Admin/EcommerceSettingsPage.php:592
 msgid "Khách hàng chuyển khoản trực tiếp vào tài khoản ngân hàng."
-msgstr ""
+msgstr "Khách hàng chuyển khoản trực tiếp vào tài khoản ngân hàng."
 
 #: src/Admin/EcommerceSettingsPage.php:615
 msgid "Sẵn sàng"
-msgstr ""
+msgstr "Sẵn sàng"
 
 #: src/Admin/EcommerceSettingsPage.php:617
 msgid "Chưa cấu hình"
-msgstr ""
+msgstr "Chưa cấu hình"
 
 #: src/Admin/EcommerceSettingsPage.php:622
 msgid "Sandbox"
-msgstr ""
+msgstr "Sandbox"
 
 #: src/Admin/EcommerceSettingsPage.php:624
 msgid "Production"
-msgstr ""
+msgstr "Production"
 
 #: src/Admin/EcommerceSettingsPage.php:630
 msgid "Cài đặt"
-msgstr ""
+msgstr "Cài đặt"
 
 #: src/Admin/EcommerceSettingsPage.php:656
 msgid "Payment System extension is not active."
-msgstr ""
+msgstr "Tiện ích Payment System chưa được kích hoạt."
 
 #: src/Admin/EcommerceSettingsPage.php:664
 msgid "Gateway not found."
-msgstr ""
+msgstr "Không tìm thấy cổng thanh toán."
 
 #: src/Admin/EcommerceSettingsPage.php:688
 #: src/Admin/EcommerceSettingsPage.php:797
 msgid "Settings saved."
-msgstr ""
+msgstr "Đã lưu cài đặt."
 
 #: src/Admin/EcommerceSettingsPage.php:702
 #: src/Admin/EcommerceSettingsPage.php:810
 #, php-format
 msgid "Cài đặt %s"
-msgstr ""
+msgstr "Cài đặt %s"
 
 #: src/Admin/EcommerceSettingsPage.php:784
 #: src/Admin/EcommerceSettingsPage.php:851
 msgid "Lưu cài đặt"
-msgstr ""
+msgstr "Lưu cài đặt"
 
 #: src/Admin/EcommerceSettingsPage.php:862
 msgid "Mô tả cho khách hàng"
-msgstr ""
+msgstr "Mô tả cho khách hàng"
 
 #: src/Admin/EcommerceSettingsPage.php:864
 msgid "Thanh toán bằng tiền mặt khi nhận hàng. Vui lòng chuẩn bị đúng số tiền."
-msgstr ""
+msgstr "Thanh toán bằng tiền mặt khi nhận hàng. Vui lòng chuẩn bị đúng số tiền."
 
 #: src/Admin/EcommerceSettingsPage.php:865
 msgid "Hiển thị trên trang thanh toán và email xác nhận."
-msgstr ""
+msgstr "Hiển thị trên trang thanh toán và email xác nhận."
 
 #: src/Admin/EcommerceSettingsPage.php:868
 msgid "Phí COD (₫)"
-msgstr ""
+msgstr "Phí COD (₫)"
 
 #: src/Admin/EcommerceSettingsPage.php:871
 msgid "Phụ phí nếu có (0 = không phụ phí)."
-msgstr ""
+msgstr "Phụ phí nếu có (0 = không phụ phí)."
 
 #: src/Admin/EcommerceSettingsPage.php:874
 msgid "Giá trị tối thiểu (₫)"
-msgstr ""
+msgstr "Giá trị tối thiểu (₫)"
 
 #: src/Admin/EcommerceSettingsPage.php:877
-msgid ""
-"Không hiển thị COD nếu đơn hàng thấp hơn giá trị này (0 = luôn hiển thị)."
-msgstr ""
+msgid "Không hiển thị COD nếu đơn hàng thấp hơn giá trị này (0 = luôn hiển thị)."
+msgstr "Không hiển thị COD nếu đơn hàng thấp hơn giá trị này (0 = luôn hiển thị)."
 
 #: src/Admin/EcommerceSettingsPage.php:880
 msgid "Giá trị tối đa (₫)"
-msgstr ""
+msgstr "Giá trị tối đa (₫)"
 
 #: src/Admin/EcommerceSettingsPage.php:883
-msgid ""
-"Không hiển thị COD nếu đơn hàng cao hơn giá trị này (0 = không giới hạn)."
-msgstr ""
+msgid "Không hiển thị COD nếu đơn hàng cao hơn giá trị này (0 = không giới hạn)."
+msgstr "Không hiển thị COD nếu đơn hàng cao hơn giá trị này (0 = không giới hạn)."
 
 #: src/Admin/EcommerceSettingsPage.php:891
 msgid "Tên ngân hàng"
-msgstr ""
+msgstr "Tên ngân hàng"
 
 #: src/Admin/EcommerceSettingsPage.php:896
 msgid "Số tài khoản"
-msgstr ""
+msgstr "Số tài khoản"
 
 #: src/Admin/EcommerceSettingsPage.php:901
 msgid "Chủ tài khoản"
-msgstr ""
+msgstr "Chủ tài khoản"
 
 #: src/Admin/EcommerceSettingsPage.php:906
 msgid "Chi nhánh"
-msgstr ""
+msgstr "Chi nhánh"
 
 #: src/Admin/EcommerceSettingsPage.php:911
 msgid "Nội dung chuyển khoản"
-msgstr ""
+msgstr "Nội dung chuyển khoản"
 
 #: src/Admin/EcommerceSettingsPage.php:913
 #: src/Blocks/AccountTabOrdersBlock.php:402
-msgid ""
-"Vui lòng ghi đúng nội dung chuyển khoản để chúng tôi xác nhận đơn hàng sớm "
-"nhất."
-msgstr ""
+msgid "Vui lòng ghi đúng nội dung chuyển khoản để chúng tôi xác nhận đơn hàng sớm nhất."
+msgstr "Vui lòng ghi đúng nội dung chuyển khoản để chúng tôi xác nhận đơn hàng sớm nhất."
 
 #: src/Admin/EcommerceSettingsPage.php:914
 msgid "Hướng dẫn khách hàng điền nội dung CK."
-msgstr ""
+msgstr "Hướng dẫn khách hàng điền nội dung CK."
 
 #: src/Admin/EcommerceSettingsPage.php:917
 msgid "Hướng dẫn chuyển khoản"
-msgstr ""
+msgstr "Hướng dẫn chuyển khoản"
 
 #: src/Admin/EcommerceSettingsPage.php:920
-msgid ""
-"Thông tin bổ sung hiển thị cho khách hàng (ví dụ: thông tin chuyển khoản "
-"nhanh 24/7, QR code...)."
-msgstr ""
+msgid "Thông tin bổ sung hiển thị cho khách hàng (ví dụ: thông tin chuyển khoản nhanh 24/7, QR code...)."
+msgstr "Thông tin bổ sung hiển thị cho khách hàng (ví dụ: thông tin chuyển khoản nhanh 24/7, QR code...)."
 
 #: src/Admin/EcommerceSettingsPage.php:961
 msgid "Thanh toán thẻ quốc tế (Visa, Mastercard, JCB) qua OnePay."
-msgstr ""
+msgstr "Thanh toán thẻ quốc tế (Visa, Mastercard, JCB) qua OnePay."
 
 #: src/Admin/EcommerceSettingsPage.php:962
 msgid "Thanh toán thẻ nội địa (ATM/Napas) qua OnePay."
-msgstr ""
+msgstr "Thanh toán thẻ nội địa (ATM/Napas) qua OnePay."
 
 #: src/Admin/EcommerceSettingsPage.php:963
 msgid "Ví điện tử MoMo - thanh toán nhanh bằng QR code."
-msgstr ""
+msgstr "Ví điện tử MoMo - thanh toán nhanh bằng QR code."
 
 #: src/Admin/EcommerceSettingsPage.php:964
 msgid "Cổng thanh toán VNPay - hỗ trợ ATM, Visa, Mastercard."
-msgstr ""
+msgstr "Cổng thanh toán VNPay - hỗ trợ ATM, Visa, Mastercard."
 
 #: src/Admin/EcommerceSettingsPage.php:965
 msgid "Ví điện tử ZaloPay - thanh toán bằng QR code."
-msgstr ""
+msgstr "Ví điện tử ZaloPay - thanh toán bằng QR code."
 
 #: src/Admin/EcommerceSettingsPage.php:966
 msgid "Thanh toán quốc tế qua Stripe (Visa, Mastercard, AMEX)."
-msgstr ""
+msgstr "Thanh toán quốc tế qua Stripe (Visa, Mastercard, AMEX)."
 
 #: src/Admin/EcommerceSettingsPage.php:967
 msgid "Thanh toán quốc tế qua PayPal."
-msgstr ""
+msgstr "Thanh toán quốc tế qua PayPal."
 
 #: src/Admin/EcommerceSettingsPage.php:970
 msgid "Phương thức thanh toán trực tuyến."
-msgstr ""
+msgstr "Phương thức thanh toán trực tuyến."
 
 #: src/Admin/EcommerceSettingsPage.php:1001
 msgid "Cho phép sử dụng mã giảm giá"
-msgstr ""
+msgstr "Cho phép sử dụng mã giảm giá"
 
 #: src/Admin/EcommerceSettingsPage.php:1005
 msgid "Bật tính năng mã giảm giá trên trang thanh toán"
-msgstr ""
+msgstr "Bật tính năng mã giảm giá trên trang thanh toán"
 
 #: src/Admin/EcommerceSettingsPage.php:1014
 msgid "Quản lý mã giảm giá"
-msgstr ""
+msgstr "Quản lý mã giảm giá"
 
 #: src/Admin/EcommerceSettingsPage.php:1029
 msgid "Cấu hình Thuế"
-msgstr ""
+msgstr "Cấu hình Thuế"
 
 #: src/Admin/EcommerceSettingsPage.php:1030
 msgid "Định cấu hình cách tính thuế cho giỏ hàng và thanh toán."
-msgstr ""
+msgstr "Định cấu hình cách tính thuế cho giỏ hàng và thanh toán."
 
 #: src/Admin/EcommerceSettingsPage.php:1071
 msgid "Kích hoạt tính thuế"
-msgstr ""
+msgstr "Kích hoạt tính thuế"
 
 #: src/Admin/EcommerceSettingsPage.php:1075
 msgid "Bật việc tính toán thuế ở giỏ hàng và trang thanh toán"
-msgstr ""
+msgstr "Bật việc tính toán thuế ở giỏ hàng và trang thanh toán"
 
 #: src/Admin/EcommerceSettingsPage.php:1087
 msgid "Chiến lược tính thuế"
-msgstr ""
+msgstr "Chiến lược tính thuế"
 
 #: src/Admin/EcommerceSettingsPage.php:1091
 msgid "Đã bao gồm trong giá (Inclusive - Mặc định)"
-msgstr ""
+msgstr "Đã bao gồm trong giá (Inclusive - Mặc định)"
 
 #: src/Admin/EcommerceSettingsPage.php:1093
-msgid ""
-"Giá hiển thị và giá khách phải trả là giá cuối cùng. Hệ thống tự tách số "
-"tiền thuế (Khuyên dùng để tránh làm khách hàng sợ vì tổng giá trị thanh toán "
-"cao lên)."
-msgstr ""
+msgid "Giá hiển thị và giá khách phải trả là giá cuối cùng. Hệ thống tự tách số tiền thuế (Khuyên dùng để tránh làm khách hàng sợ vì tổng giá trị thanh toán cao lên)."
+msgstr "Giá hiển thị và giá khách phải trả là giá cuối cùng. Hệ thống tự tách số tiền thuế (Khuyên dùng để tránh làm khách hàng sợ vì tổng giá trị thanh toán cao lên)."
 
 #: src/Admin/EcommerceSettingsPage.php:1098
 msgid "Cộng thêm vào tổng đơn (Exclusive)"
-msgstr ""
+msgstr "Cộng thêm vào tổng đơn (Exclusive)"
 
 #: src/Admin/EcommerceSettingsPage.php:1100
-msgid ""
-"Tính thuế đè thêm vào giá các mặt hàng. Tổng thanh toán = Tổng giá trị món "
-"hàng + Từng loại Thuế."
-msgstr ""
+msgid "Tính thuế đè thêm vào giá các mặt hàng. Tổng thanh toán = Tổng giá trị món hàng + Từng loại Thuế."
+msgstr "Tính thuế đè thêm vào giá các mặt hàng. Tổng thanh toán = Tổng giá trị món hàng + Từng loại Thuế."
 
 #: src/Admin/EcommerceSettingsPage.php:1114
 msgid "Các loại thuế áp dụng"
-msgstr ""
+msgstr "Các loại thuế áp dụng"
 
 #: src/Admin/EcommerceSettingsPage.php:1119
 msgid "Nhập mỗi loại thuế nằm trên 1 dòng theo cú pháp (SSR Fallback): "
-msgstr ""
+msgstr "Nhập mỗi loại thuế nằm trên 1 dòng theo cú pháp (SSR Fallback): "
 
 #: src/Admin/EcommerceSettingsPage.php:1120
 msgid "Ví dụ: "
-msgstr ""
+msgstr "Ví dụ: "
 
 #: src/Admin/EcommerceSettingsPage.php:1120
 msgid "(Nghĩa là thuế VAT 10% với priority 10)"
-msgstr ""
+msgstr "(Nghĩa là thuế VAT 10% với priority 10)"
 
 #: src/Admin/OrderAdmin.php:38 src/Admin/OrderAdmin.php:48
 #: src/Admin/OrderAdmin.php:275
 msgid "Đơn hàng"
-msgstr ""
+msgstr "Đơn hàng"
 
 #: src/Admin/OrderAdmin.php:281
 msgid "Tất cả trạng thái"
-msgstr ""
+msgstr "Tất cả trạng thái"
 
 #: src/Admin/OrderAdmin.php:292
 msgid "Tìm kiếm..."
-msgstr ""
+msgstr "Tìm kiếm..."
 
 #: src/Admin/OrderAdmin.php:293
 msgid "Tìm"
-msgstr ""
+msgstr "Tìm"
 
 #: src/Admin/OrderAdmin.php:300
 msgid "Mã đơn"
-msgstr ""
+msgstr "Mã đơn"
 
 #: src/Admin/OrderAdmin.php:301
 msgid "Khách hàng"
-msgstr ""
+msgstr "Khách hàng"
 
 #: src/Admin/OrderAdmin.php:302
 msgid "Sản phẩm"
-msgstr ""
+msgstr "Sản phẩm"
 
 #: src/Admin/OrderAdmin.php:303
 msgid "Tổng"
-msgstr ""
+msgstr "Tổng"
 
 #: src/Admin/OrderAdmin.php:305
 msgid "Ngày tạo"
-msgstr ""
+msgstr "Ngày tạo"
 
 #: src/Admin/OrderAdmin.php:310
 msgid "Không có đơn hàng nào."
-msgstr ""
+msgstr "Không có đơn hàng nào."
 
 #: src/Admin/OrderAdmin.php:319
 msgid "Đặt qua form"
-msgstr ""
+msgstr "Đặt qua form"
 
 #: src/Admin/OrderAdmin.php:344
 msgid "Chờ báo giá"
-msgstr ""
+msgstr "Chờ báo giá"
 
 #: src/Admin/OrderAdmin.php:350
 msgid "Xử lý thủ công"
-msgstr ""
+msgstr "Xử lý thủ công"
 
 #: src/Admin/OrderAdmin.php:394 src/Rest/EcommerceController.php:331
 msgid "Đơn hàng không tồn tại."
-msgstr ""
+msgstr "Đơn hàng không tồn tại."
 
 #: src/Admin/OrderAdmin.php:405
 #, php-format
 msgid "Edit Order \"%s\""
-msgstr ""
+msgstr "Sửa đơn hàng \"%s\""
 
 #: src/Admin/OrderAdmin.php:409
 msgid "Đơn hàng đã được cập nhật."
-msgstr ""
+msgstr "Đơn hàng đã được cập nhật."
 
 #: src/Admin/OrderAdmin.php:422
 msgid "Order Details"
-msgstr ""
+msgstr "Chi tiết đơn hàng"
 
 #: src/Admin/OrderAdmin.php:426
 msgid "Đơn đặt qua form (Xử lý thủ công):"
-msgstr ""
+msgstr "Đơn đặt qua form (Xử lý thủ công):"
 
 #: src/Admin/OrderAdmin.php:426
-msgid ""
-"Đơn hàng này chưa có giá tiền ban đầu. Vui lòng liên hệ với khách hàng để tư "
-"vấn và nhập số tiền chốt vào ô \"Báo giá / Tổng tiền\" ở cột bên phải."
-msgstr ""
+msgid "Đơn hàng này chưa có giá tiền ban đầu. Vui lòng liên hệ với khách hàng để tư vấn và nhập số tiền chốt vào ô \"Báo giá / Tổng tiền\" ở cột bên phải."
+msgstr "Đơn hàng này chưa có giá tiền ban đầu. Vui lòng liên hệ với khách hàng để tư vấn và nhập số tiền chốt vào ô \"Báo giá / Tổng tiền\" ở cột bên phải."
 
 #: src/Admin/OrderAdmin.php:432
 msgid "STATUS"
-msgstr ""
+msgstr "TRẠNG THÁI"
 
 #: src/Admin/OrderAdmin.php:440 src/Admin/OrderAdmin.php:586
 msgid "ORDER TOTAL"
-msgstr ""
+msgstr "TỔNG ĐƠN HÀNG"
 
 #: src/Admin/OrderAdmin.php:443
 msgid "CHỜ BÁO GIÁ"
-msgstr ""
+msgstr "CHỜ BÁO GIÁ"
 
 #: src/Admin/OrderAdmin.php:450
 msgid "ITEMS"
-msgstr ""
+msgstr "MẶT HÀNG"
 
 #: src/Admin/OrderAdmin.php:454
 msgid "PAYMENT"
-msgstr ""
+msgstr "THANH TOÁN"
 
 #: src/Admin/OrderAdmin.php:458
 msgid "Xử lý thủ công (Đặt qua form)"
-msgstr ""
+msgstr "Xử lý thủ công (Đặt qua form)"
 
 #: src/Admin/OrderAdmin.php:466
 msgid "CREATED"
-msgstr ""
+msgstr "NGÀY TẠO"
 
 #: src/Admin/OrderAdmin.php:479
 msgid "TRACKING"
-msgstr ""
+msgstr "VẬN ĐƠN"
 
 #: src/Admin/OrderAdmin.php:491
 msgid "CUSTOMER INFORMATION"
-msgstr ""
+msgstr "THÔNG TIN KHÁCH HÀNG"
 
 #: src/Admin/OrderAdmin.php:496
 msgid "FULL NAME"
-msgstr ""
+msgstr "HỌ VÀ TÊN"
 
 #: src/Admin/OrderAdmin.php:502
 msgid "EMAIL"
-msgstr ""
+msgstr "EMAIL"
 
 #: src/Admin/OrderAdmin.php:512
 msgid "PHONE"
-msgstr ""
+msgstr "ĐIỆN THOẠI"
 
 #: src/Admin/OrderAdmin.php:518
 msgid "ADDRESS"
-msgstr ""
+msgstr "ĐỊA CHỈ"
 
 #: src/Admin/OrderAdmin.php:531
 msgid "ORDER ITEMS"
-msgstr ""
+msgstr "CÁC MẶT HÀNG"
 
 #: src/Admin/OrderAdmin.php:537
 msgid "PRODUCT"
-msgstr ""
+msgstr "SẢN PHẨM"
 
 #: src/Admin/OrderAdmin.php:538
 msgid "QTY"
-msgstr ""
+msgstr "SL"
 
 #: src/Admin/OrderAdmin.php:539
 msgid "UNIT PRICE"
-msgstr ""
+msgstr "ĐƠN GIÁ"
 
 #: src/Admin/OrderAdmin.php:540
 msgid "TOTAL"
-msgstr ""
+msgstr "TỔNG CỘNG"
 
 #: src/Admin/OrderAdmin.php:545 src/Blocks/AccountTabOrdersBlock.php:155
 msgid "No items."
-msgstr ""
+msgstr "Không có mục nào."
 
 #: src/Admin/OrderAdmin.php:594
-msgid ""
-"Chỉnh sửa số lượng hoặc đơn giá rồi nhấn \"Cập nhật đơn hàng\" để lưu. Thay "
-"đổi sẽ được ghi vào lịch sử."
-msgstr ""
+msgid "Chỉnh sửa số lượng hoặc đơn giá rồi nhấn \"Cập nhật đơn hàng\" để lưu. Thay đổi sẽ được ghi vào lịch sử."
+msgstr "Chỉnh sửa số lượng hoặc đơn giá rồi nhấn \"Cập nhật đơn hàng\" để lưu. Thay đổi sẽ được ghi vào lịch sử."
 
 #: src/Admin/OrderAdmin.php:603
 msgid "Order History"
-msgstr ""
+msgstr "Lịch sử đơn hàng"
 
 #. translators: 1: old status label, 2: new status label
 #: src/Admin/OrderAdmin.php:633
 #, php-format
 msgid "đã chuyển trạng thái từ %s sang %s"
-msgstr ""
+msgstr "đã chuyển trạng thái từ %s sang %s"
 
 #. translators: 1: old total, 2: new total
 #: src/Admin/OrderAdmin.php:641
 #, php-format
 msgid "đã cập nhật tổng tiền từ %s → %s"
-msgstr ""
+msgstr "đã cập nhật tổng tiền từ %s → %s"
 
 #: src/Admin/OrderAdmin.php:651
 #, php-format
 msgid "đã thêm mã vận đơn %s"
-msgstr ""
+msgstr "đã thêm mã vận đơn %s"
 
 #: src/Admin/OrderAdmin.php:656
 #, php-format
 msgid "đã xóa mã vận đơn %s"
-msgstr ""
+msgstr "đã xóa mã vận đơn %s"
 
 #: src/Admin/OrderAdmin.php:661
 #, php-format
 msgid "đã cập nhật mã vận đơn từ %s → %s"
-msgstr ""
+msgstr "đã cập nhật mã vận đơn từ %s → %s"
 
 #: src/Admin/OrderAdmin.php:676
 #, php-format
 msgid "đơn giá %s → %s"
-msgstr ""
+msgstr "đơn giá %s → %s"
 
 #: src/Admin/OrderAdmin.php:683
 #, php-format
 msgid "số lượng %s → %s"
-msgstr ""
+msgstr "số lượng %s → %s"
 
 #: src/Admin/OrderAdmin.php:689
 #, php-format
 msgid "đã chỉnh sửa sản phẩm \"%s\": %s"
-msgstr ""
+msgstr "đã chỉnh sửa sản phẩm \"%s\": %s"
 
 #: src/Admin/OrderAdmin.php:695
 msgid "đã thêm ghi chú"
-msgstr ""
+msgstr "đã thêm ghi chú"
 
 #: src/Admin/OrderAdmin.php:723
 msgid "Update Status"
-msgstr ""
+msgstr "Cập nhật trạng thái"
 
 #: src/Admin/OrderAdmin.php:726
 msgid "CURRENT STATUS"
-msgstr ""
+msgstr "TRẠNG THÁI HIỆN TẠI"
 
 #: src/Admin/OrderAdmin.php:733
 msgid "TRẠNG THÁI"
-msgstr ""
+msgstr "TRẠNG THÁI"
 
 #: src/Admin/OrderAdmin.php:736
 #, php-format
 msgid "Giữ nguyên (%s)"
-msgstr ""
+msgstr "Giữ nguyên (%s)"
 
 #: src/Admin/OrderAdmin.php:750
 msgid "CHUYỂN NGAY"
-msgstr ""
+msgstr "CHUYỂN NGAY"
 
 #: src/Admin/OrderAdmin.php:777
 msgid "BÁO GIÁ / TỔNG TIỀN (VND)"
-msgstr ""
+msgstr "BÁO GIÁ / TỔNG TIỀN (VND)"
 
 #: src/Admin/OrderAdmin.php:780
 msgid "Nhập giá báo cho khách..."
-msgstr ""
+msgstr "Nhập giá báo cho khách..."
 
 #: src/Admin/OrderAdmin.php:782
 msgid "Cập nhật số tiền sau khi thỏa thuận báo giá với khách hàng."
-msgstr ""
+msgstr "Cập nhật số tiền sau khi thỏa thuận báo giá với khách hàng."
 
 #: src/Admin/OrderAdmin.php:792
 msgid "MÃ VẬN ĐƠN"
-msgstr ""
+msgstr "MÃ VẬN ĐƠN"
 
 #: src/Admin/OrderAdmin.php:795
 msgid "Nhập mã vận đơn..."
-msgstr ""
+msgstr "Nhập mã vận đơn..."
 
 #: src/Admin/OrderAdmin.php:799
 msgid "NOTE"
-msgstr ""
+msgstr "GHI CHÚ"
 
 #: src/Admin/OrderAdmin.php:800
 msgid "Optional note..."
-msgstr ""
+msgstr "Ghi chú (không bắt buộc)..."
 
 #: src/Admin/OrderAdmin.php:802
 msgid "Cập nhật đơn hàng"
-msgstr ""
+msgstr "Cập nhật đơn hàng"
 
 #: src/Admin/OrderAdmin.php:810
 msgid "Publish"
-msgstr ""
+msgstr "Đăng"
 
 #: src/Admin/OrderAdmin.php:815
 msgid "Status:"
-msgstr ""
+msgstr "Trạng thái:"
 
 #: src/Admin/OrderAdmin.php:819
 msgid "Visibility:"
-msgstr ""
+msgstr "Hiển thị:"
 
 #: src/Admin/OrderAdmin.php:819
 msgid "Public"
-msgstr ""
+msgstr "Công khai"
 
 #: src/Admin/OrderAdmin.php:828
 #, php-format
 msgid "Published on: %s"
-msgstr ""
+msgstr "Đã đăng vào: %s"
 
 #: src/Blocks/AccountTabOrdersBlock.php:47
 msgid "Your orders"
-msgstr ""
+msgstr "Đơn hàng của bạn"
 
 #: src/Blocks/AccountTabOrdersBlock.php:52
 msgid "You have no orders yet."
-msgstr ""
+msgstr "Bạn chưa có đơn hàng nào."
 
 #: src/Blocks/AccountTabOrdersBlock.php:98
 #: src/Blocks/AccountTabOrdersBlock.php:473
 msgid "Back to orders"
-msgstr ""
+msgstr "Quay lại danh sách đơn hàng"
 
 #: src/Blocks/AccountTabOrdersBlock.php:112 src/Order/OrderPostType.php:39
 msgid "Order"
-msgstr ""
+msgstr "Đơn hàng"
 
 #: src/Blocks/AccountTabOrdersBlock.php:120
 #: src/Blocks/AccountTabOrdersBlock.php:184 src/Blocks/CartTotalsBlock.php:78
 #: src/Blocks/CheckoutOrderReviewBlock.php:93
 #: blocks/cart-totals/build/index.js:1
 msgid "Total"
-msgstr ""
+msgstr "Tổng cộng"
 
 #: src/Blocks/AccountTabOrdersBlock.php:150
 msgid "Order items"
-msgstr ""
+msgstr "Các mặt hàng"
 
 #: src/Blocks/AccountTabOrdersBlock.php:164
 msgid "Qty"
-msgstr ""
+msgstr "SL"
 
 #: src/Blocks/AccountTabOrdersBlock.php:174 src/Blocks/CartTotalsBlock.php:63
 #: blocks/cart-totals/build/index.js:1
 msgid "Subtotal"
-msgstr ""
+msgstr "Tạm tính"
 
 #: src/Blocks/AccountTabOrdersBlock.php:179
 msgid "Shipping & handling"
-msgstr ""
+msgstr "Vận chuyển & phí xử lý"
 
 #: src/Blocks/AccountTabOrdersBlock.php:197
 msgid "Notes"
-msgstr ""
+msgstr "Ghi chú"
 
 #: src/Blocks/AccountTabOrdersBlock.php:219
 msgid "Customer"
-msgstr ""
+msgstr "Khách hàng"
 
 #: src/Blocks/AccountTabOrdersBlock.php:223
 #: src/Blocks/CheckoutCustomerDetailsBlock.php:29
 #: blocks/checkout-customer-details/build/index.js:1
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: src/Blocks/AccountTabOrdersBlock.php:225
 #: src/Blocks/CheckoutCustomerDetailsBlock.php:35
 #: blocks/checkout-customer-details/build/index.js:1
 msgid "Phone"
-msgstr ""
+msgstr "Điện thoại"
 
 #: src/Blocks/AccountTabOrdersBlock.php:228
 #: src/Blocks/CheckoutCustomerDetailsBlock.php:41
 #: blocks/checkout-customer-details/build/index.js:1
 msgid "Address"
-msgstr ""
+msgstr "Địa chỉ"
 
 #: src/Blocks/AccountTabOrdersBlock.php:237
 msgid "Payment"
-msgstr ""
+msgstr "Thanh toán"
 
 #: src/Blocks/AccountTabOrdersBlock.php:243
 msgid "Method"
-msgstr ""
+msgstr "Phương thức"
 
 #: src/Blocks/AccountTabOrdersBlock.php:264
 msgid "Need help with this order?"
-msgstr ""
+msgstr "Cần hỗ trợ về đơn hàng này?"
 
 #: src/Blocks/AccountTabOrdersBlock.php:265
 msgid "Contact support"
-msgstr ""
+msgstr "Liên hệ hỗ trợ"
 
 #: src/Blocks/AccountTabOrdersBlock.php:313
 msgid "Placed"
-msgstr ""
+msgstr "Đã tiếp nhận"
 
 #: src/Blocks/AccountTabOrdersBlock.php:314
 #: src/Blocks/AccountTabOrdersBlock.php:524 src/Order/Order.php:280
 msgid "Processing"
-msgstr ""
+msgstr "Đang xử lý"
 
 #: src/Blocks/AccountTabOrdersBlock.php:315
 msgid "Shipping"
-msgstr ""
+msgstr "Đang giao hàng"
 
 #: src/Blocks/AccountTabOrdersBlock.php:316
 #: src/Blocks/AccountTabOrdersBlock.php:525 src/Order/Order.php:282
 msgid "Completed"
-msgstr ""
+msgstr "Hoàn thành"
 
 #: src/Blocks/AccountTabOrdersBlock.php:374
 msgid "Chưa thanh toán. Nhấn nút bên dưới để hoàn tất thanh toán."
-msgstr ""
+msgstr "Chưa thanh toán. Nhấn nút bên dưới để hoàn tất thanh toán."
 
 #: src/Blocks/AccountTabOrdersBlock.php:381
 msgid "Thanh toán ngay"
-msgstr ""
+msgstr "Thanh toán ngay"
 
 #: src/Blocks/AccountTabOrdersBlock.php:406
 msgid "Thông tin chuyển khoản"
-msgstr ""
+msgstr "Thông tin chuyển khoản"
 
 #: src/Blocks/AccountTabOrdersBlock.php:409
 msgid "Ngân hàng:"
-msgstr ""
+msgstr "Ngân hàng:"
 
 #: src/Blocks/AccountTabOrdersBlock.php:412
 msgid "Số TK:"
-msgstr ""
+msgstr "Số TK:"
 
 #: src/Blocks/AccountTabOrdersBlock.php:415
 msgid "Chủ TK:"
-msgstr ""
+msgstr "Chủ TK:"
 
 #: src/Blocks/AccountTabOrdersBlock.php:417
 msgid "Nội dung CK:"
-msgstr ""
+msgstr "Nội dung CK:"
 
 #: src/Blocks/AccountTabOrdersBlock.php:427
-msgid ""
-"Đơn hàng COD sẽ được xác nhận bởi nhân viên. Vui lòng đặt cọc nếu được yêu "
-"cầu."
-msgstr ""
+msgid "Đơn hàng COD sẽ được xác nhận bởi nhân viên. Vui lòng đặt cọc nếu được yêu cầu."
+msgstr "Đơn hàng COD sẽ được xác nhận bởi nhân viên. Vui lòng đặt cọc nếu được yêu cầu."
 
 #: src/Blocks/AccountTabOrdersBlock.php:456
 msgid "Cash on delivery"
-msgstr ""
+msgstr "Thanh toán khi nhận hàng"
 
 #: src/Blocks/AccountTabOrdersBlock.php:457
 msgid "Bank transfer"
-msgstr ""
+msgstr "Chuyển khoản ngân hàng"
 
 #: src/Blocks/AccountTabOrdersBlock.php:470
 msgid "Order not found"
-msgstr ""
+msgstr "Không tìm thấy đơn hàng"
 
 #: src/Blocks/AccountTabOrdersBlock.php:471
 msgid "We couldn't find this order or you don't have permission to view it."
-msgstr ""
+msgstr "Chúng tôi không tìm thấy đơn hàng này hoặc bạn không có quyền xem."
 
 #: src/Blocks/AccountTabOrdersBlock.php:500
 msgid "View details"
-msgstr ""
+msgstr "Xem chi tiết"
 
 #: src/Blocks/AccountTabOrdersBlock.php:523 src/Order/Order.php:279
 msgid "Pending"
-msgstr ""
+msgstr "Chờ xử lý"
 
 #: src/Blocks/AccountTabOrdersBlock.php:526 src/Order/Order.php:283
 msgid "Failed"
-msgstr ""
+msgstr "Thất bại"
 
 #: src/Blocks/AccountTabOrdersBlock.php:527 src/Order/Order.php:284
 msgid "Cancelled"
-msgstr ""
+msgstr "Đã hủy"
 
 #: src/Blocks/AccountTabOrdersBlock.php:528 src/Order/Order.php:285
 msgid "Refunded"
-msgstr ""
+msgstr "Đã hoàn tiền"
 
 #: src/Blocks/AccountTabOrdersBlock.php:639
 msgid "Orders pagination"
-msgstr ""
+msgstr "Phân trang đơn hàng"
 
 #: src/Blocks/AddToCart/ContactAddToCartStrategy.php:19
 msgid "Liên hệ với chúng tôi để được tư vấn và báo giá."
-msgstr ""
+msgstr "Liên hệ với chúng tôi để được tư vấn và báo giá."
 
 #: src/Blocks/AddToCart/NormalAddToCartStrategy.php:30
 #: src/Blocks/AddToCartBlock.php:64
 msgid "Ngày khởi hành"
-msgstr ""
+msgstr "Ngày khởi hành"
 
 #: src/Blocks/AddToCart/NormalAddToCartStrategy.php:39
 msgid "Số lượng"
-msgstr ""
+msgstr "Số lượng"
 
 #: src/Blocks/AddToCart/NormalAddToCartStrategy.php:43
 #: src/Blocks/AddToCartBlock.php:77
 msgid "Thêm vào giỏ hàng"
-msgstr ""
+msgstr "Thêm vào giỏ hàng"
 
 #: src/Blocks/AddToCart/ScrollToFormAddToCartStrategy.php:25
 msgid "Gửi yêu cầu đặt hàng"
-msgstr ""
+msgstr "Gửi yêu cầu đặt hàng"
 
 #: src/Blocks/AddToCartBlock.php:83
-msgid ""
-"Bản xem trước trong trình soạn thảo — biểu mẫu thêm vào giỏ hàng cho sản "
-"phẩm hiện tại."
-msgstr ""
+msgid "Bản xem trước trong trình soạn thảo — biểu mẫu thêm vào giỏ hàng cho sản phẩm hiện tại."
+msgstr "Bản xem trước trong trình soạn thảo — biểu mẫu thêm vào giỏ hàng cho sản phẩm hiện tại."
 
 #: src/Blocks/CartBlock.php:191 src/Blocks/CartTotalsBlock.php:112
 msgid "Gỡ mã"
-msgstr ""
+msgstr "Gỡ mã"
 
 #: src/Blocks/CartBlock.php:195 src/Blocks/CartTotalsBlock.php:116
 #: blocks/cart-totals/build/index.js:1
 msgid "Nhập mã giảm giá"
-msgstr ""
+msgstr "Nhập mã giảm giá"
 
 #: src/Blocks/CartBlock.php:197 src/Blocks/CartTotalsBlock.php:118
 #: blocks/cart-totals/build/index.js:1
 msgid "Áp dụng"
-msgstr ""
+msgstr "Áp dụng"
 
 #: src/Blocks/CartEmptyBlock.php:57 blocks/cart-empty/build/index.js:1
 msgid "Your cart is empty"
-msgstr ""
+msgstr "Giỏ hàng của bạn đang trống"
 
 #: src/Blocks/CartEmptyBlock.php:61 blocks/cart-empty/build/index.js:1
 msgid "Add some products before checking out."
-msgstr ""
+msgstr "Hãy thêm sản phẩm trước khi thanh toán."
 
 #: src/Blocks/CartEmptyBlock.php:65 src/Blocks/CheckoutEmptyBlock.php:60
 #: blocks/cart-empty/build/index.js:1 blocks/checkout-empty/build/index.js:1
 msgid "Continue shopping"
-msgstr ""
+msgstr "Tiếp tục mua sắm"
 
 #: src/Blocks/CartItemBlock.php:58
 #: src/Blocks/MiniCart/AbstractMiniCartRenderer.php:17
 #: src/Checkout/CheckoutManager.php:92
 #: src/Order/Strategies/CartCheckoutStrategy.php:30
 msgid "Giỏ hàng của bạn đang trống."
-msgstr ""
+msgstr "Giỏ hàng của bạn đang trống."
 
 #: src/Blocks/CartItemBlock.php:60
 #: src/Blocks/MiniCart/CartFooterRenderer.php:18
 msgid "Xem giỏ hàng"
-msgstr ""
+msgstr "Xem giỏ hàng"
 
 #: src/Blocks/CartItemBlock.php:61
 msgid "Xem tất cả"
-msgstr ""
+msgstr "Xem tất cả"
 
 #: src/Blocks/CartItemBlock.php:63
 msgid "Xóa"
-msgstr ""
+msgstr "Xóa"
 
 #: src/Blocks/CartItemBlock.php:64
 msgid "Không thể xóa sản phẩm."
-msgstr ""
+msgstr "Không thể xóa sản phẩm."
 
 #: src/Blocks/CartItemBlock.php:65
 #: src/Blocks/MiniCart/CartFooterRenderer.php:12
 msgid "Tổng cộng"
-msgstr ""
+msgstr "Tổng cộng"
 
 #: src/Blocks/CartItemBlock.php:66
 msgid "Không thể cập nhật giỏ hàng."
-msgstr ""
+msgstr "Không thể cập nhật giỏ hàng."
 
 #: src/Blocks/CartItemCheckboxBlock.php:22
 msgid "Chọn sản phẩm"
-msgstr ""
+msgstr "Chọn sản phẩm"
 
 #: src/Blocks/CartItemMetaBlock.php:97
 msgid "Phiêu lưu"
-msgstr ""
+msgstr "Phiêu lưu"
 
 #: src/Blocks/CartItemMetaBlock.php:98
 msgid "Văn hóa"
-msgstr ""
+msgstr "Văn hóa"
 
 #: src/Blocks/CartItemMetaBlock.php:99
 msgid "Thiên nhiên"
-msgstr ""
+msgstr "Thiên nhiên"
 
 #: src/Blocks/CartItemMetaBlock.php:100
 msgid "Biển đảo"
-msgstr ""
+msgstr "Biển đảo"
 
 #: src/Blocks/CartItemMetaBlock.php:101
 msgid "Thành phố"
-msgstr ""
+msgstr "Thành phố"
 
 #: src/Blocks/CartItemMetaBlock.php:102
 msgid "Ẩm thực"
-msgstr ""
+msgstr "Ẩm thực"
 
 #: src/Blocks/CartItemMetaBlock.php:103
 msgid "Sức khỏe"
-msgstr ""
+msgstr "Sức khỏe"
 
 #: src/Blocks/CartItemMetaBlock.php:104
 msgid "Gia đình"
-msgstr ""
+msgstr "Gia đình"
 
 #: src/Blocks/CartItemMetaBlock.php:105
 msgid "Sang trọng"
-msgstr ""
+msgstr "Sang trọng"
 
 #: src/Blocks/CartItemMetaBlock.php:106
 msgid "Tiết kiệm"
-msgstr ""
+msgstr "Tiết kiệm"
 
 #: src/Blocks/CartItemMetaBlock.php:107
 msgid "Nhóm"
-msgstr ""
+msgstr "Nhóm"
 
 #: src/Blocks/CartItemMetaBlock.php:108
 msgid "Đơn thân"
-msgstr ""
+msgstr "Đơn thân"
 
 #: src/Blocks/CartItemMetaBlock.php:109
 msgid "Trăng mật"
-msgstr ""
+msgstr "Trăng mật"
 
 #: src/Blocks/CartItemQuantityBlock.php:23
 msgid "Giảm số lượng"
-msgstr ""
+msgstr "Giảm số lượng"
 
 #: src/Blocks/CartItemQuantityBlock.php:25
 msgid "Tăng số lượng"
-msgstr ""
+msgstr "Tăng số lượng"
 
 #: src/Blocks/CartItemRemoveBlock.php:21
 msgid "Xóa sản phẩm"
-msgstr ""
+msgstr "Xóa sản phẩm"
 
 #: src/Blocks/CartTotalsBlock.php:55 blocks/cart-totals/build/index.js:1
 msgid "Cart totals"
-msgstr ""
+msgstr "Tổng giỏ hàng"
 
 #: src/Blocks/CartTotalsBlock.php:68 src/Blocks/CheckoutOrderReviewBlock.php:83
 msgid "Discount"
-msgstr ""
+msgstr "Giảm giá"
 
 #: src/Blocks/CartTotalsBlock.php:73 src/Blocks/CheckoutOrderReviewBlock.php:88
 msgid "Credits"
-msgstr ""
+msgstr "Số dư tín dụng"
 
 #: src/Blocks/CartTotalsBlock.php:84 blocks/cart-totals/build/index.js:1
 msgid "Proceed to checkout"
-msgstr ""
+msgstr "Tiến hành thanh toán"
 
 #: src/Blocks/CartTotalsBlock.php:156 src/Blocks/CheckoutCreditsBlock.php:33
 #: blocks/checkout-credits/build/index.js:1
 msgid "Số dư tín dụng:"
-msgstr ""
+msgstr "Số dư tín dụng:"
 
 #: src/Blocks/CheckoutActionsBlock.php:20
 #: blocks/checkout-actions/build/index.js:1
 msgid "Place order"
-msgstr ""
+msgstr "Đặt hàng"
 
 #: src/Blocks/CheckoutCustomerDetailsBlock.php:20
 #: blocks/checkout-customer-details/build/index.js:1
 msgid "Billing details"
-msgstr ""
+msgstr "Thông tin thanh toán"
 
 #: src/Blocks/CheckoutCustomerDetailsBlock.php:23
 #: blocks/checkout-customer-details/build/index.js:1
 msgid "Full name"
-msgstr ""
+msgstr "Họ và tên"
 
 #: src/Blocks/CheckoutCustomerDetailsBlock.php:49
 msgid "Tạo tài khoản với email này"
-msgstr ""
+msgstr "Tạo tài khoản với email này"
 
 #: src/Blocks/CheckoutCustomerDetailsBlock.php:51
 msgid "Tạo mật khẩu sẽ được gửi qua email sau khi đặt hàng."
-msgstr ""
+msgstr "Tạo mật khẩu sẽ được gửi qua email sau khi đặt hàng."
 
 #: src/Blocks/CheckoutEmptyBlock.php:52 blocks/checkout-empty/build/index.js:1
 msgid "Nothing to check out yet"
-msgstr ""
+msgstr "Chưa có gì để thanh toán"
 
 #: src/Blocks/CheckoutEmptyBlock.php:56 blocks/checkout-empty/build/index.js:1
 msgid "Add some products to your cart before checking out."
-msgstr ""
+msgstr "Hãy thêm sản phẩm vào giỏ hàng trước khi thanh toán."
 
 #: src/Blocks/CheckoutOrderReviewBlock.php:30
 #: blocks/checkout-order-review/build/index.js:1
 msgid "Your order"
-msgstr ""
+msgstr "Đơn hàng của bạn"
 
 #: src/Blocks/CheckoutPaymentMethodsBlock.php:18
 msgid "Payment method"
-msgstr ""
+msgstr "Phương thức thanh toán"
 
 #: src/Blocks/CurrencySwitcherBlock.php:117
 msgid "Chọn tiền tệ"
-msgstr ""
+msgstr "Chọn tiền tệ"
 
 #: src/Blocks/CurrencySwitcherBlock.php:120
 msgid "Close currency"
-msgstr ""
+msgstr "Đóng danh sách tiền tệ"
 
 #: src/Blocks/MiniCart/AbstractMiniCartRenderer.php:11
 msgid "Close cart"
-msgstr ""
+msgstr "Đóng giỏ hàng"
 
 #: src/Blocks/MiniCart/CartRowRenderer.php:22
 msgid "Remove"
-msgstr ""
+msgstr "Xóa"
 
 #: src/Blocks/MiniCart/CartToggleRenderer.php:24
 #: blocks/cart-item/build/index.js:1
 msgid "Open cart"
-msgstr ""
+msgstr "Mở giỏ hàng"
 
 #: src/Blocks/MiniCart/DrawerMiniCartRenderer.php:22
 #: src/Blocks/MiniCart/DropdownMiniCartRenderer.php:22
 msgid "Shopping cart"
-msgstr ""
+msgstr "Giỏ hàng"
 
 #: src/Blocks/MiniCart/DropdownMiniCartRenderer.php:44
 #, php-format
 msgid "Xem tất cả (%d)"
-msgstr ""
+msgstr "Xem tất cả (%d)"
 
 #: src/Checkout/CheckoutManager.php:46
 msgid "Vui lòng nhập họ tên."
-msgstr ""
+msgstr "Vui lòng nhập họ tên."
 
 #: src/Checkout/CheckoutManager.php:49
 msgid "Vui lòng nhập email hợp lệ."
-msgstr ""
+msgstr "Vui lòng nhập email hợp lệ."
 
 #: src/Checkout/CheckoutManager.php:122
 msgid "Không thể tạo đơn hàng, vui lòng thử lại."
-msgstr ""
+msgstr "Không thể tạo đơn hàng, vui lòng thử lại."
 
 #: src/Currency/Admin/ConverterSettingsPage.php:45
 msgid "Exchange Rate Converter"
-msgstr ""
+msgstr "Bộ chuyển đổi tỷ giá"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:48
-msgid ""
-"Configure how currency conversion works on your site. Prices are stored in "
-"the default currency and converted to the user's selected currency for "
-"display."
-msgstr ""
+msgid "Configure how currency conversion works on your site. Prices are stored in the default currency and converted to the user's selected currency for display."
+msgstr "Cấu hình cách chuyển đổi tiền tệ hoạt động trên trang của bạn. Giá được lưu ở tiền tệ mặc định và chuyển sang tiền tệ người dùng đã chọn để hiển thị."
 
 #: src/Currency/Admin/ConverterSettingsPage.php:54
 msgid "Converter Type"
-msgstr ""
+msgstr "Loại bộ chuyển đổi"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:62
 msgid "Not configured"
-msgstr ""
+msgstr "Chưa cấu hình"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:78
 msgid "Save Converter Settings"
-msgstr ""
+msgstr "Lưu cài đặt bộ chuyển đổi"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:123
 msgid "Đồng tiền cơ sở (Base Currency)"
-msgstr ""
+msgstr "Đồng tiền cơ sở (Base Currency)"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:134
-msgid ""
-"Tỷ giá của các đồng tiền khác sẽ được tính quy đổi qua đồng tiền cơ sở này "
-"(Base = 1)."
-msgstr ""
+msgid "Tỷ giá của các đồng tiền khác sẽ được tính quy đổi qua đồng tiền cơ sở này (Base = 1)."
+msgstr "Tỷ giá của các đồng tiền khác sẽ được tính quy đổi qua đồng tiền cơ sở này (Base = 1)."
 
 #: src/Currency/Admin/ConverterSettingsPage.php:140
 msgid "Tỷ giá (Exchange Rates)"
-msgstr ""
+msgstr "Tỷ giá (Exchange Rates)"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:146
 msgid "Đồng tiền"
-msgstr ""
+msgstr "Đồng tiền"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:147
 msgid "Tỷ giá (so với Base)"
-msgstr ""
+msgstr "Tỷ giá (so với Base)"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:166
-msgid ""
-"Ví dụ: Nếu Base là USD, tỷ giá VND = 25300 (Tức là 1 USD = 25300 VND). Mọi "
-"phép đổi từ EUR sang VND sẽ tự chia qua Base."
-msgstr ""
+msgid "Ví dụ: Nếu Base là USD, tỷ giá VND = 25300 (Tức là 1 USD = 25300 VND). Mọi phép đổi từ EUR sang VND sẽ tự chia qua Base."
+msgstr "Ví dụ: Nếu Base là USD, tỷ giá VND = 25300 (Tức là 1 USD = 25300 VND). Mọi phép đổi từ EUR sang VND sẽ tự chia qua Base."
 
 #: src/Currency/Admin/ConverterSettingsPage.php:183
 #: src/Currency/Admin/ConverterSettingsPage.php:224
 msgid "API Key"
-msgstr ""
+msgstr "API Key"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:190
 msgid "Get a free API key"
-msgstr ""
+msgstr "Nhận API key miễn phí"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:192
 msgid "(Free tier: 1000 requests/month, USD base only)"
-msgstr ""
+msgstr "(Gói miễn phí: 1000 yêu cầu/tháng, chỉ hỗ trợ USD)"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:198
 #: src/Currency/Admin/ConverterSettingsPage.php:239
 msgid "Base Currency"
-msgstr ""
+msgstr "Tiền tệ cơ sở"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:207
 msgid "Free tier limited to USD. Paid plans support other base currencies."
-msgstr ""
+msgstr "Gói miễn phí giới hạn ở USD. Các gói trả phí hỗ trợ thêm tiền tệ cơ sở khác."
 
 #: src/Currency/Admin/ConverterSettingsPage.php:231
 msgid "Get an API key from Fixer.io"
-msgstr ""
+msgstr "Nhận API key từ Fixer.io"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:233
 msgid "(Free tier: 100 requests/month, EUR base only)"
-msgstr ""
+msgstr "(Gói miễn phí: 100 yêu cầu/tháng, chỉ hỗ trợ EUR)"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:248
 msgid "Free tier limited to EUR. Paid plans support other base currencies."
-msgstr ""
+msgstr "Gói miễn phí giới hạn ở EUR. Các gói trả phí hỗ trợ thêm tiền tệ cơ sở khác."
 
 #: src/Currency/Admin/ConverterSettingsPage.php:270
 msgid "Converter Status"
-msgstr ""
+msgstr "Trạng thái bộ chuyển đổi"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:275
 msgid "Converter"
-msgstr ""
+msgstr "Bộ chuyển đổi"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:277
 msgid "Details"
-msgstr ""
+msgstr "Chi tiết"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:301
 #, php-format
 msgid "Exchange rate 1 USD = %.2f VND"
-msgstr ""
+msgstr "Tỷ giá 1 USD = %.2f VND"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:305
 msgid "Converter ready but rate not available"
-msgstr ""
+msgstr "Bộ chuyển đổi đã sẵn sàng nhưng chưa có tỷ giá"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:313
 msgid "Missing configuration (e.g., API key)"
-msgstr ""
+msgstr "Thiếu cấu hình (ví dụ: API key)"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:323
 msgid "Usage Examples"
-msgstr ""
+msgstr "Ví dụ sử dụng"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:324
 msgid "To use the currency converter in your code:"
-msgstr ""
+msgstr "Để dùng bộ chuyển đổi tiền tệ trong mã của bạn:"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:356
 msgid "Invalid converter selected"
-msgstr ""
+msgstr "Đã chọn bộ chuyển đổi không hợp lệ"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:372
 msgid "OpenExchangeRates API key is required"
-msgstr ""
+msgstr "Yêu cầu API key của OpenExchangeRates"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:389
 msgid "Fixer.io API key is required"
-msgstr ""
+msgstr "Yêu cầu API key của Fixer.io"
 
 #: src/Currency/Admin/ConverterSettingsPage.php:428
 msgid "Converter settings saved successfully"
-msgstr ""
+msgstr "Đã lưu cài đặt bộ chuyển đổi thành công"
 
 #: src/Currency/Converters/FixerIOConverter.php:84
 msgid "Fixer.io"
-msgstr ""
+msgstr "Fixer.io"
 
 #: src/Currency/Converters/FixerIOConverter.php:89
-msgid ""
-"Live exchange rates from Fixer.io API. Requires API key (free tier "
-"available, EUR base only)."
-msgstr ""
+msgid "Live exchange rates from Fixer.io API. Requires API key (free tier available, EUR base only)."
+msgstr "Tỷ giá trực tiếp từ Fixer.io API. Yêu cầu API key (có gói miễn phí, chỉ hỗ trợ EUR)."
 
 #: src/Currency/Converters/FixerIOConverter.php:127
 #, php-format
 msgid "Fixer.io API error: HTTP %d"
-msgstr ""
+msgstr "Lỗi API của Fixer.io: HTTP %d"
 
 #: src/Currency/Converters/FixerIOConverter.php:137
 #: src/Currency/Converters/FixerIOConverter.php:148
 msgid "Invalid response from Fixer.io API"
-msgstr ""
+msgstr "Phản hồi không hợp lệ từ Fixer.io API"
 
 #: src/Currency/Converters/ManualRateConverter.php:89
 msgid "Tỷ giá thủ công (Manual Exchange Rates)"
-msgstr ""
+msgstr "Tỷ giá thủ công (Manual Exchange Rates)"
 
 #: src/Currency/Converters/ManualRateConverter.php:94
-msgid ""
-"Nhập tỷ giá hối đoái thủ công. Phù hợp với site kiểm soát giá cố định, không "
-"cần API bên ngoài."
-msgstr ""
+msgid "Nhập tỷ giá hối đoái thủ công. Phù hợp với site kiểm soát giá cố định, không cần API bên ngoài."
+msgstr "Nhập tỷ giá hối đoái thủ công. Phù hợp với site kiểm soát giá cố định, không cần API bên ngoài."
 
 #: src/Currency/Converters/NoOpConverter.php:42
 msgid "No Conversion (Default)"
-msgstr ""
+msgstr "Không chuyển đổi (Mặc định)"
 
 #: src/Currency/Converters/NoOpConverter.php:47
-msgid ""
-"Prices are displayed in their original currency without conversion. Useful "
-"for single-currency sites or development."
-msgstr ""
+msgid "Prices are displayed in their original currency without conversion. Useful for single-currency sites or development."
+msgstr "Giá hiển thị theo tiền tệ gốc, không chuyển đổi. Hữu ích cho trang chỉ dùng một loại tiền tệ hoặc trong lúc phát triển."
 
 #: src/Currency/Converters/OpenExchangeRatesConverter.php:83
 msgid "OpenExchangeRates.io"
-msgstr ""
+msgstr "OpenExchangeRates.io"
 
 #: src/Currency/Converters/OpenExchangeRatesConverter.php:88
-msgid ""
-"Live exchange rates from OpenExchangeRates.io API. Requires API key (free "
-"tier available)."
-msgstr ""
+msgid "Live exchange rates from OpenExchangeRates.io API. Requires API key (free tier available)."
+msgstr "Tỷ giá trực tiếp từ OpenExchangeRates.io API. Yêu cầu API key (có gói miễn phí)."
 
 #: src/Currency/Converters/OpenExchangeRatesConverter.php:126
 #, php-format
 msgid "OpenExchangeRates API error: HTTP %d"
-msgstr ""
+msgstr "Lỗi API của OpenExchangeRates: HTTP %d"
 
 #: src/Currency/Converters/OpenExchangeRatesConverter.php:136
 msgid "Invalid response from OpenExchangeRates API"
-msgstr ""
+msgstr "Phản hồi không hợp lệ từ OpenExchangeRates API"
 
 #: src/Currency/helpers.php:245
 #, php-format
-msgid ""
-"Currency converter \"%s\" is not properly configured. Prices will not be "
-"converted. <a href=\"%s\">Configure now</a>"
-msgstr ""
+msgid "Currency converter \"%s\" is not properly configured. Prices will not be converted. <a href=\"%s\">Configure now</a>"
+msgstr "Bộ chuyển đổi tiền tệ \"%s\" chưa được cấu hình đúng. Giá sẽ không được chuyển đổi. <a href=\"%s\">Cấu hình ngay</a>"
 
 #: src/MyAccount/OrdersSubPage.php:16 src/Order/OrderPostType.php:38
 #: src/Order/OrderPostType.php:40
 msgid "Orders"
-msgstr ""
+msgstr "Đơn hàng"
 
 #: src/Order/Order.php:281
 msgid "Đang vận chuyển"
-msgstr ""
+msgstr "Đang vận chuyển"
 
 #: src/Order/OrderCreationManager.php:77
 #, php-format
 msgid "Chiến lược tạo đơn hàng \"%s\" không tồn tại."
-msgstr ""
+msgstr "Chiến lược tạo đơn hàng \"%s\" không tồn tại."
 
 #: src/Order/OrderCreationManager.php:95
 msgid "Không thể tạo đơn hàng, vui lòng thử lại sau."
-msgstr ""
+msgstr "Không thể tạo đơn hàng, vui lòng thử lại sau."
 
 #: src/Order/OrderPostType.php:41
 msgid "All Orders"
-msgstr ""
+msgstr "Tất cả đơn hàng"
 
 #: src/Order/OrderPostType.php:42
 msgid "Add Order"
-msgstr ""
+msgstr "Thêm đơn hàng"
 
 #: src/Order/OrderPostType.php:43
 msgid "Add New Order"
-msgstr ""
+msgstr "Thêm đơn hàng mới"
 
 #: src/Order/OrderPostType.php:44
 msgid "Edit Order"
-msgstr ""
+msgstr "Sửa đơn hàng"
 
 #: src/Order/OrderPostType.php:45
 msgid "New Order"
-msgstr ""
+msgstr "Đơn hàng mới"
 
 #: src/Order/OrderPostType.php:46
 msgid "View Order"
-msgstr ""
+msgstr "Xem đơn hàng"
 
 #: src/Order/OrderPostType.php:47
 msgid "View Orders"
-msgstr ""
+msgstr "Xem các đơn hàng"
 
 #: src/Order/OrderPostType.php:48
 msgid "Search Orders"
-msgstr ""
+msgstr "Tìm kiếm đơn hàng"
 
 #: src/Order/OrderPostType.php:49
 msgid "No orders found."
-msgstr ""
+msgstr "Không tìm thấy đơn hàng nào."
 
 #: src/Order/OrderPostType.php:50
 msgid "No orders found in Trash."
-msgstr ""
+msgstr "Không tìm thấy đơn hàng nào trong Thùng rác."
 
 #: src/Order/Strategies/AbstractOrderCreationStrategy.php:27
 msgid "Vui lòng nhập họ và tên."
-msgstr ""
+msgstr "Vui lòng nhập họ và tên."
 
 #: src/Order/Strategies/AbstractOrderCreationStrategy.php:31
 msgid "Vui lòng nhập số điện thoại."
-msgstr ""
+msgstr "Vui lòng nhập số điện thoại."
 
 #: src/Order/Strategies/AbstractOrderCreationStrategy.php:35
 msgid "Vui lòng nhập địa chỉ email."
-msgstr ""
+msgstr "Vui lòng nhập địa chỉ email."
 
 #: src/Order/Strategies/AbstractOrderCreationStrategy.php:37
 msgid "Địa chỉ email không hợp lệ."
-msgstr ""
+msgstr "Địa chỉ email không hợp lệ."
 
 #: src/Order/Strategies/ManualFormOrderStrategy.php:33
 msgid "Sản phẩm không hợp lệ."
-msgstr ""
+msgstr "Sản phẩm không hợp lệ."
 
 #: src/Order/Strategies/ManualFormOrderStrategy.php:37
 msgid "Sản phẩm không tồn tại hoặc chưa được công khai."
-msgstr ""
+msgstr "Sản phẩm không tồn tại hoặc chưa được công khai."
 
 #: src/Order/Strategies/ManualFormOrderStrategy.php:53
 msgid "Sản phẩm không xác định"
-msgstr ""
+msgstr "Sản phẩm không xác định"
 
 #: src/Order/Strategies/ManualFormOrderStrategy.php:101
 #, php-format
 msgid "Đơn hàng được đặt qua form sản phẩm \"%s\" với đơn giá %s."
-msgstr ""
+msgstr "Đơn hàng được đặt qua form sản phẩm \"%s\" với đơn giá %s."
 
 #: src/Order/Strategies/ManualFormOrderStrategy.php:110
 #, php-format
-msgid ""
-"Đơn hàng được đặt qua form sản phẩm \"%s\". Sản phẩm chưa có giá, cần liên "
-"hệ và xử lý báo giá thủ công."
-msgstr ""
+msgid "Đơn hàng được đặt qua form sản phẩm \"%s\". Sản phẩm chưa có giá, cần liên hệ và xử lý báo giá thủ công."
+msgstr "Đơn hàng được đặt qua form sản phẩm \"%s\". Sản phẩm chưa có giá, cần liên hệ và xử lý báo giá thủ công."
 
 #: src/Payment/PaymentManager.php:130
 #, php-format
 msgid "Payment for %s"
-msgstr ""
+msgstr "Thanh toán cho %s"
 
 #: src/Rest/EcommerceController.php:177
 msgid "Sản phẩm không hợp lệ hoặc không thể mua."
-msgstr ""
+msgstr "Sản phẩm không hợp lệ hoặc không thể mua."
 
 #: src/Rest/EcommerceController.php:214 src/Rest/EcommerceController.php:234
 msgid "Không tìm thấy sản phẩm trong giỏ hàng."
-msgstr ""
+msgstr "Không tìm thấy sản phẩm trong giỏ hàng."
 
 #: src/Rest/EcommerceController.php:339
 msgid "Đơn hàng này không thể thanh toán lại."
-msgstr ""
+msgstr "Đơn hàng này không thể thanh toán lại."
 
 #: src/Rest/EcommerceController.php:361
 #, php-format
-msgid ""
-"Đơn hàng COD sẽ được xác nhận bởi nhân viên. Vui lòng đặt cọc %s nếu được "
-"yêu cầu."
-msgstr ""
+msgid "Đơn hàng COD sẽ được xác nhận bởi nhân viên. Vui lòng đặt cọc %s nếu được yêu cầu."
+msgstr "Đơn hàng COD sẽ được xác nhận bởi nhân viên. Vui lòng đặt cọc %s nếu được yêu cầu."
 
 #: src/Rest/EcommerceController.php:382
 msgid "Không thể tạo liên kết thanh toán. Vui lòng thử lại."
-msgstr ""
+msgstr "Không thể tạo liên kết thanh toán. Vui lòng thử lại."
 
 #: src/Rest/EcommerceController.php:393
 msgid "Vui lòng ghi đúng nội dung chuyển khoản."
-msgstr ""
+msgstr "Vui lòng ghi đúng nội dung chuyển khoản."
 
 #: src/Rest/EcommerceController.php:397
 #, php-format
 msgid "Ngân hàng: %s"
-msgstr ""
+msgstr "Ngân hàng: %s"
 
 #: src/Rest/EcommerceController.php:400
 #, php-format
 msgid "Số tài khoản: %s"
-msgstr ""
+msgstr "Số tài khoản: %s"
 
 #: src/Rest/EcommerceController.php:403
 #, php-format
 msgid "Chủ tài khoản: %s"
-msgstr ""
+msgstr "Chủ tài khoản: %s"
 
 #: src/Rest/EcommerceController.php:406
 #, php-format
 msgid "Chi nhánh: %s"
-msgstr ""
+msgstr "Chi nhánh: %s"
 
 #: src/Rest/EcommerceController.php:409
 msgid "Nội dung CK: Mã đơn hàng của bạn"
-msgstr ""
+msgstr "Nội dung CK: Mã đơn hàng của bạn"
 
 #: src/Rest/EcommerceController.php:463
 msgid "Tiền tệ không hợp lệ."
-msgstr ""
+msgstr "Tiền tệ không hợp lệ."
 
 #: src/Rest/EcommerceController.php:488
-msgid ""
-"Gửi thông tin đặt sản phẩm thành công! Chúng tôi sẽ liên hệ với bạn trong "
-"thời gian sớm nhất."
-msgstr ""
+msgid "Gửi thông tin đặt sản phẩm thành công! Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất."
+msgstr "Gửi thông tin đặt sản phẩm thành công! Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất."
 
 #: blocks/account-tab-orders/block.json
 msgctxt "block title"
 msgid "Account Orders"
-msgstr ""
+msgstr "Đơn hàng tài khoản"
 
 #: blocks/account-tab-orders/block.json
 msgctxt "block description"
 msgid "Lists the orders of the logged-in customer inside the My Account area."
-msgstr ""
+msgstr "Liệt kê các đơn hàng của khách hàng đã đăng nhập trong khu vực Tài khoản của tôi."
 
 #: blocks/add-to-cart/block.json
 msgctxt "block title"
 msgid "Add to Cart"
-msgstr ""
+msgstr "Thêm vào giỏ"
 
 #: blocks/add-to-cart/block.json
 msgctxt "block description"
-msgid ""
-"Add the current product/tour to the cart. Place it on single product or tour "
-"pages."
-msgstr ""
+msgid "Add the current product/tour to the cart. Place it on single product or tour pages."
+msgstr "Thêm sản phẩm/tour hiện tại vào giỏ hàng. Đặt khối này trên trang sản phẩm hoặc tour."
 
 #: blocks/cart-empty/block.json
 msgctxt "block title"
 msgid "Cart Empty State"
-msgstr ""
+msgstr "Trạng thái giỏ hàng trống"
 
 #: blocks/cart-empty/block.json
 msgctxt "block description"
-msgid ""
-"Notice and continue shopping button displayed when the shopping cart is "
-"empty."
-msgstr ""
+msgid "Notice and continue shopping button displayed when the shopping cart is empty."
+msgstr "Thông báo và nút tiếp tục mua sắm hiển thị khi giỏ hàng trống."
 
 #: blocks/cart-item-checkbox/block.json
 msgctxt "block title"
 msgid "Cart Item Checkbox"
-msgstr ""
+msgstr "Hộp chọn mục giỏ hàng"
 
 #: blocks/cart-item-checkbox/block.json
 msgctxt "block description"
 msgid "Checkbox to select this cart item."
-msgstr ""
+msgstr "Hộp chọn để chọn mục giỏ hàng này."
 
 #: blocks/cart-item-image/block.json
 msgctxt "block title"
 msgid "Cart Item Image"
-msgstr ""
+msgstr "Hình ảnh mục giỏ hàng"
 
 #: blocks/cart-item-image/block.json
 msgctxt "block description"
 msgid "Featured image of the current cart item."
-msgstr ""
+msgstr "Hình ảnh nổi bật của mục giỏ hàng hiện tại."
 
 #: blocks/cart-item-meta/block.json
 msgctxt "block title"
 msgid "Cart Item Meta"
-msgstr ""
+msgstr "Thông tin mục giỏ hàng"
 
 #: blocks/cart-item-meta/block.json
 msgctxt "block description"
-msgid ""
-"Tour type, departure date and passenger breakdown of the current cart item."
-msgstr ""
+msgid "Tour type, departure date and passenger breakdown of the current cart item."
+msgstr "Loại tour, ngày khởi hành và chi tiết hành khách của mục giỏ hàng hiện tại."
 
 #: blocks/cart-item-price/block.json
 msgctxt "block title"
 msgid "Cart Item Price"
-msgstr ""
+msgstr "Giá mục giỏ hàng"
 
 #: blocks/cart-item-price/block.json
 msgctxt "block description"
 msgid "Line total of the current cart item."
-msgstr ""
+msgstr "Tổng tiền của dòng hàng hiện tại."
 
 #: blocks/cart-item-quantity/block.json
 msgctxt "block title"
 msgid "Cart Item Quantity"
-msgstr ""
+msgstr "Số lượng mục giỏ hàng"
 
 #: blocks/cart-item-quantity/block.json
 msgctxt "block description"
 msgid "Quantity stepper for the current cart item."
-msgstr ""
+msgstr "Bộ tăng/giảm số lượng cho mục giỏ hàng hiện tại."
 
 #: blocks/cart-item-remove/block.json
 msgctxt "block title"
 msgid "Cart Item Remove"
-msgstr ""
+msgstr "Xóa mục giỏ hàng"
 
 #: blocks/cart-item-remove/block.json
 msgctxt "block description"
 msgid "Remove button for the current cart item."
-msgstr ""
+msgstr "Nút xóa cho mục giỏ hàng hiện tại."
 
 #: blocks/cart-item-title/block.json
 msgctxt "block title"
 msgid "Cart Item Title"
-msgstr ""
+msgstr "Tiêu đề mục giỏ hàng"
 
 #: blocks/cart-item-title/block.json
 msgctxt "block description"
 msgid "Product name of the current cart item."
-msgstr ""
+msgstr "Tên sản phẩm của mục giỏ hàng hiện tại."
 
 #: blocks/cart-item/block.json
 msgctxt "block title"
 msgid "Cart Item (Mini Cart)"
-msgstr ""
+msgstr "Mục giỏ hàng (Mini Cart)"
 
 #: blocks/cart-item/block.json
 msgctxt "block description"
-msgid ""
-"Cart icon with item counter. Variants: slide-out drawer or dropdown mini "
-"cart in the menu."
-msgstr ""
+msgid "Cart icon with item counter. Variants: slide-out drawer or dropdown mini cart in the menu."
+msgstr "Biểu tượng giỏ hàng kèm bộ đếm sản phẩm. Biến thể: ngăn kéo trượt ra hoặc mini cart thả xuống trong menu."
 
 #: blocks/cart-item/block.json
 msgctxt "block style label"
 msgid "Drawer"
-msgstr ""
+msgstr "Ngăn kéo"
 
 #: blocks/cart-item/block.json
 msgctxt "block style label"
 msgid "Dropdown"
-msgstr ""
+msgstr "Thả xuống"
 
 #: blocks/cart-totals/block.json
 msgctxt "block title"
 msgid "Cart Totals"
-msgstr ""
+msgstr "Tổng giỏ hàng"
 
 #: blocks/cart-totals/block.json
 msgctxt "block description"
-msgid ""
-"Cart totals section with subtotal, discount, coupon form, total and checkout "
-"button."
-msgstr ""
+msgid "Cart totals section with subtotal, discount, coupon form, total and checkout button."
+msgstr "Phần tổng giỏ hàng gồm tạm tính, giảm giá, ô mã giảm giá, tổng cộng và nút thanh toán."
 
 #: blocks/cart/block.json
 msgctxt "block title"
 msgid "Shopping Cart"
-msgstr ""
+msgstr "Giỏ hàng"
 
 #: blocks/cart/block.json
 msgctxt "block description"
-msgid ""
-"Shopping cart page. Lists the items in the customer's cart with totals and "
-"checkout action."
-msgstr ""
+msgid "Shopping cart page. Lists the items in the customer's cart with totals and checkout action."
+msgstr "Trang giỏ hàng. Liệt kê các sản phẩm trong giỏ của khách hàng kèm tổng cộng và nút thanh toán."
 
 #: blocks/checkout-actions/block.json
 msgctxt "block title"
 msgid "Checkout Actions"
-msgstr ""
+msgstr "Thao tác thanh toán"
 
 #: blocks/checkout-actions/block.json
 msgctxt "block description"
 msgid "Error box and the place order button of the checkout form."
-msgstr ""
+msgstr "Khung lỗi và nút đặt hàng của biểu mẫu thanh toán."
 
 #: blocks/checkout-credits/block.json
 msgctxt "block title"
 msgid "Checkout Credits"
-msgstr ""
+msgstr "Số dư tín dụng khi thanh toán"
 
 #: blocks/checkout-credits/block.json
 msgctxt "block description"
-msgid ""
-"Credit balance toggle that lets the customer pay part of the order with "
-"their credit balance."
-msgstr ""
+msgid "Credit balance toggle that lets the customer pay part of the order with their credit balance."
+msgstr "Công tắc số dư tín dụng cho phép khách hàng thanh toán một phần đơn hàng bằng số dư tín dụng."
 
 #: blocks/checkout-customer-details/block.json
 msgctxt "block title"
 msgid "Checkout Customer Details"
-msgstr ""
+msgstr "Thông tin khách hàng khi thanh toán"
 
 #: blocks/checkout-customer-details/block.json
 msgctxt "block description"
-msgid ""
-"Billing fields of the checkout form: full name, email, phone, address and "
-"optional account creation."
-msgstr ""
+msgid "Billing fields of the checkout form: full name, email, phone, address and optional account creation."
+msgstr "Các trường thông tin thanh toán: họ và tên, email, điện thoại, địa chỉ và tùy chọn tạo tài khoản."
 
 #: blocks/checkout-empty/block.json
 msgctxt "block title"
 msgid "Checkout Empty State"
-msgstr ""
+msgstr "Trạng thái thanh toán trống"
 
 #: blocks/checkout-empty/block.json
 msgctxt "block description"
-msgid ""
-"Notice and continue shopping button displayed when there is nothing to check "
-"out."
-msgstr ""
+msgid "Notice and continue shopping button displayed when there is nothing to check out."
+msgstr "Thông báo và nút tiếp tục mua sắm hiển thị khi không có gì để thanh toán."
 
 #: blocks/checkout-order-review/block.json
 msgctxt "block title"
 msgid "Checkout Order Review"
-msgstr ""
+msgstr "Xem lại đơn hàng khi thanh toán"
 
 #: blocks/checkout-order-review/block.json
 msgctxt "block description"
-msgid ""
-"Order review box of the checkout form: one row per cart item plus discount, "
-"credits and total rows."
-msgstr ""
+msgid "Order review box of the checkout form: one row per cart item plus discount, credits and total rows."
+msgstr "Khung xem lại đơn hàng của biểu mẫu thanh toán: một dòng cho mỗi sản phẩm trong giỏ, cộng các dòng giảm giá, tín dụng và tổng cộng."
 
 #: blocks/checkout-payment-methods/block.json
 msgctxt "block title"
 msgid "Checkout Payment Methods"
-msgstr ""
+msgstr "Phương thức thanh toán"
 
 #: blocks/checkout-payment-methods/block.json
 msgctxt "block description"
-msgid ""
-"Payment method selector (bank transfer, COD, online gateways) of the "
-"checkout form."
-msgstr ""
+msgid "Payment method selector (bank transfer, COD, online gateways) of the checkout form."
+msgstr "Bộ chọn phương thức thanh toán (chuyển khoản, COD, cổng trực tuyến) của biểu mẫu thanh toán."
 
 #: blocks/checkout-review-item-name/block.json
 msgctxt "block title"
 msgid "Order Review Item Name"
-msgstr ""
+msgstr "Tên sản phẩm trong phần xem lại đơn"
 
 #: blocks/checkout-review-item-name/block.json
 msgctxt "block description"
 msgid "Product name and quantity of one checkout order review row."
-msgstr ""
+msgstr "Tên sản phẩm và số lượng của một dòng xem lại đơn hàng."
 
 #: blocks/checkout-review-item-price/block.json
 msgctxt "block title"
 msgid "Order Review Item Price"
-msgstr ""
+msgstr "Giá sản phẩm trong phần xem lại đơn"
 
 #: blocks/checkout-review-item-price/block.json
 msgctxt "block description"
 msgid "Subtotal price of one checkout order review row."
-msgstr ""
+msgstr "Giá tạm tính của một dòng xem lại đơn hàng."
 
 #: blocks/checkout/block.json
 msgctxt "block title"
 msgid "Checkout"
-msgstr ""
+msgstr "Thanh toán"
 
 #: blocks/checkout/block.json
 msgctxt "block description"
-msgid ""
-"Checkout page. Collects customer billing details and payment method, then "
-"turns the cart into an order."
-msgstr ""
+msgid "Checkout page. Collects customer billing details and payment method, then turns the cart into an order."
+msgstr "Trang thanh toán. Thu thập thông tin thanh toán và phương thức thanh toán của khách hàng, sau đó chuyển giỏ hàng thành đơn hàng."
 
 #: blocks/currency-switcher/block.json
 msgctxt "block title"
 msgid "Currency Switcher"
-msgstr ""
+msgstr "Bộ chọn tiền tệ"
 
 #: blocks/currency-switcher/block.json
 msgctxt "block description"
 msgid "Hiển thị bộ chuyển đổi tiền tệ cho khách hàng."
-msgstr ""
+msgstr "Hiển thị bộ chuyển đổi tiền tệ cho khách hàng."
 
 #: blocks/post-price/block.json
 msgctxt "block title"
 msgid "Post Price"
-msgstr ""
+msgstr "Giá bài viết"
 
 #: blocks/post-price/block.json
 msgctxt "block description"
-msgid ""
-"Hiển thị giá của sản phẩm hiện tại (tour, experience, product...) qua API "
-"Product dùng chung của base-ecommerce."
-msgstr ""
+msgid "Hiển thị giá của sản phẩm hiện tại (tour, experience, product...) qua API Product dùng chung của base-ecommerce."
+msgstr "Hiển thị giá của sản phẩm hiện tại (tour, experience, product...) qua API Product dùng chung của base-ecommerce."
 
 #: blocks/add-to-cart/build/index.js:1
 msgid "Cài đặt nút Thêm vào giỏ hàng"
-msgstr ""
+msgstr "Cài đặt nút Thêm vào giỏ hàng"
 
 #: blocks/add-to-cart/build/index.js:1
 msgid "Tiêu đề"
-msgstr ""
+msgstr "Tiêu đề"
 
 #: blocks/add-to-cart/build/index.js:1
 msgid "Hiển thị ô số lượng"
-msgstr ""
+msgstr "Hiển thị ô số lượng"
 
 #: blocks/add-to-cart/build/index.js:1
 msgid "Hiển thị ngày khởi hành"
-msgstr ""
+msgstr "Hiển thị ngày khởi hành"
 
 #: blocks/cart-empty/build/index.js:1
 msgid "Hiển thị khi giỏ hàng trống (Empty Cart)"
-msgstr ""
+msgstr "Hiển thị khi giỏ hàng trống (Empty Cart)"
 
 #: blocks/cart-item/build/index.js:1
 msgid "Mini Cart Settings"
-msgstr ""
+msgstr "Cài đặt Mini Cart"
 
 #: blocks/cart-item/build/index.js:1
 msgid "Hide on Desktop"
-msgstr ""
+msgstr "Ẩn trên máy tính"
 
 #: blocks/cart-item/build/index.js:1
 msgid "Hide on Tablet"
-msgstr ""
+msgstr "Ẩn trên máy tính bảng"
 
 #: blocks/cart-item/build/index.js:1
 msgid "Hide on Mobile"
-msgstr ""
+msgstr "Ẩn trên điện thoại"
 
 #: blocks/cart-item/build/index.js:1
 msgid "Dropdown max items"
-msgstr ""
+msgstr "Số mục tối đa của menu thả xuống"
 
 #: blocks/cart-item/build/index.js:1
-msgid ""
-"Hiển thị tối đa số sản phẩm trong dropdown. Số còn lại mở bằng nút \"Xem tất "
-"cả\"."
-msgstr ""
+msgid "Hiển thị tối đa số sản phẩm trong dropdown. Số còn lại mở bằng nút \"Xem tất cả\"."
+msgstr "Hiển thị tối đa số sản phẩm trong dropdown. Số còn lại mở bằng nút \"Xem tất cả\"."
 
 #: blocks/cart-item/build/index.js:1
 msgid "Badge Colors"
-msgstr ""
+msgstr "Màu huy hiệu"
 
 #: blocks/cart-item/build/index.js:1
 msgid "Text Color"
-msgstr ""
+msgstr "Màu chữ"
 
 #: blocks/cart-item/build/index.js:1
 msgid "Background Color"
-msgstr ""
+msgstr "Màu nền"
 
 #: blocks/cart-item/build/index.js:1
 msgid "Border Color"
-msgstr ""
+msgstr "Màu viền"
 
 #: blocks/cart-item/build/index.js:1
 msgid "Badge Styles"
-msgstr ""
+msgstr "Kiểu huy hiệu"
 
 #: blocks/cart-item/build/index.js:1
 msgid "Top Position"
-msgstr ""
+msgstr "Vị trí trên"
 
 #: blocks/cart-item/build/index.js:1
 msgid "Right Position"
-msgstr ""
+msgstr "Vị trí phải"
 
 #: blocks/cart-item/build/index.js:1
 msgid "Width"
-msgstr ""
+msgstr "Chiều rộng"
 
 #: blocks/cart-item/build/index.js:1
 msgid "Height"
-msgstr ""
+msgstr "Chiều cao"
 
 #: blocks/cart-item/build/index.js:1
 msgid "Font Size"
-msgstr ""
+msgstr "Cỡ chữ"
 
 #: blocks/cart-item/build/index.js:1
 msgid "Border Width"
-msgstr ""
+msgstr "Độ dày viền"
 
 #: blocks/cart-item/build/index.js:1
 msgid "Border Radius"
-msgstr ""
+msgstr "Bo tròn viền"
 
 #: blocks/cart-totals/build/index.js:1
 msgid "1.500.000₫"
-msgstr ""
+msgstr "1.500.000₫"
 
 #: blocks/checkout-actions/build/index.js:1
 #: blocks/checkout-credits/build/index.js:1
@@ -2183,7 +2104,7 @@ msgstr ""
 #: blocks/checkout-payment-methods/build/index.js:1
 #: blocks/currency-switcher/build/index.js:1
 msgid "Layout"
-msgstr ""
+msgstr "Bố cục"
 
 #: blocks/checkout-actions/build/index.js:1
 #: blocks/checkout-credits/build/index.js:1
@@ -2191,7 +2112,7 @@ msgstr ""
 #: blocks/checkout-order-review/build/index.js:1
 #: blocks/checkout-payment-methods/build/index.js:1
 msgid "Column"
-msgstr ""
+msgstr "Cột"
 
 #: blocks/checkout-actions/build/index.js:1
 #: blocks/checkout-credits/build/index.js:1
@@ -2199,7 +2120,7 @@ msgstr ""
 #: blocks/checkout-order-review/build/index.js:1
 #: blocks/checkout-payment-methods/build/index.js:1
 msgid "Customer column"
-msgstr ""
+msgstr "Cột khách hàng"
 
 #: blocks/checkout-actions/build/index.js:1
 #: blocks/checkout-credits/build/index.js:1
@@ -2207,7 +2128,7 @@ msgstr ""
 #: blocks/checkout-order-review/build/index.js:1
 #: blocks/checkout-payment-methods/build/index.js:1
 msgid "Summary column"
-msgstr ""
+msgstr "Cột tóm tắt"
 
 #: blocks/checkout-actions/build/index.js:1
 #: blocks/checkout-credits/build/index.js:1
@@ -2215,99 +2136,97 @@ msgstr ""
 #: blocks/checkout-order-review/build/index.js:1
 #: blocks/checkout-payment-methods/build/index.js:1
 msgid "Full width"
-msgstr ""
+msgstr "Tràn toàn chiều rộng"
 
 #: blocks/checkout-credits/build/index.js:1
 msgid "Dùng số dư tín dụng để thanh toán"
-msgstr ""
+msgstr "Dùng số dư tín dụng để thanh toán"
 
 #: blocks/checkout-empty/build/index.js:1
 msgid "Hiển thị khi giỏ hàng trống (Empty Checkout)"
-msgstr ""
+msgstr "Hiển thị khi giỏ hàng trống (Empty Checkout)"
 
 #: blocks/checkout/build/index.js:1
-msgid ""
-"Tùy chỉnh thanh toán: Section có cột \"customer\" hiển thị bên trái, cột "
-"\"summary\" hiển thị bên phải. Block checkout-empty hiển thị khi giỏ hàng "
-"trống."
-msgstr ""
+msgid "Tùy chỉnh thanh toán: Section có cột \"customer\" hiển thị bên trái, cột \"summary\" hiển thị bên phải. Block checkout-empty hiển thị khi giỏ hàng trống."
+msgstr "Tùy chỉnh thanh toán: Section có cột \"customer\" hiển thị bên trái, cột \"summary\" hiển thị bên phải. Block checkout-empty hiển thị khi giỏ hàng trống."
 
 #: blocks/currency-switcher/build/index.js:1
 msgid "Currency Switcher Settings"
-msgstr ""
+msgstr "Cài đặt bộ chọn tiền tệ"
 
 #: blocks/currency-switcher/build/index.js:1
 msgid "Display Mode"
-msgstr ""
+msgstr "Chế độ hiển thị"
 
 #: blocks/currency-switcher/build/index.js:1
 msgid "Dropdown"
-msgstr ""
+msgstr "Thả xuống"
 
 #: blocks/currency-switcher/build/index.js:1
 msgid "Inline List"
-msgstr ""
+msgstr "Danh sách ngang"
 
 #: blocks/currency-switcher/build/index.js:1
 msgid "Horizontal"
-msgstr ""
+msgstr "Ngang"
 
 #: blocks/currency-switcher/build/index.js:1
 msgid "Vertical"
-msgstr ""
+msgstr "Dọc"
 
 #: blocks/currency-switcher/build/index.js:1
 msgid "Icon Size"
-msgstr ""
+msgstr "Kích thước biểu tượng"
 
 #: blocks/currency-switcher/build/index.js:1
 msgid "Small"
-msgstr ""
+msgstr "Nhỏ"
 
 #: blocks/currency-switcher/build/index.js:1
 msgid "Medium"
-msgstr ""
+msgstr "Vừa"
 
 #: blocks/currency-switcher/build/index.js:1
 msgid "Large"
-msgstr ""
+msgstr "Lớn"
 
 #: blocks/currency-switcher/build/index.js:1
 msgid "Show Flag"
-msgstr ""
+msgstr "Hiển thị cờ"
 
 #: blocks/currency-switcher/build/index.js:1
 msgid "Show Code"
-msgstr ""
+msgstr "Hiển thị mã"
 
 #: blocks/currency-switcher/build/index.js:1
 msgid "Show Symbol"
-msgstr ""
+msgstr "Hiển thị ký hiệu"
 
 #: blocks/currency-switcher/build/index.js:1
 msgid "Show Name"
-msgstr ""
+msgstr "Hiển thị tên"
 
 #: blocks/post-price/build/index.js:1
 msgid "Cài đặt hiển thị giá"
-msgstr ""
+msgstr "Cài đặt hiển thị giá"
 
 #: blocks/post-price/build/index.js:1
 msgid "Tiền tố"
-msgstr ""
+msgstr "Tiền tố"
 
 #: blocks/post-price/build/index.js:1
 msgid "Hậu tố"
-msgstr ""
+msgstr "Hậu tố"
 
 #: blocks/post-price/build/index.js:1
 msgid "Hiển thị khi chưa có giá"
-msgstr ""
+msgstr "Hiển thị khi chưa có giá"
 
 #: blocks/post-price/build/index.js:1
 msgid "Chữ khi chưa có giá"
-msgstr ""
+msgstr "Chữ khi chưa có giá"
 
 #: blocks/post-price/build/index.js:1
 msgid "Thẻ HTML"
-msgstr ""
+msgstr "Thẻ HTML"
+

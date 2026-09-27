@@ -27,7 +27,7 @@ class NormalAddToCartStrategy implements AddToCartStrategyInterface
         if ($showDeparture) {
             $formBody .= '<div class="jankx-add-to-cart__field">'
                 . '<label for="jankx-departure-' . esc_attr($postId) . '">'
-                . esc_html__('Ngày khởi hành', 'jankx') . '</label>'
+                . esc_html__('Ngày khởi hành', 'base-ecommerce') . '</label>'
                 . '<input type="date" id="jankx-departure-' . esc_attr($postId)
                 . '" name="departure_date" class="jankx-input" min="' . esc_attr(current_time('Y-m-d')) . '">'
                 . '</div>';
@@ -36,11 +36,11 @@ class NormalAddToCartStrategy implements AddToCartStrategyInterface
         $formBody .= '<div class="jankx-add-to-cart__row">';
         if (!isset($attributes['show_quantity']) || !empty($attributes['show_quantity'])) {
             $formBody .= '<input type="number" name="quantity" value="1" min="1" class="jankx-input jankx-add-to-cart__qty"'
-                . ' aria-label="' . esc_attr__('Số lượng', 'jankx') . '">';
+                . ' aria-label="' . esc_attr__('Số lượng', 'base-ecommerce') . '">';
         }
 
         $formBody .= '<button type="submit" class="jankx-btn jankx-btn-primary jankx-add-to-cart__btn">'
-            . esc_html__('Thêm vào giỏ hàng', 'jankx') . '</button>';
+            . esc_html__('Thêm vào giỏ hàng', 'base-ecommerce') . '</button>';
 
         $formBody .= '</div>';
 

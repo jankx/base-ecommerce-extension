@@ -188,13 +188,13 @@ class CartBlock extends Block
             $output .= '<div class="jankx-coupon-applied">'
                 . '<span class="jankx-coupon-applied-code">' . esc_html($appliedCode) . '</span>'
                 . '<button type="button" class="jankx-btn jankx-btn-outline jankx-coupon-remove">'
-                . esc_html__('Gỡ mã', 'jankx') . '</button>'
+                . esc_html__('Gỡ mã', 'base-ecommerce') . '</button>'
                 . '</div>';
         } else {
             $output .= '<div class="jankx-coupon-input-row">'
-                . '<input type="text" class="jankx-coupon-code" placeholder="' . esc_attr__('Nhập mã giảm giá', 'jankx') . '" autocomplete="off">'
+                . '<input type="text" class="jankx-coupon-code" placeholder="' . esc_attr__('Nhập mã giảm giá', 'base-ecommerce') . '" autocomplete="off">'
                 . '<button type="button" class="jankx-btn jankx-btn-primary jankx-coupon-apply">'
-                . esc_html__('Áp dụng', 'jankx') . '</button>'
+                . esc_html__('Áp dụng', 'base-ecommerce') . '</button>'
                 . '</div>';
             $output .= '<span class="jankx-coupon-message" role="status"></span>';
         }

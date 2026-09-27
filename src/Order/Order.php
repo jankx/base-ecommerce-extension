@@ -276,13 +276,13 @@ class Order extends AbstractOrder
     public static function getStatusLabels(): array
     {
         $labels = [
-            self::STATUS_PENDING    => __('Pending', 'jankx'),
-            self::STATUS_PROCESSING => __('Processing', 'jankx'),
-            self::STATUS_SHIPPING   => __('Đang vận chuyển', 'jankx'),
-            self::STATUS_COMPLETED  => __('Completed', 'jankx'),
-            self::STATUS_FAILED     => __('Failed', 'jankx'),
-            self::STATUS_CANCELLED  => __('Cancelled', 'jankx'),
-            self::STATUS_REFUNDED   => __('Refunded', 'jankx'),
+            self::STATUS_PENDING    => __('Pending', 'base-ecommerce'),
+            self::STATUS_PROCESSING => __('Processing', 'base-ecommerce'),
+            self::STATUS_SHIPPING   => __('Đang vận chuyển', 'base-ecommerce'),
+            self::STATUS_COMPLETED  => __('Completed', 'base-ecommerce'),
+            self::STATUS_FAILED     => __('Failed', 'base-ecommerce'),
+            self::STATUS_CANCELLED  => __('Cancelled', 'base-ecommerce'),
+            self::STATUS_REFUNDED   => __('Refunded', 'base-ecommerce'),
         ];
 
         return apply_filters('jankx/ecommerce/order/status_labels', $labels);

@@ -1,0 +1,36 @@
+{
+    "translation-revision-date": "YEAR-MO-DA HO:MI+ZONE",
+    "generator": "WP-CLI\/2.12.0",
+    "source": "blocks\/checkout-credits\/build\/index.js",
+    "domain": "messages",
+    "locale_data": {
+        "messages": {
+            "": {
+                "domain": "messages",
+                "lang": "vi",
+                "plural-forms": "nplurals=1; plural=0;"
+            },
+            "S\u1ed1 d\u01b0 t\u00edn d\u1ee5ng:": [
+                "S\u1ed1 d\u01b0 t\u00edn d\u1ee5ng:"
+            ],
+            "Layout": [
+                "B\u1ed1 c\u1ee5c"
+            ],
+            "Column": [
+                "C\u1ed9t"
+            ],
+            "Customer column": [
+                "C\u1ed9t kh\u00e1ch h\u00e0ng"
+            ],
+            "Summary column": [
+                "C\u1ed9t t\u00f3m t\u1eaft"
+            ],
+            "Full width": [
+                "Tr\u00e0n to\u00e0n chi\u1ec1u r\u1ed9ng"
+            ],
+            "D\u00f9ng s\u1ed1 d\u01b0 t\u00edn d\u1ee5ng \u0111\u1ec3 thanh to\u00e1n": [
+                "D\u00f9ng s\u1ed1 d\u01b0 t\u00edn d\u1ee5ng \u0111\u1ec3 thanh to\u00e1n"
+            ]
+        }
+    }
+}

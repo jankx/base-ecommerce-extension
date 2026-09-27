@@ -27,7 +27,7 @@ class CheckoutOrderReviewBlock extends CheckoutSectionBlock
             ])
         );
 
-        $output .= '<h2 class="jankx-section-title">' . esc_html__('Your order', 'jankx') . '</h2>';
+        $output .= '<h2 class="jankx-section-title">' . esc_html__('Your order', 'base-ecommerce') . '</h2>';
         $output .= '<div class="jankx-order-review">';
 
         $itemInnerBlocks = [];
@@ -80,17 +80,17 @@ class CheckoutOrderReviewBlock extends CheckoutSectionBlock
         $otherDiscount = max(0, $cart->getDiscount() - $creditDiscount);
 
         $output = '<div class="jankx-review-total-row jankx-review-discount-row"' . ($otherDiscount > 0 ? '' : ' hidden') . '>'
-            . '<span>' . esc_html__('Discount', 'jankx') . '</span>'
+            . '<span>' . esc_html__('Discount', 'base-ecommerce') . '</span>'
             . '<span class="jankx-review-discount-value">' . esc_html('-' . $this->formatPrice($otherDiscount)) . '</span>'
             . '</div>';
 
         $output .= '<div class="jankx-review-total-row jankx-review-credit-row"' . ($creditDiscount > 0 ? '' : ' hidden') . '>'
-            . '<span>' . esc_html__('Credits', 'jankx') . '</span>'
+            . '<span>' . esc_html__('Credits', 'base-ecommerce') . '</span>'
             . '<span class="jankx-review-credit-value">' . esc_html('-' . $this->formatPrice($creditDiscount)) . '</span>'
             . '</div>';
 
         $output .= '<div class="jankx-review-total-row jankx-review-total">'
-            . '<span>' . esc_html__('Total', 'jankx') . '</span>'
+            . '<span>' . esc_html__('Total', 'base-ecommerce') . '</span>'
             . '<span class="jankx-review-total-value">' . esc_html($this->formatPrice($cart->getTotal())) . '</span>'
             . '</div>';
 

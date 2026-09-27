@@ -44,12 +44,12 @@ class AccountTabOrdersBlock extends Block
         ]);
 
         $output = sprintf('<div %s>', $wrapperAttrs);
-        $output .= '<h2 class="jankx-section-title">' . esc_html__('Your orders', 'jankx') . '</h2>';
+        $output .= '<h2 class="jankx-section-title">' . esc_html__('Your orders', 'base-ecommerce') . '</h2>';
 
         if (empty($orders)) {
             $output .= '<div class="jankx-empty-state">'
                 . '<span class="jankx-empty-icon" aria-hidden="true">&#128203;</span>'
-                . '<p>' . esc_html__('You have no orders yet.', 'jankx') . '</p>'
+                . '<p>' . esc_html__('You have no orders yet.', 'base-ecommerce') . '</p>'
                 . '</div>';
         } else {
             $output .= '<div class="jankx-orders-list">';
@@ -95,7 +95,7 @@ class AccountTabOrdersBlock extends Block
         $output .= '<div class="jankx-od-nav">'
             . '<a href="' . esc_url($this->getOrdersUrl()) . '" class="jankx-od-back">'
             . '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>'
-            . esc_html__('Back to orders', 'jankx')
+            . esc_html__('Back to orders', 'base-ecommerce')
             . '</a>'
             . '</div>';
 
@@ -109,7 +109,7 @@ class AccountTabOrdersBlock extends Block
         $output .= '<div class="jankx-od-hero-content">';
         $output .= '<div class="jankx-od-hero-row">';
         $output .= '<div class="jankx-od-hero-left">';
-        $output .= '<span class="jankx-od-hero-label">' . esc_html__('Order', 'jankx') . '</span>';
+        $output .= '<span class="jankx-od-hero-label">' . esc_html__('Order', 'base-ecommerce') . '</span>';
         $output .= '<h1 class="jankx-od-hero-num">' . esc_html($order->getOrderNumber()) . '</h1>';
         $output .= '<span class="jankx-od-hero-date">'
             . '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'
@@ -117,7 +117,7 @@ class AccountTabOrdersBlock extends Block
             . '</span>';
         $output .= '</div>';
         $output .= '<div class="jankx-od-hero-right">';
-        $output .= '<div class="jankx-od-hero-total-label">' . esc_html__('Total', 'jankx') . '</div>';
+        $output .= '<div class="jankx-od-hero-total-label">' . esc_html__('Total', 'base-ecommerce') . '</div>';
         $output .= '<div class="jankx-od-hero-total">' . esc_html($this->formatPrice($order->getTotal())) . '</div>';
         $output .= '<span class="jankx-od-pill jankx-od-pill--' . esc_attr($status) . '">'
             . $this->getStatusIcon($status)
@@ -147,12 +147,12 @@ class AccountTabOrdersBlock extends Block
         $output .= '<div class="jankx-od-card">';
         $output .= '<div class="jankx-od-card-head">';
         $output .= '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>';
-        $output .= '<h3 class="jankx-od-card-title">' . esc_html__('Order items', 'jankx') . '</h3>';
+        $output .= '<h3 class="jankx-od-card-title">' . esc_html__('Order items', 'base-ecommerce') . '</h3>';
         $output .= '<span class="jankx-od-card-badge">' . count($items) . '</span>';
         $output .= '</div>';
 
         if (empty($items)) {
-            $output .= '<p class="jankx-od-empty">' . esc_html__('No items.', 'jankx') . '</p>';
+            $output .= '<p class="jankx-od-empty">' . esc_html__('No items.', 'base-ecommerce') . '</p>';
         } else {
             $output .= '<div class="jankx-od-items">';
             foreach ($items as $idx => $item) {
@@ -161,7 +161,7 @@ class AccountTabOrdersBlock extends Block
                 $output .= $this->getItemThumbnail($item);
                 $output .= '<div class="jankx-od-item-body">';
                 $output .= '<span class="jankx-od-item-name">' . esc_html($item->getName()) . '</span>';
-                $output .= '<span class="jankx-od-item-meta">' . esc_html__('Qty', 'jankx') . ': ' . esc_html($item->getQuantity()) . '</span>';
+                $output .= '<span class="jankx-od-item-meta">' . esc_html__('Qty', 'base-ecommerce') . ': ' . esc_html($item->getQuantity()) . '</span>';
 
                 $itemMetaLines = $this->getOrderItemMetaLines($item);
                 if (!empty($itemMetaLines)) {
@@ -178,17 +178,17 @@ class AccountTabOrdersBlock extends Block
             // Totals
             $output .= '<div class="jankx-od-totals">';
             $output .= '<div class="jankx-od-totals-row">'
-                . '<span>' . esc_html__('Subtotal', 'jankx') . '</span>'
+                . '<span>' . esc_html__('Subtotal', 'base-ecommerce') . '</span>'
                 . '<strong>' . esc_html($this->formatPrice($subtotal)) . '</strong>'
                 . '</div>';
             if (abs($subtotal - $order->getTotal()) > 0.01) {
                 $output .= '<div class="jankx-od-totals-row">'
-                    . '<span>' . esc_html__('Shipping & handling', 'jankx') . '</span>'
+                    . '<span>' . esc_html__('Shipping & handling', 'base-ecommerce') . '</span>'
                     . '<strong>' . esc_html($this->formatPrice($order->getTotal() - $subtotal)) . '</strong>'
                     . '</div>';
             }
             $output .= '<div class="jankx-od-totals-row jankx-od-totals-grand">'
-                . '<span>' . esc_html__('Total', 'jankx') . '</span>'
+                . '<span>' . esc_html__('Total', 'base-ecommerce') . '</span>'
                 . '<strong>' . esc_html($this->formatPrice($order->getTotal())) . '</strong>'
                 . '</div>';
             $output .= '</div>';
@@ -201,7 +201,7 @@ class AccountTabOrdersBlock extends Block
             $output .= '<div class="jankx-od-card">';
             $output .= '<div class="jankx-od-card-head">';
             $output .= '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
-            $output .= '<h3 class="jankx-od-card-title">' . esc_html__('Notes', 'jankx') . '</h3>';
+            $output .= '<h3 class="jankx-od-card-title">' . esc_html__('Notes', 'base-ecommerce') . '</h3>';
             $output .= '</div>';
             $output .= '<div class="jankx-od-notes">';
             foreach ($notes as $note) {
@@ -223,16 +223,16 @@ class AccountTabOrdersBlock extends Block
         $output .= '<div class="jankx-od-card jankx-od-card--accent">';
         $output .= '<div class="jankx-od-card-head">';
         $output .= '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
-        $output .= '<h3 class="jankx-od-card-title">' . esc_html__('Customer', 'jankx') . '</h3>';
+        $output .= '<h3 class="jankx-od-card-title">' . esc_html__('Customer', 'base-ecommerce') . '</h3>';
         $output .= '</div>';
         $output .= '<div class="jankx-od-facts">';
-        $output .= $this->renderFactRow('user', esc_html__('Name', 'jankx'), $order->getCustomerName());
-        $output .= $this->renderFactRow('mail', esc_html__('Email', 'jankx'), $order->getCustomerEmail());
+        $output .= $this->renderFactRow('user', esc_html__('Name', 'base-ecommerce'), $order->getCustomerName());
+        $output .= $this->renderFactRow('mail', esc_html__('Email', 'base-ecommerce'), $order->getCustomerEmail());
         if ($order->getCustomerPhone()) {
-            $output .= $this->renderFactRow('phone', esc_html__('Phone', 'jankx'), $order->getCustomerPhone());
+            $output .= $this->renderFactRow('phone', esc_html__('Phone', 'base-ecommerce'), $order->getCustomerPhone());
         }
         if ($order->getCustomerAddress()) {
-            $output .= $this->renderFactRow('pin', esc_html__('Address', 'jankx'), $order->getCustomerAddress());
+            $output .= $this->renderFactRow('pin', esc_html__('Address', 'base-ecommerce'), $order->getCustomerAddress());
         }
         $output .= '</div>';
         $output .= '</div>';
@@ -241,20 +241,20 @@ class AccountTabOrdersBlock extends Block
         $output .= '<div class="jankx-od-card">';
         $output .= '<div class="jankx-od-card-head">';
         $output .= '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
-        $output .= '<h3 class="jankx-od-card-title">' . esc_html__('Payment', 'jankx') . '</h3>';
+        $output .= '<h3 class="jankx-od-card-title">' . esc_html__('Payment', 'base-ecommerce') . '</h3>';
         $output .= '</div>';
         $output .= '<div class="jankx-od-facts">';
         $output .= '<div class="jankx-od-fact">';
         $output .= '<span class="jankx-od-fact-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>';
         $output .= '<div class="jankx-od-fact-body">';
-        $output .= '<span class="jankx-od-fact-label">' . esc_html__('Method', 'jankx') . '</span>';
+        $output .= '<span class="jankx-od-fact-label">' . esc_html__('Method', 'base-ecommerce') . '</span>';
         $output .= '<strong class="jankx-od-fact-value">' . esc_html($this->getPaymentMethodLabel($order->getPaymentMethod())) . '</strong>';
         $output .= '</div>';
         $output .= '</div>';
         $output .= '<div class="jankx-od-fact">';
         $output .= '<span class="jankx-od-fact-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>';
         $output .= '<div class="jankx-od-fact-body">';
-        $output .= '<span class="jankx-od-fact-label">' . esc_html__('Status', 'jankx') . '</span>';
+        $output .= '<span class="jankx-od-fact-label">' . esc_html__('Status', 'base-ecommerce') . '</span>';
         $output .= '<strong class="jankx-od-fact-value jankx-od-status--' . esc_attr($status) . '">'
             . $this->getStatusIcon($status)
             . esc_html($this->getStatusLabel($status))
@@ -268,8 +268,8 @@ class AccountTabOrdersBlock extends Block
         $output .= '<div class="jankx-od-card jankx-od-card--help">';
         $output .= '<div class="jankx-od-help-inner">';
         $output .= '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
-        $output .= '<p>' . esc_html__('Need help with this order?', 'jankx') . '</p>';
-        $output .= '<a href="mailto:support@nibitour.vn" class="jankx-od-help-link">' . esc_html__('Contact support', 'jankx') . '</a>';
+        $output .= '<p>' . esc_html__('Need help with this order?', 'base-ecommerce') . '</p>';
+        $output .= '<a href="mailto:support@nibitour.vn" class="jankx-od-help-link">' . esc_html__('Contact support', 'base-ecommerce') . '</a>';
         $output .= '</div>';
         $output .= '</div>';
 
@@ -317,10 +317,10 @@ class AccountTabOrdersBlock extends Block
     protected function renderOrderProgress(string $status): string
     {
         $steps = [
-            Order::STATUS_PENDING    => ['label' => __('Placed', 'jankx'),    'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'],
-            Order::STATUS_PROCESSING => ['label' => __('Processing', 'jankx'), 'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>'],
-            Order::STATUS_SHIPPING   => ['label' => __('Shipping', 'jankx'),   'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>'],
-            Order::STATUS_COMPLETED  => ['label' => __('Completed', 'jankx'),  'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'],
+            Order::STATUS_PENDING    => ['label' => __('Placed', 'base-ecommerce'),    'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'],
+            Order::STATUS_PROCESSING => ['label' => __('Processing', 'base-ecommerce'), 'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>'],
+            Order::STATUS_SHIPPING   => ['label' => __('Shipping', 'base-ecommerce'),   'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>'],
+            Order::STATUS_COMPLETED  => ['label' => __('Completed', 'base-ecommerce'),  'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'],
         ];
 
         $isTerminal = in_array($status, [Order::STATUS_FAILED, Order::STATUS_CANCELLED, Order::STATUS_REFUNDED], true);
@@ -378,14 +378,14 @@ class AccountTabOrdersBlock extends Block
         $output = '<div class="jankx-od-card jankx-od-card--action">';
         $output .= '<div class="jankx-od-pay-inner">';
         $output .= '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
-        $output .= '<p>' . esc_html__('Chưa thanh toán. Nhấn nút bên dưới để hoàn tất thanh toán.', 'jankx') . '</p>';
+        $output .= '<p>' . esc_html__('Chưa thanh toán. Nhấn nút bên dưới để hoàn tất thanh toán.', 'base-ecommerce') . '</p>';
         $output .= '<button class="jankx-od-btn jankx-od-btn--pay" '
             . 'data-rest-url="' . esc_attr($restUrl) . '" '
             . 'data-nonce="' . esc_attr($nonce) . '" '
             . 'data-order="' . esc_attr($order->getOrderNumber()) . '" '
             . 'onclick="jankxPayOrder(this)">'
             . '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>'
-            . esc_html__('Thanh toán ngay', 'jankx')
+            . esc_html__('Thanh toán ngay', 'base-ecommerce')
             . '</button>';
         $output .= '</div>';
         $output .= '</div>';
@@ -406,22 +406,22 @@ class AccountTabOrdersBlock extends Block
             $bankName = $bankConfig['bank_name'] ?? '';
             $accountNumber = $bankConfig['account_number'] ?? '';
             $accountHolder = $bankConfig['account_holder'] ?? '';
-            $transferContent = $bankConfig['transfer_content'] ?? __('Vui lòng ghi đúng nội dung chuyển khoản để chúng tôi xác nhận đơn hàng sớm nhất.', 'jankx');
+            $transferContent = $bankConfig['transfer_content'] ?? __('Vui lòng ghi đúng nội dung chuyển khoản để chúng tôi xác nhận đơn hàng sớm nhất.', 'base-ecommerce');
             $instructions = $bankConfig['instructions'] ?? '';
 
             $output .= '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>';
-            $output .= '<h4>' . esc_html__('Thông tin chuyển khoản', 'jankx') . '</h4>';
+            $output .= '<h4>' . esc_html__('Thông tin chuyển khoản', 'base-ecommerce') . '</h4>';
             $output .= '<div class="jankx-od-bank-info">';
             if ($bankName) {
-                $output .= '<p><strong>' . esc_html__('Ngân hàng:', 'jankx') . '</strong> ' . esc_html($bankName) . '</p>';
+                $output .= '<p><strong>' . esc_html__('Ngân hàng:', 'base-ecommerce') . '</strong> ' . esc_html($bankName) . '</p>';
             }
             if ($accountNumber) {
-                $output .= '<p><strong>' . esc_html__('Số TK:', 'jankx') . '</strong> ' . esc_html($accountNumber) . '</p>';
+                $output .= '<p><strong>' . esc_html__('Số TK:', 'base-ecommerce') . '</strong> ' . esc_html($accountNumber) . '</p>';
             }
             if ($accountHolder) {
-                $output .= '<p><strong>' . esc_html__('Chủ TK:', 'jankx') . '</strong> ' . esc_html($accountHolder) . '</p>';
+                $output .= '<p><strong>' . esc_html__('Chủ TK:', 'base-ecommerce') . '</strong> ' . esc_html($accountHolder) . '</p>';
             }
-            $output .= '<p><strong>' . esc_html__('Nội dung CK:', 'jankx') . '</strong> <code>' . esc_html($order->getOrderNumber()) . '</code></p>';
+            $output .= '<p><strong>' . esc_html__('Nội dung CK:', 'base-ecommerce') . '</strong> <code>' . esc_html($order->getOrderNumber()) . '</code></p>';
             if ($transferContent) {
                 $output .= '<p class="description">' . esc_html($transferContent) . '</p>';
             }
@@ -431,10 +431,10 @@ class AccountTabOrdersBlock extends Block
             $output .= '</div>';
         } else {
             $codConfig = get_option('jankx_built_in_gateway_cod', []);
-            $codDescription = $codConfig['description'] ?? __('Đơn hàng COD sẽ được xác nhận bởi nhân viên. Vui lòng đặt cọc nếu được yêu cầu.', 'jankx');
+            $codDescription = $codConfig['description'] ?? __('Đơn hàng COD sẽ được xác nhận bởi nhân viên. Vui lòng đặt cọc nếu được yêu cầu.', 'base-ecommerce');
 
             $output .= '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
-            $output .= '<h4>' . esc_html__('Thanh toán khi nhận hàng (COD)', 'jankx') . '</h4>';
+            $output .= '<h4>' . esc_html__('Thanh toán khi nhận hàng (COD)', 'base-ecommerce') . '</h4>';
             $output .= '<p>' . esc_html($codDescription) . '</p>';
         }
 
@@ -460,8 +460,8 @@ class AccountTabOrdersBlock extends Block
     protected function getPaymentMethodLabel(string $method): string
     {
         $labels = [
-            'cod'           => __('Cash on delivery', 'jankx'),
-            'bank_transfer' => __('Bank transfer', 'jankx'),
+            'cod'           => __('Cash on delivery', 'base-ecommerce'),
+            'bank_transfer' => __('Bank transfer', 'base-ecommerce'),
         ];
 
         return $labels[$method] ?? ($method ?: '—');
@@ -474,10 +474,10 @@ class AccountTabOrdersBlock extends Block
         $output .= '<div class="jankx-od-empty-icon">';
         $output .= '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>';
         $output .= '</div>';
-        $output .= '<h3>' . esc_html__('Order not found', 'jankx') . '</h3>';
-        $output .= '<p>' . esc_html__('We couldn\'t find this order or you don\'t have permission to view it.', 'jankx') . '</p>';
+        $output .= '<h3>' . esc_html__('Order not found', 'base-ecommerce') . '</h3>';
+        $output .= '<p>' . esc_html__('We couldn\'t find this order or you don\'t have permission to view it.', 'base-ecommerce') . '</p>';
         $output .= '<a href="' . esc_url($this->getOrdersUrl()) . '" class="jankx-od-btn">'
-            . esc_html__('Back to orders', 'jankx')
+            . esc_html__('Back to orders', 'base-ecommerce')
             . '</a>';
         $output .= '</div>';
         $output .= '</div>';
@@ -504,7 +504,7 @@ class AccountTabOrdersBlock extends Block
 
         $output .= '<div class="jankx-order-card-foot">'
             . '<span class="jankx-order-total">' . esc_html($this->formatPrice($order->getTotal())) . '</span>'
-            . '<span class="jankx-order-view-link">' . esc_html__('View details', 'jankx') . ' &rarr;</span>'
+            . '<span class="jankx-order-view-link">' . esc_html__('View details', 'base-ecommerce') . ' &rarr;</span>'
             . '</div>';
 
         $output .= '</a>';
@@ -553,12 +553,12 @@ class AccountTabOrdersBlock extends Block
     protected function getStatusLabel(string $status): string
     {
         $labels = [
-            Order::STATUS_PENDING    => __('Pending', 'jankx'),
-            Order::STATUS_PROCESSING => __('Processing', 'jankx'),
-            Order::STATUS_COMPLETED  => __('Completed', 'jankx'),
-            Order::STATUS_FAILED     => __('Failed', 'jankx'),
-            Order::STATUS_CANCELLED  => __('Cancelled', 'jankx'),
-            Order::STATUS_REFUNDED   => __('Refunded', 'jankx'),
+            Order::STATUS_PENDING    => __('Pending', 'base-ecommerce'),
+            Order::STATUS_PROCESSING => __('Processing', 'base-ecommerce'),
+            Order::STATUS_COMPLETED  => __('Completed', 'base-ecommerce'),
+            Order::STATUS_FAILED     => __('Failed', 'base-ecommerce'),
+            Order::STATUS_CANCELLED  => __('Cancelled', 'base-ecommerce'),
+            Order::STATUS_REFUNDED   => __('Refunded', 'base-ecommerce'),
         ];
 
         return $labels[$status] ?? ucfirst($status);
@@ -669,7 +669,7 @@ class AccountTabOrdersBlock extends Block
         }
 
         $baseUrl = $this->getOrdersUrl();
-        $output = '<nav class="jankx-pagination" aria-label="' . esc_attr__('Orders pagination', 'jankx') . '">';
+        $output = '<nav class="jankx-pagination" aria-label="' . esc_attr__('Orders pagination', 'base-ecommerce') . '">';
         $output .= '<div class="jankx-pagination-inner">';
 
         // Previous

@@ -21,7 +21,7 @@ final class CartToggleRenderer
             : '<span class="jankx-mini-cart-icon" aria-hidden="true">' . self::CART_ICON_SVG . '</span>';
 
         return '<button type="button" class="jankx-mini-cart-toggle" aria-expanded="false" '
-            . 'aria-controls="' . esc_attr($panelId) . '" aria-label="' . esc_attr__('Open cart', 'jankx') . '">'
+            . 'aria-controls="' . esc_attr($panelId) . '" aria-label="' . esc_attr__('Open cart', 'base-ecommerce') . '">'
             . $iconHtml
             . '<span class="jankx-mini-cart-count' . ($count ? '' : ' is-empty') . '" data-jankx-cart-count'
             . $context->getBadgeStyleAttribute() . '>'

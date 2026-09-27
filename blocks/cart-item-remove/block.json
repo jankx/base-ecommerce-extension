@@ -6,7 +6,7 @@
   "category": "jankx",
   "icon": "trash",
   "description": "Remove button for the current cart item.",
-  "textdomain": "jankx",
+  "textdomain": "base-ecommerce",
   "supports": {
     "html": false
   },

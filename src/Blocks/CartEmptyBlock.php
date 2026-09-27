@@ -54,15 +54,15 @@ class CartEmptyBlock extends Block
 
         $title = !empty($attributes['title'])
             ? $attributes['title']
-            : __('Your cart is empty', 'jankx');
+            : __('Your cart is empty', 'base-ecommerce');
 
         $desc = !empty($attributes['description'])
             ? $attributes['description']
-            : __('Add some products before checking out.', 'jankx');
+            : __('Add some products before checking out.', 'base-ecommerce');
 
         $btnText = !empty($attributes['buttonText'])
             ? $attributes['buttonText']
-            : __('Continue shopping', 'jankx');
+            : __('Continue shopping', 'base-ecommerce');
 
         $btnUrl = !empty($attributes['buttonUrl'])
             ? $attributes['buttonUrl']

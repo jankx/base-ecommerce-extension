@@ -19,8 +19,8 @@ abstract class CheckoutSectionBlock extends Block
         $enabledGateways = get_option('jankx_payment_gateways', []);
 
         $builtIn = [
-            'bank_transfer' => __('Chuyển khoản ngân hàng', 'jankx'),
-            'cod' => __('Thanh toán khi nhận hàng (COD)', 'jankx'),
+            'bank_transfer' => __('Chuyển khoản ngân hàng', 'base-ecommerce'),
+            'cod' => __('Thanh toán khi nhận hàng (COD)', 'base-ecommerce'),
         ];
 
         $onlineGateways = [];

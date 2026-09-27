@@ -95,8 +95,17 @@ class EcommerceExtension extends AbstractExtension
         return self::$instance;
     }
 
+    /**
+     * Text domain owned by this extension. Every extension ships its own
+     * translations - only the theme's built-in blocks share the `jankx` domain.
+     */
+    public const TEXT_DOMAIN = 'base-ecommerce';
+
     public function register_hooks(): void
     {
+        // Load this extension's translations (.mo for PHP, .json for block JS).
+        $this->load_textdomain();
+
         // Install order database tables on first run.
         (new OrderDatabaseInstaller())->register();
 
@@ -138,6 +147,38 @@ class EcommerceExtension extends AbstractExtension
         // Send notifications on order lifecycle events.
         add_action('jankx/ecommerce/order/created', [$this, 'on_order_created'], 10, 2);
         add_action('jankx/ecommerce/order/status_changed', [$this, 'on_order_status_changed'], 10, 4);
+    }
+
+    /**
+     * Load the extension's own translations and register the languages
+     * directory so block editor scripts can resolve their Jed JSON files.
+     */
+    protected function load_textdomain(): void
+    {
+        /** @var \WP_Textdomain_Registry $wp_textdomain_registry */
+        global $wp_textdomain_registry;
+
+        $locale = determine_locale();
+        $dir    = __DIR__ . '/languages';
+
+        if ($wp_textdomain_registry instanceof \WP_Textdomain_Registry) {
+            $wp_textdomain_registry->set_custom_path(self::TEXT_DOMAIN, $dir);
+        }
+
+        $mo = $dir . '/' . self::TEXT_DOMAIN . '-' . $locale . '.mo';
+        if (!is_readable($mo)) {
+            return;
+        }
+
+        $loader = static function () use ($mo) {
+            load_textdomain(self::TEXT_DOMAIN, $mo);
+        };
+
+        if (did_action('after_setup_theme')) {
+            $loader();
+        } else {
+            add_action('after_setup_theme', $loader, 5);
+        }
     }
 
     public function register_blocks(): void
@@ -324,10 +365,10 @@ class EcommerceExtension extends AbstractExtension
             'cartUrl' => self::get_cart_page_url(),
             'ordersUrl' => self::get_orders_page_url(),
             'i18n' => [
-                'successTitle' => __('Order placed successfully!', 'jankx'),
-                'successMessage' => __('Your order number is %s.', 'jankx'),
-                'adding' => __('Đang thêm...', 'jankx'),
-                'added' => __('Đã thêm ✓', 'jankx'),
+                'successTitle' => __('Order placed successfully!', 'base-ecommerce'),
+                'successMessage' => __('Your order number is %s.', 'base-ecommerce'),
+                'adding' => __('Đang thêm...', 'base-ecommerce'),
+                'added' => __('Đã thêm ✓', 'base-ecommerce'),
             ],
         ]);
     }
@@ -365,7 +406,7 @@ class EcommerceExtension extends AbstractExtension
         }
 
         $pageId = wp_insert_post([
-            'post_title' => __('Giỏ hàng', 'jankx'),
+            'post_title' => __('Giỏ hàng', 'base-ecommerce'),
             'post_content' => '<!-- wp:jankx/cart {"align":"wide"} /-->',
             'post_status' => 'publish',
             'post_type' => 'page',
@@ -385,7 +426,7 @@ class EcommerceExtension extends AbstractExtension
         }
 
         $pageId = wp_insert_post([
-            'post_title' => __('Thanh toán', 'jankx'),
+            'post_title' => __('Thanh toán', 'base-ecommerce'),
             'post_content' => '<!-- wp:jankx/checkout {"align":"wide"} /-->',
             'post_status' => 'publish',
             'post_type' => 'page',
@@ -561,9 +602,9 @@ class EcommerceExtension extends AbstractExtension
         NotificationService::send(
             $userId,
             'order.created',
-            sprintf(__('Đơn hàng #%s đã được tạo', 'jankx'), $order->getOrderNumber()),
+            sprintf(__('Đơn hàng #%s đã được tạo', 'base-ecommerce'), $order->getOrderNumber()),
             sprintf(
-                __('Đơn hàng của bạn với tổng %s đã được tiếp nhận và đang chờ xử lý.', 'jankx'),
+                __('Đơn hàng của bạn với tổng %s đã được tiếp nhận và đang chờ xử lý.', 'base-ecommerce'),
                 $total
             ),
             [
@@ -595,7 +636,7 @@ class EcommerceExtension extends AbstractExtension
             : number_format($order->getTotal(), 0, ',', '.') . ' ' . $order->getCurrency();
 
         $message = sprintf(
-            __('Trạng thái đơn hàng #%s đã chuyển từ "%s" sang "%s".', 'jankx'),
+            __('Trạng thái đơn hàng #%s đã chuyển từ "%s" sang "%s".', 'base-ecommerce'),
             $order->getOrderNumber(),
             $labels[$oldStatus] ?? ucfirst($oldStatus),
             $newLabel
@@ -614,7 +655,7 @@ class EcommerceExtension extends AbstractExtension
 
         if ($newStatus === Order::STATUS_SHIPPING && $order->getTrackingNumber()) {
             $message .= sprintf(
-                __(" Mã vận đơn: %s", 'jankx'),
+                __(" Mã vận đơn: %s", 'base-ecommerce'),
                 $order->getTrackingNumber()
             );
             $data['tracking_number'] = $order->getTrackingNumber();
@@ -624,7 +665,7 @@ class EcommerceExtension extends AbstractExtension
             $userId,
             'order.status_changed',
             sprintf(
-                __('Đơn hàng #%s: %s', 'jankx'),
+                __('Đơn hàng #%s: %s', 'base-ecommerce'),
                 $order->getOrderNumber(),
                 $newLabel
             ),

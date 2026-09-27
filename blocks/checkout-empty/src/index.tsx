@@ -18,7 +18,7 @@ const DEFAULT_TEMPLATE = [
         {
             textAlign: 'center',
             level: 2,
-            content: __('Nothing to check out yet', 'jankx'),
+            content: __('Nothing to check out yet', 'base-ecommerce'),
             className: 'jankx-section-title',
         },
     ],
@@ -26,7 +26,7 @@ const DEFAULT_TEMPLATE = [
         'core/paragraph',
         {
             align: 'center',
-            content: __('Add some products to your cart before checking out.', 'jankx'),
+            content: __('Add some products to your cart before checking out.', 'base-ecommerce'),
         },
     ],
     [
@@ -38,7 +38,7 @@ const DEFAULT_TEMPLATE = [
             [
                 'core/button',
                 {
-                    text: __('Continue shopping', 'jankx'),
+                    text: __('Continue shopping', 'base-ecommerce'),
                     url: '/',
                     className: 'jankx-btn jankx-btn-primary',
                 },
@@ -65,7 +65,7 @@ function Edit() {
                 color: '#1565c0',
                 borderRadius: '4px',
             }}>
-                {__('Hiển thị khi giỏ hàng trống (Empty Checkout)', 'jankx')}
+                {__('Hiển thị khi giỏ hàng trống (Empty Checkout)', 'base-ecommerce')}
             </div>
             <InnerBlocks
                 template={DEFAULT_TEMPLATE}

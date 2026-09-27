@@ -127,7 +127,7 @@ class PaymentManager
         $currency = $order->getCurrency() ?: 'VND';
 
         $transaction = $class::create([
-            'title'          => sprintf(__('Payment for %s', 'jankx'), $order->getOrderNumber()),
+            'title'          => sprintf(__('Payment for %s', 'base-ecommerce'), $order->getOrderNumber()),
             'gateway'        => $gateway,
             'amount'         => $order->getTotal(),
             'currency'       => $currency,

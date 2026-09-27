@@ -16,7 +16,7 @@ class ContactAddToCartStrategy implements AddToCartStrategyInterface
         }
 
         $output .= '<p class="jankx-add-to-cart__note">'
-            . esc_html__('Liên hệ với chúng tôi để được tư vấn và báo giá.', 'jankx')
+            . esc_html__('Liên hệ với chúng tôi để được tư vấn và báo giá.', 'base-ecommerce')
             . '</p>';
 
         $output .= '</div>';

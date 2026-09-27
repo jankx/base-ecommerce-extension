@@ -6,7 +6,7 @@
   "category": "jankx",
   "icon": "yes-alt",
   "description": "Checkbox to select this cart item.",
-  "textdomain": "jankx",
+  "textdomain": "base-ecommerce",
   "supports": {
     "html": false
   },

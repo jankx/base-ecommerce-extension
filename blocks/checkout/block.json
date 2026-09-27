@@ -6,7 +6,7 @@
   "category": "jankx",
   "icon": "money",
   "description": "Checkout page. Collects customer billing details and payment method, then turns the cart into an order.",
-  "textdomain": "jankx",
+  "textdomain": "base-ecommerce",
   "attributes": {
     "jankxHideOnUltrawide": {
       "type": "boolean",

@@ -42,16 +42,16 @@ class ConverterSettingsPage
         $config = $this->manager->getActiveConverterConfig();
         ?>
         <div class="converter-settings-section">
-            <h3><?php esc_html_e('Exchange Rate Converter', 'jankx'); ?></h3>
+            <h3><?php esc_html_e('Exchange Rate Converter', 'base-ecommerce'); ?></h3>
 
             <p class="description">
-                <?php esc_html_e('Configure how currency conversion works on your site. Prices are stored in the default currency and converted to the user\'s selected currency for display.', 'jankx'); ?>
+                <?php esc_html_e('Configure how currency conversion works on your site. Prices are stored in the default currency and converted to the user\'s selected currency for display.', 'base-ecommerce'); ?>
             </p>
 
             <table class="form-table">
                 <tr>
                     <th scope="row">
-                        <label for="converter_type"><?php esc_html_e('Converter Type', 'jankx'); ?></label>
+                        <label for="converter_type"><?php esc_html_e('Converter Type', 'base-ecommerce'); ?></label>
                     </th>
                     <td>
                         <select id="converter_type" name="jankx_currency_converter_type" class="regular-text">
@@ -59,7 +59,7 @@ class ConverterSettingsPage
                                 <option value="<?php echo esc_attr($key); ?>" <?php selected($key, $activeType); ?>>
                                     <?php echo esc_html($info['name']); ?>
                                     <?php if (!$info['is_ready'] && $key !== 'noop'): ?>
-                                        (<?php esc_html_e('Not configured', 'jankx'); ?>)
+                                        (<?php esc_html_e('Not configured', 'base-ecommerce'); ?>)
                                     <?php endif; ?>
                                 </option>
                             <?php endforeach; ?>
@@ -75,7 +75,7 @@ class ConverterSettingsPage
 
             <p class="submit">
                 <button type="submit" class="button button-primary" name="save_converter_settings">
-                    <?php esc_html_e('Save Converter Settings', 'jankx'); ?>
+                    <?php esc_html_e('Save Converter Settings', 'base-ecommerce'); ?>
                 </button>
             </p>
         </div>
@@ -120,7 +120,7 @@ class ConverterSettingsPage
         ?>
         <tr>
             <th scope="row">
-                <label for="manual_base_currency"><?php esc_html_e('Đồng tiền cơ sở (Base Currency)', 'jankx'); ?></label>
+                <label for="manual_base_currency"><?php esc_html_e('Đồng tiền cơ sở (Base Currency)', 'base-ecommerce'); ?></label>
             </th>
             <td>
                 <select id="manual_base_currency" name="manual_base_currency">
@@ -131,20 +131,20 @@ class ConverterSettingsPage
                     <?php endforeach; ?>
                 </select>
                 <p class="description">
-                    <?php esc_html_e('Tỷ giá của các đồng tiền khác sẽ được tính quy đổi qua đồng tiền cơ sở này (Base = 1).', 'jankx'); ?>
+                    <?php esc_html_e('Tỷ giá của các đồng tiền khác sẽ được tính quy đổi qua đồng tiền cơ sở này (Base = 1).', 'base-ecommerce'); ?>
                 </p>
             </td>
         </tr>
         <tr>
             <th scope="row">
-                <label><?php esc_html_e('Tỷ giá (Exchange Rates)', 'jankx'); ?></label>
+                <label><?php esc_html_e('Tỷ giá (Exchange Rates)', 'base-ecommerce'); ?></label>
             </th>
             <td>
                 <table class="widefat striped" style="max-width: 400px; margin-top: 5px;">
                     <thead>
                         <tr>
-                            <th><?php esc_html_e('Đồng tiền', 'jankx'); ?></th>
-                            <th><?php esc_html_e('Tỷ giá (so với Base)', 'jankx'); ?></th>
+                            <th><?php esc_html_e('Đồng tiền', 'base-ecommerce'); ?></th>
+                            <th><?php esc_html_e('Tỷ giá (so với Base)', 'base-ecommerce'); ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -163,7 +163,7 @@ class ConverterSettingsPage
                     </tbody>
                 </table>
                 <p class="description">
-                    <?php esc_html_e('Ví dụ: Nếu Base là USD, tỷ giá VND = 25300 (Tức là 1 USD = 25300 VND). Mọi phép đổi từ EUR sang VND sẽ tự chia qua Base.', 'jankx'); ?>
+                    <?php esc_html_e('Ví dụ: Nếu Base là USD, tỷ giá VND = 25300 (Tức là 1 USD = 25300 VND). Mọi phép đổi từ EUR sang VND sẽ tự chia qua Base.', 'base-ecommerce'); ?>
                 </p>
             </td>
         </tr>
@@ -180,22 +180,22 @@ class ConverterSettingsPage
         ?>
         <tr>
             <th scope="row">
-                <label for="oer_api_key"><?php esc_html_e('API Key', 'jankx'); ?></label>
+                <label for="oer_api_key"><?php esc_html_e('API Key', 'base-ecommerce'); ?></label>
             </th>
             <td>
                 <input type="password" id="oer_api_key" name="openexchangerates_api_key" class="regular-text"
                     value="<?php echo esc_attr($apiKey); ?>" />
                 <p class="description">
                     <a href="https://openexchangerates.io/signup/free" target="_blank">
-                        <?php esc_html_e('Get a free API key', 'jankx'); ?>
+                        <?php esc_html_e('Get a free API key', 'base-ecommerce'); ?>
                     </a>
-                    <?php esc_html_e('(Free tier: 1000 requests/month, USD base only)', 'jankx'); ?>
+                    <?php esc_html_e('(Free tier: 1000 requests/month, USD base only)', 'base-ecommerce'); ?>
                 </p>
             </td>
         </tr>
         <tr>
             <th scope="row">
-                <label for="oer_base_currency"><?php esc_html_e('Base Currency', 'jankx'); ?></label>
+                <label for="oer_base_currency"><?php esc_html_e('Base Currency', 'base-ecommerce'); ?></label>
             </th>
             <td>
                 <select id="oer_base_currency" name="openexchangerates_base_currency">
@@ -204,7 +204,7 @@ class ConverterSettingsPage
                     <option value="GBP" <?php selected('GBP', $baseCurrency); ?>>GBP (Paid)</option>
                 </select>
                 <p class="description">
-                    <?php esc_html_e('Free tier limited to USD. Paid plans support other base currencies.', 'jankx'); ?>
+                    <?php esc_html_e('Free tier limited to USD. Paid plans support other base currencies.', 'base-ecommerce'); ?>
                 </p>
             </td>
         </tr>
@@ -221,22 +221,22 @@ class ConverterSettingsPage
         ?>
         <tr>
             <th scope="row">
-                <label for="fio_api_key"><?php esc_html_e('API Key', 'jankx'); ?></label>
+                <label for="fio_api_key"><?php esc_html_e('API Key', 'base-ecommerce'); ?></label>
             </th>
             <td>
                 <input type="password" id="fio_api_key" name="fixerio_api_key" class="regular-text"
                     value="<?php echo esc_attr($apiKey); ?>" />
                 <p class="description">
                     <a href="https://fixer.io/" target="_blank">
-                        <?php esc_html_e('Get an API key from Fixer.io', 'jankx'); ?>
+                        <?php esc_html_e('Get an API key from Fixer.io', 'base-ecommerce'); ?>
                     </a>
-                    <?php esc_html_e('(Free tier: 100 requests/month, EUR base only)', 'jankx'); ?>
+                    <?php esc_html_e('(Free tier: 100 requests/month, EUR base only)', 'base-ecommerce'); ?>
                 </p>
             </td>
         </tr>
         <tr>
             <th scope="row">
-                <label for="fio_base_currency"><?php esc_html_e('Base Currency', 'jankx'); ?></label>
+                <label for="fio_base_currency"><?php esc_html_e('Base Currency', 'base-ecommerce'); ?></label>
             </th>
             <td>
                 <select id="fio_base_currency" name="fixerio_base_currency">
@@ -245,7 +245,7 @@ class ConverterSettingsPage
                     <option value="GBP" <?php selected('GBP', $baseCurrency); ?>>GBP (Paid)</option>
                 </select>
                 <p class="description">
-                    <?php esc_html_e('Free tier limited to EUR. Paid plans support other base currencies.', 'jankx'); ?>
+                    <?php esc_html_e('Free tier limited to EUR. Paid plans support other base currencies.', 'base-ecommerce'); ?>
                 </p>
             </td>
         </tr>
@@ -267,14 +267,14 @@ class ConverterSettingsPage
             $innerConverter = $converter;
         }
         ?>
-        <h3><?php esc_html_e('Converter Status', 'jankx'); ?></h3>
+        <h3><?php esc_html_e('Converter Status', 'base-ecommerce'); ?></h3>
 
         <table class="widefat">
             <thead>
                 <tr>
-                    <th><?php esc_html_e('Converter', 'jankx'); ?></th>
-                    <th><?php esc_html_e('Status', 'jankx'); ?></th>
-                    <th><?php esc_html_e('Details', 'jankx'); ?></th>
+                    <th><?php esc_html_e('Converter', 'base-ecommerce'); ?></th>
+                    <th><?php esc_html_e('Status', 'base-ecommerce'); ?></th>
+                    <th><?php esc_html_e('Details', 'base-ecommerce'); ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -285,10 +285,10 @@ class ConverterSettingsPage
                     <td>
                         <?php if ($converter->isReady()): ?>
                             <span class="dashicons dashicons-yes" style="color: green;"></span>
-                            <?php esc_html_e('Ready', 'jankx'); ?>
+                            <?php esc_html_e('Ready', 'base-ecommerce'); ?>
                         <?php else: ?>
                             <span class="dashicons dashicons-no" style="color: red;"></span>
-                            <?php esc_html_e('Not Ready', 'jankx'); ?>
+                            <?php esc_html_e('Not Ready', 'base-ecommerce'); ?>
                         <?php endif; ?>
                     </td>
                     <td>
@@ -298,11 +298,11 @@ class ConverterSettingsPage
                             $rate = $converter->getRate('USD', 'VND');
                             if ($rate !== null) {
                                 printf(
-                                    esc_html__('Exchange rate 1 USD = %.2f VND', 'jankx'),
+                                    esc_html__('Exchange rate 1 USD = %.2f VND', 'base-ecommerce'),
                                     $rate
                                 );
                             } else {
-                                esc_html_e('Converter ready but rate not available', 'jankx');
+                                esc_html_e('Converter ready but rate not available', 'base-ecommerce');
                             }
                         } else {
                             if (method_exists($innerConverter, 'getLastError')) {
@@ -310,7 +310,7 @@ class ConverterSettingsPage
                                 if ($error) {
                                     echo esc_html($error);
                                 } else {
-                                    esc_html_e('Missing configuration (e.g., API key)', 'jankx');
+                                    esc_html_e('Missing configuration (e.g., API key)', 'base-ecommerce');
                                 }
                             }
                         }
@@ -320,8 +320,8 @@ class ConverterSettingsPage
             </tbody>
         </table>
 
-        <h3 style="margin-top: 30px;"><?php esc_html_e('Usage Examples', 'jankx'); ?></h3>
-        <p><?php esc_html_e('To use the currency converter in your code:', 'jankx'); ?></p>
+        <h3 style="margin-top: 30px;"><?php esc_html_e('Usage Examples', 'base-ecommerce'); ?></h3>
+        <p><?php esc_html_e('To use the currency converter in your code:', 'base-ecommerce'); ?></p>
         <pre><code><?php echo esc_html(
             '// Display price with automatic conversion
 echo CurrencyManager::formatPriceWithConversion(100); // 100 USD → display in current currency
@@ -353,7 +353,7 @@ $converted = CurrencyManager::convertPrice(100, "USD", "VND");
             add_settings_error(
                 'converter_settings',
                 'invalid_converter',
-                __('Invalid converter selected', 'jankx')
+                __('Invalid converter selected', 'base-ecommerce')
             );
             return;
         }
@@ -369,7 +369,7 @@ $converted = CurrencyManager::convertPrice(100, "USD", "VND");
                 add_settings_error(
                     'converter_settings',
                     'missing_api_key',
-                    __('OpenExchangeRates API key is required', 'jankx')
+                    __('OpenExchangeRates API key is required', 'base-ecommerce')
                 );
                 return;
             }
@@ -386,7 +386,7 @@ $converted = CurrencyManager::convertPrice(100, "USD", "VND");
                 add_settings_error(
                     'converter_settings',
                     'missing_api_key',
-                    __('Fixer.io API key is required', 'jankx')
+                    __('Fixer.io API key is required', 'base-ecommerce')
                 );
                 return;
             }
@@ -425,7 +425,7 @@ $converted = CurrencyManager::convertPrice(100, "USD", "VND");
         add_settings_error(
             'converter_settings',
             'settings_saved',
-            __('Converter settings saved successfully', 'jankx'),
+            __('Converter settings saved successfully', 'base-ecommerce'),
             'success'
         );
 

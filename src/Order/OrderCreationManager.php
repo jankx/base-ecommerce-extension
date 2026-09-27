@@ -74,7 +74,7 @@ class OrderCreationManager
         if (!$strategy) {
             return [
                 'success' => false,
-                'errors'  => [sprintf(__('Chiến lược tạo đơn hàng "%s" không tồn tại.', 'jankx'), $strategyName)],
+                'errors'  => [sprintf(__('Chiến lược tạo đơn hàng "%s" không tồn tại.', 'base-ecommerce'), $strategyName)],
                 'order'   => null,
             ];
         }
@@ -92,7 +92,7 @@ class OrderCreationManager
         if (!$order) {
             return [
                 'success' => false,
-                'errors'  => [__('Không thể tạo đơn hàng, vui lòng thử lại sau.', 'jankx')],
+                'errors'  => [__('Không thể tạo đơn hàng, vui lòng thử lại sau.', 'base-ecommerce')],
                 'order'   => null,
             ];
         }

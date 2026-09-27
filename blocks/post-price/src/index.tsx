@@ -13,29 +13,29 @@ function Edit({ attributes, setAttributes }) {
     return (
         <>
             <InspectorControls>
-                <PanelBody title={__('Cài đặt hiển thị giá', 'jankx')}>
+                <PanelBody title={__('Cài đặt hiển thị giá', 'base-ecommerce')}>
                     <TextControl
-                        label={__('Tiền tố', 'jankx')}
+                        label={__('Tiền tố', 'base-ecommerce')}
                         value={attributes.prefix}
                         onChange={(value) => setAttributes({ prefix: value })}
                     />
                     <TextControl
-                        label={__('Hậu tố', 'jankx')}
+                        label={__('Hậu tố', 'base-ecommerce')}
                         value={attributes.suffix}
                         onChange={(value) => setAttributes({ suffix: value })}
                     />
                     <ToggleControl
-                        label={__('Hiển thị khi chưa có giá', 'jankx')}
+                        label={__('Hiển thị khi chưa có giá', 'base-ecommerce')}
                         checked={attributes.showWhenEmpty}
                         onChange={(value) => setAttributes({ showWhenEmpty: value })}
                     />
                     <TextControl
-                        label={__('Chữ khi chưa có giá', 'jankx')}
+                        label={__('Chữ khi chưa có giá', 'base-ecommerce')}
                         value={attributes.emptyText}
                         onChange={(value) => setAttributes({ emptyText: value })}
                     />
                     <SelectControl
-                        label={__('Thẻ HTML', 'jankx')}
+                        label={__('Thẻ HTML', 'base-ecommerce')}
                         value={attributes.tagName}
                         options={[
                             { label: 'span', value: 'span' },

@@ -6,7 +6,7 @@
   "category": "jankx",
   "icon": "cart",
   "description": "Notice and continue shopping button displayed when there is nothing to check out.",
-  "textdomain": "jankx",
+  "textdomain": "base-ecommerce",
   "attributes": {
     "title": {
       "type": "string",
