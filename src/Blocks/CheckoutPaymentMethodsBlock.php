@@ -116,6 +116,8 @@ class CheckoutPaymentMethodsBlock extends CheckoutSectionBlock
                 return $this->renderBankTransferPanel();
             case 'qr_code':
                 return $this->renderQrCodePanel();
+            case 'onepay':
+                return $this->renderCreditCardPanel();
             case 'cod':
                 return '<p class="jankx-payment-desc">'
                     . esc_html__('Thanh toán bằng tiền mặt khi nhận hàng/dịch vụ.', 'base-ecommerce')
@@ -135,6 +137,15 @@ class CheckoutPaymentMethodsBlock extends CheckoutSectionBlock
     protected function renderBankTransferPanel(): string
     {
         return '<div class="jankx-bank-transfer-panel">'
+            . '<p class="jankx-payment-desc">'
+            . esc_html__('Bạn vui lòng chuyển khoản vào tài khoản ngân hàng của chúng tôi. Thông tin tài khoản sẽ được cung cấp sau khi bạn đặt hàng thành công.', 'base-ecommerce')
+            . '</p>'
+            . '</div>';
+    }
+
+    protected function renderCreditCardPanel(): string
+    {
+        return '<div class="jankx-credit-card-panel">'
             . '<div class="jankx-field-row">'
             . '<div class="jankx-field">'
             . '<label for="jankx_card_number">' . esc_html__('Thẻ tín dụng/Ghi nợ', 'base-ecommerce') . '</label>'
