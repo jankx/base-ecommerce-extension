@@ -363,6 +363,7 @@ class EcommerceExtension extends AbstractExtension
         wp_localize_script('jankx-ecommerce', 'jankxEcommerce', [
             'restUrl' => esc_url_raw(rest_url(EcommerceController::REST_NAMESPACE)),
             'cartUrl' => self::get_cart_page_url(),
+            'checkoutUrl' => self::get_checkout_page_url(),
             'ordersUrl' => self::get_orders_page_url(),
             'i18n' => [
                 'successTitle' => __('Order placed successfully!', 'base-ecommerce'),

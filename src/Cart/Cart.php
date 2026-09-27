@@ -21,9 +21,24 @@ class Cart implements CartInterface
     const CART_TTL = 30 * DAY_IN_SECONDS;
 
     /**
+     * Quick-buy (đặt ngay) scope: a temporary cart used only at the
+     * checkout page. It is stored under its own transient prefix so it never
+     * leaks into the main cart, and it is replaced on every new quick-buy.
+     */
+    const SCOPE_NORMAL = 'normal';
+    const SCOPE_QUICK = 'quick';
+    const QUICK_TRANSIENT_PREFIX = 'jankx_quick_cart_';
+    const QUICK_MODE_FLAG_PREFIX = 'jankx_quick_mode_';
+
+    /**
      * @var Cart|null
      */
     protected static $instance;
+
+    /**
+     * @var string Which storage this cart reads/writes: normal or quick.
+     */
+    protected $scope = self::SCOPE_NORMAL;
 
     /**
      * @var string
@@ -51,6 +66,64 @@ class Cart implements CartInterface
         return self::$instance;
     }
 
+    public function setScope(string $scope): self
+    {
+        $scope = $scope === self::SCOPE_QUICK ? self::SCOPE_QUICK : self::SCOPE_NORMAL;
+        if ($this->scope !== $scope) {
+            $this->scope = $scope;
+            $this->items = [];
+            $this->loaded = false;
+        }
+
+        return $this;
+    }
+
+    public function getScope(): string
+    {
+        return $this->scope;
+    }
+
+    public function isQuickScope(): bool
+    {
+        return $this->scope === self::SCOPE_QUICK;
+    }
+
+    protected function getTransientPrefix(): string
+    {
+        return $this->isQuickScope() ? self::QUICK_TRANSIENT_PREFIX : self::CART_TRANSIENT_PREFIX;
+    }
+
+    /**
+     * The cart used by the checkout flow. Returns a fresh instance wired to
+     * the quick scope when a quick-buy mode is active, otherwise the main cart.
+     */
+    public static function get_active_cart(): self
+    {
+        $cart = new self();
+        $cart->setScope(self::isQuickModeActive() ? self::SCOPE_QUICK : self::SCOPE_NORMAL);
+
+        return $cart;
+    }
+
+    public static function enableQuickMode(): void
+    {
+        set_transient(self::QUICK_MODE_FLAG_PREFIX . self::get_instance()->getCartKey(), 1, self::CART_TTL);
+    }
+
+    public static function disableQuickMode(): void
+    {
+        delete_transient(self::QUICK_MODE_FLAG_PREFIX . self::get_instance()->getCartKey());
+
+        $quickCart = new self();
+        $quickCart->setScope(self::SCOPE_QUICK);
+        $quickCart->emptyCart();
+    }
+
+    public static function isQuickModeActive(): bool
+    {
+        return (bool) get_transient(self::QUICK_MODE_FLAG_PREFIX . self::get_instance()->getCartKey());
+    }
+
     public function getCartKey(): string
     {
         if (!$this->cartKey) {
@@ -68,6 +141,10 @@ class Cart implements CartInterface
 
         if (!$key) {
             $key = md5(uniqid('jankx_cart_', true));
+            // Keep every instance created during this request on the same key,
+            // otherwise fresh instances (e.g. Cart::get_active_cart()) would
+            // each generate their own key and read/write different storages.
+            $_COOKIE[self::CART_COOKIE] = $key;
             if (!headers_sent()) {
                 setcookie(self::CART_COOKIE, $key, time() + self::CART_TTL, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
             }
@@ -83,13 +160,13 @@ class Cart implements CartInterface
         }
         $this->loaded = true;
 
-        $data = get_transient(self::CART_TRANSIENT_PREFIX . $this->getCartKey());
+        $data = get_transient($this->getTransientPrefix() . $this->getCartKey());
         $this->items = is_array($data) ? $data : [];
     }
 
     protected function save(): void
     {
-        set_transient(self::CART_TRANSIENT_PREFIX . $this->getCartKey(), $this->items, self::CART_TTL);
+        set_transient($this->getTransientPrefix() . $this->getCartKey(), $this->items, self::CART_TTL);
     }
 
     protected function buildItemKey(int $productId, array $args = []): string
@@ -169,6 +246,27 @@ class Cart implements CartInterface
             )) {
                 $added++;
             }
+        }
+
+        return $added;
+    }
+
+    /**
+     * Perform a quick-buy (đặt ngay) add. Works exactly like addItems but
+     * targets the quick scope and REPLACES any previous quick-buy session:
+     * the quick cart is emptied first, then the new lines are added and the
+     * quick-buy mode flag is turned on so the checkout page shows them.
+     *
+     * @return int Number of lines successfully added
+     */
+    public function quickAddItems(array $lines, array $commonArgs = []): int
+    {
+        $this->setScope(self::SCOPE_QUICK);
+        $this->emptyCart();
+
+        $added = $this->addItems($lines, $commonArgs);
+        if ($added > 0) {
+            self::enableQuickMode();
         }
 
         return $added;
@@ -299,6 +397,7 @@ class Cart implements CartInterface
         $converterManager = \Jankx\Extensions\Ecommerce\Currency\Converters\CurrencyConverterManager::getInstance();
 
         return [
+            'scope' => $this->getScope(),
             'cart_key' => $this->getCartKey(),
             'items' => array_map(function (CartItem $item) {
                 return $item->toArray();

@@ -43,7 +43,7 @@ class CheckoutBlock extends Block
 
     public function render($attributes, $content = '', $block = null): string
     {
-        $cart = Cart::get_instance();
+        $cart = Cart::get_active_cart();
         $wrapperAttrs = get_block_wrapper_attributes([
             'class' => 'jankx-checkout-block',
         ]);
@@ -86,6 +86,9 @@ class CheckoutBlock extends Block
 
     protected function renderForm($block): string
     {
+        $cart = Cart::get_active_cart();
+        $formAttrs = $this->getFormAttributes($cart);
+
         $innerBlocks = [];
         if ($block && !empty($block->inner_blocks)) {
             foreach ($block->inner_blocks as $innerBlock) {
@@ -115,7 +118,7 @@ class CheckoutBlock extends Block
             }
         }
 
-        $output = '<form class="jankx-checkout-form" method="post" novalidate>';
+        $output = sprintf('<form %s>', $formAttrs);
         $output .= '<div class="jankx-checkout-cols">';
 
         $output .= '<div class="jankx-checkout-customer">';
@@ -143,7 +146,10 @@ class CheckoutBlock extends Block
 
     protected function renderDefaultForm(): string
     {
-        $output = '<form class="jankx-checkout-form" method="post" novalidate>';
+        $cart = Cart::get_active_cart();
+        $formAttrs = $this->getFormAttributes($cart);
+
+        $output = sprintf('<form %s>', $formAttrs);
         $output .= '<div class="jankx-checkout-cols">';
 
         $output .= '<div class="jankx-checkout-customer">';
@@ -172,5 +178,28 @@ class CheckoutBlock extends Block
         }
 
         return (new $blockClass())->render([]);
+    }
+
+    protected function getFormAttributes(Cart $cart): string
+    {
+        $attrs = [
+            'class' => 'jankx-checkout-form',
+            'method' => 'post',
+            'novalidate' => 'novalidate',
+        ];
+
+        if ($cart->isQuickScope()) {
+            $attrs['data-jankx-checkout-mode'] = 'quick';
+        }
+
+        $output = '';
+        foreach ($attrs as $key => $value) {
+            if (is_bool($value)) {
+                $value = $value ? 'true' : 'false';
+            }
+            $output .= sprintf('%s="%s" ', esc_attr($key), esc_attr((string) $value));
+        }
+
+        return trim($output);
     }
 }

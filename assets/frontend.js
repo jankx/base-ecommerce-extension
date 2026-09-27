@@ -85,6 +85,8 @@
 
         event.preventDefault();
 
+        var mode = form.getAttribute('data-jankx-mode') || 'normal';
+        var isQuick = mode === 'quick';
         var productId = form.querySelector('[name="product_id"]').value;
         var quantityInput = form.querySelector('[name="quantity"]');
         var departureInput = form.querySelector('[name="departure_date"]');
@@ -93,7 +95,8 @@
 
         var body = {
             product_id: parseInt(productId, 10) || 0,
-            quantity: quantityInput ? parseInt(quantityInput.value, 10) || 1 : 1
+            quantity: quantityInput ? parseInt(quantityInput.value, 10) || 1 : 1,
+            mode: mode
         };
 
         // Group-wise quantities (e.g. date-based tour pricing): read every
@@ -126,7 +129,8 @@
                     lines: lines,
                     args: (departureInput && departureInput.value)
                         ? { departure_date: departureInput.value }
-                        : {}
+                        : {},
+                    mode: mode
                 };
 
                 if (statusBox) {
@@ -155,7 +159,7 @@
                     button.classList.remove('is-loading');
                     button.textContent = window.jankxEcommerce.i18n ? window.jankxEcommerce.i18n.added : 'Đã thêm ✓';
 
-                    if (document.querySelector('.jankx-mini-cart-toggle')) {
+                    if (document.querySelector('.jankx-mini-cart-toggle') && !isQuick) {
                         document.dispatchEvent(new CustomEvent('jankx:cart-updated'));
                         setTimeout(function () {
                             button.textContent = batchOriginalText;
@@ -163,8 +167,9 @@
                         }, 1500);
                         return;
                     }
-                    if (window.jankxEcommerce.cartUrl) {
-                        window.location.href = window.jankxEcommerce.cartUrl;
+                    var batchRedirect = isQuick ? window.jankxEcommerce.checkoutUrl : window.jankxEcommerce.cartUrl;
+                    if (batchRedirect) {
+                        window.location.href = batchRedirect;
                         return;
                     }
                     if (statusBox) {
@@ -216,7 +221,7 @@
             button.classList.remove('is-loading');
             button.textContent = window.jankxEcommerce.i18n ? window.jankxEcommerce.i18n.added : 'Đã thêm ✓';
 
-            if (document.querySelector('.jankx-mini-cart-toggle')) {
+            if (document.querySelector('.jankx-mini-cart-toggle') && !isQuick) {
                 document.dispatchEvent(new CustomEvent('jankx:cart-updated'));
                 setTimeout(function () {
                     button.textContent = originalText;
@@ -224,8 +229,9 @@
                 }, 1500);
                 return;
             }
-            if (window.jankxEcommerce.cartUrl) {
-                window.location.href = window.jankxEcommerce.cartUrl;
+            var redirectUrl = isQuick ? window.jankxEcommerce.checkoutUrl : window.jankxEcommerce.cartUrl;
+            if (redirectUrl) {
+                window.location.href = redirectUrl;
                 return;
             }
             if (statusBox) {
@@ -273,10 +279,16 @@
             var createAccountCheckbox = checkoutForm.querySelector('#jankx_create_account');
             var createAccount = createAccountCheckbox ? createAccountCheckbox.checked : false;
 
+            var checkoutMode = checkoutForm.getAttribute('data-jankx-checkout-mode') || 'normal';
+            var checkoutBody = { customer: customer, gateway: gateway, create_account: createAccount };
+            if (checkoutMode !== 'normal') {
+                checkoutBody.mode = checkoutMode;
+            }
+
             getJson({
                 url: window.jankxEcommerce.restUrl + '/checkout',
                 method: 'POST',
-                body: { customer: customer, gateway: gateway, create_account: createAccount }
+                body: checkoutBody
             }).then(function (response) {
                 if (!response.success) {
                     var message = Array.isArray(response.message) ? response.message.join(', ') : response.message;

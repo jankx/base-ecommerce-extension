@@ -30,6 +30,13 @@ class EcommerceController
             'methods'             => \WP_REST_Server::READABLE,
             'callback'            => [$this, 'getCart'],
             'permission_callback' => '__return_true',
+            'args'                => [
+                'mode' => [
+                    'type'              => 'string',
+                    'default'           => 'normal',
+                    'sanitize_callback' => 'sanitize_key',
+                ],
+            ],
         ]);
 
         register_rest_route(self::REST_NAMESPACE, '/cart/items', [
@@ -46,6 +53,11 @@ class EcommerceController
                     'default'           => 1,
                     'type'              => 'integer',
                     'sanitize_callback' => 'absint',
+                ],
+                'mode' => [
+                    'type'              => 'string',
+                    'default'           => 'normal',
+                    'sanitize_callback' => 'sanitize_key',
                 ],
             ],
         ]);
@@ -67,6 +79,11 @@ class EcommerceController
                     'sanitize_callback' => function ($value) {
                         return is_array($value) ? $this->sanitizeArgs($value) : [];
                     },
+                ],
+                'mode' => [
+                    'type'              => 'string',
+                    'default'           => 'normal',
+                    'sanitize_callback' => 'sanitize_key',
                 ],
             ],
         ]);
@@ -104,6 +121,13 @@ class EcommerceController
             'methods'             => \WP_REST_Server::CREATABLE,
             'callback'            => [$this, 'checkout'],
             'permission_callback' => '__return_true',
+            'args'                => [
+                'mode' => [
+                    'type'              => 'string',
+                    'default'           => '',
+                    'sanitize_callback' => 'sanitize_key',
+                ],
+            ],
         ]);
 
         register_rest_route(self::REST_NAMESPACE, '/orders/(?P<order_number>[a-zA-Z0-9_-]+)/pay', [
@@ -178,6 +202,11 @@ class EcommerceController
 
     public function getCart(\WP_REST_Request $request): \WP_REST_Response
     {
+        $mode = $request->get_param('mode');
+        if ($mode === 'quick') {
+            return rest_ensure_response(Cart::get_active_cart()->toArray());
+        }
+
         return rest_ensure_response(Cart::get_instance()->toArray());
     }
 
@@ -185,12 +214,33 @@ class EcommerceController
     {
         $args = $request->get_param('args');
         $args = is_array($args) ? $this->sanitizeArgs($args) : [];
+        $mode = $request->get_param('mode');
 
-        $added = Cart::get_instance()->addItem(
-            (int) $request->get_param('product_id'),
-            (int) $request->get_param('quantity'),
-            $args
-        );
+        if ($mode === 'quick') {
+            $cart = Cart::get_active_cart();
+            // Switch scope BEFORE emptying so we replace the quick session,
+            // never the main cart.
+            $cart->setScope(Cart::SCOPE_QUICK);
+            $cart->emptyCart();
+
+            $added = $cart->addItem(
+                (int) $request->get_param('product_id'),
+                (int) $request->get_param('quantity'),
+                $args
+            );
+
+            if ($added) {
+                Cart::enableQuickMode();
+            }
+        } else {
+            $added = Cart::get_instance()->addItem(
+                (int) $request->get_param('product_id'),
+                (int) $request->get_param('quantity'),
+                $args
+            );
+
+            $cart = Cart::get_instance();
+        }
 
         if (!$added) {
             return new \WP_REST_Response([
@@ -201,7 +251,8 @@ class EcommerceController
 
         return rest_ensure_response([
             'success' => true,
-            'cart'    => Cart::get_instance()->toArray(),
+            'mode'    => $mode,
+            'cart'    => $cart->toArray(),
         ]);
     }
 
@@ -259,7 +310,14 @@ class EcommerceController
             ], 400);
         }
 
-        $added = Cart::get_instance()->addItems($normalized, $commonArgs);
+        $mode = $request->get_param('mode');
+        if ($mode === 'quick') {
+            $added = Cart::get_active_cart()->quickAddItems($normalized, $commonArgs);
+            $cart = Cart::get_active_cart();
+        } else {
+            $added = Cart::get_instance()->addItems($normalized, $commonArgs);
+            $cart = Cart::get_instance();
+        }
 
         if ($added === 0) {
             return new \WP_REST_Response([
@@ -270,8 +328,9 @@ class EcommerceController
 
         return rest_ensure_response([
             'success' => true,
+            'mode'    => $mode,
             'added'   => $added,
-            'cart'    => Cart::get_instance()->toArray(),
+            'cart'    => $cart->toArray(),
         ]);
     }
 
@@ -327,8 +386,13 @@ class EcommerceController
 
         $createAccount = (bool) $request->get_param('create_account');
 
+        $cart = Cart::get_active_cart();
+        if ($request->get_param('mode') === 'quick') {
+            $cart->setScope(Cart::SCOPE_QUICK);
+        }
+
         $result = CheckoutManager::get_instance()->checkout(
-            Cart::get_instance(),
+            $cart,
             $customer,
             [
                 'gateway'        => $gateway,
@@ -342,6 +406,10 @@ class EcommerceController
                 'success' => false,
                 'message' => $result['errors'],
             ], 400);
+        }
+
+        if ($cart->isQuickScope()) {
+            Cart::disableQuickMode();
         }
 
         /** @var \Jankx\Extensions\Ecommerce\Order\Order $order */

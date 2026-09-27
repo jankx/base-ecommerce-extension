@@ -22,7 +22,7 @@ class CheckoutEmptyBlock extends Block
 
     public function render($attributes, $content = '', $block = null): string
     {
-        $cart = Cart::get_instance();
+        $cart = Cart::get_active_cart();
         if (!$cart->isEmpty()) {
             return '';
         }
