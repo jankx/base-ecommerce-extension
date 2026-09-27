@@ -370,4 +370,123 @@
             button.textContent = 'Thanh toán ngay';
         });
     };
+
+    // -------------------------------------------------------
+    // Payment method tabs (new checkout redesign)
+    // -------------------------------------------------------
+    var checkoutBlocks = document.querySelectorAll('.jankx-checkout-payment-methods');
+    checkoutBlocks.forEach(function (block) {
+        var tabs   = block.querySelectorAll('.jankx-payment-tab');
+        var panels = block.querySelectorAll('.jankx-payment-panel');
+        var radios = block.querySelectorAll('.jankx-payment-radio');
+
+        tabs.forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                var method = tab.getAttribute('data-method');
+
+                // Update tabs
+                tabs.forEach(function (t) {
+                    t.classList.remove('jankx-payment-tab--active');
+                    t.setAttribute('aria-selected', 'false');
+                });
+                tab.classList.add('jankx-payment-tab--active');
+                tab.setAttribute('aria-selected', 'true');
+
+                // Update panels
+                panels.forEach(function (p) {
+                    if (p.getAttribute('data-method') === method) {
+                        p.classList.add('jankx-payment-panel--active');
+                        p.hidden = false;
+                    } else {
+                        p.classList.remove('jankx-payment-panel--active');
+                        p.hidden = true;
+                    }
+                });
+
+                // Check the corresponding radio
+                radios.forEach(function (r) {
+                    r.checked = (r.value === method);
+                });
+            });
+        });
+    });
+
+    // -------------------------------------------------------
+    // Section toggle (collapse / expand)
+    // -------------------------------------------------------
+    document.querySelectorAll('.jankx-section-toggle').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var section = btn.closest('.jankx-checkout-section');
+            if (!section) return;
+            var body = section.querySelector('.jankx-section-body');
+            if (!body) return;
+            var expanded = btn.getAttribute('aria-expanded') === 'true';
+            body.hidden = expanded;
+            btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+            // Rotate chevron
+            btn.style.transform = expanded ? 'rotate(180deg)' : '';
+        });
+    });
+
+    // -------------------------------------------------------
+    // Submit button: show total from hidden grand-total element
+    // (already embedded in button HTML via PHP)
+    // -------------------------------------------------------
+    var placeOrderBtn = document.querySelector('.jankx-btn-place-order');
+    if (placeOrderBtn) {
+        // Listen to credits/coupon updates and refresh the displayed total
+        document.addEventListener('jankx:cart:updated', function (e) {
+            var totalEl = document.querySelector('.jankx-review-total-value');
+            var btnTotal = placeOrderBtn.querySelector('.jankx-btn-total');
+            if (totalEl && btnTotal) {
+                btnTotal.textContent = totalEl.textContent;
+            }
+        });
+    }
+
+    // Coupon "Áp dụng" button (hook into existing coupon REST if available)
+    var couponBtn = document.getElementById('jankx-apply-coupon');
+    if (couponBtn) {
+        couponBtn.addEventListener('click', function () {
+            var input   = document.getElementById('jankx_coupon_code');
+            var msgEl   = document.querySelector('.jankx-coupon-message');
+            if (!input || !input.value.trim()) return;
+
+            couponBtn.disabled = true;
+            if (msgEl) { msgEl.textContent = ''; }
+
+            getJson({
+                url: window.jankxEcommerce.restUrl + '/coupon/apply',
+                method: 'POST',
+                body: { code: input.value.trim() }
+            }).then(function (response) {
+                couponBtn.disabled = false;
+                if (!response.success) {
+                    if (msgEl) { msgEl.textContent = response.message || 'Mã không hợp lệ.'; }
+                    return;
+                }
+                // Refresh discount rows
+                var discountRow = document.querySelector('.jankx-review-discount-row');
+                var discountVal = document.querySelector('.jankx-review-discount-value');
+                if (discountRow && discountVal && response.discount_formatted) {
+                    discountVal.textContent = '-' + response.discount_formatted;
+                    discountRow.hidden = false;
+                }
+                var totalVal = document.querySelector('.jankx-review-total-value');
+                if (totalVal && response.total_formatted) {
+                    totalVal.textContent = response.total_formatted;
+                    var btnTotal = document.querySelector('.jankx-btn-total');
+                    if (btnTotal) btnTotal.textContent = response.total_formatted;
+                }
+                if (msgEl) {
+                    msgEl.style.color = '#27ae60';
+                    msgEl.textContent = response.message || 'Áp dụng thành công!';
+                }
+                document.dispatchEvent(new CustomEvent('jankx:cart:updated'));
+            }).catch(function () {
+                couponBtn.disabled = false;
+                if (msgEl) { msgEl.textContent = 'Có lỗi xảy ra. Vui lòng thử lại.'; }
+            });
+        });
+    }
 })();
