@@ -49,15 +49,15 @@ class CheckoutEmptyBlock extends Block
 
         $title = !empty($attributes['title'])
             ? $attributes['title']
-            : __('Nothing to check out yet', 'jankx');
+            : __('Nothing to check out yet', 'base-ecommerce');
 
         $desc = !empty($attributes['description'])
             ? $attributes['description']
-            : __('Add some products to your cart before checking out.', 'jankx');
+            : __('Add some products to your cart before checking out.', 'base-ecommerce');
 
         $btnText = !empty($attributes['buttonText'])
             ? $attributes['buttonText']
-            : __('Continue shopping', 'jankx');
+            : __('Continue shopping', 'base-ecommerce');
 
         $btnUrl = !empty($attributes['buttonUrl'])
             ? $attributes['buttonUrl']

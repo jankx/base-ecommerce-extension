@@ -242,7 +242,7 @@ function jankx_admin_converter_notice(): string
         return sprintf(
             '<div class="notice notice-warning"><p>%s</p></div>',
             sprintf(
-                __('Currency converter "%s" is not properly configured. Prices will not be converted. <a href="%s">Configure now</a>', 'jankx'),
+                __('Currency converter "%s" is not properly configured. Prices will not be converted. <a href="%s">Configure now</a>', 'base-ecommerce'),
                 $info['name'],
                 admin_url('admin.php?page=jankx-ecommerce-settings&tab=currency')
             )

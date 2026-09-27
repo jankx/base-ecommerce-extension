@@ -30,7 +30,7 @@ class CheckoutCreditsBlock extends CheckoutSectionBlock
             . '<span>' . esc_html($integration->getLabel()) . '</span>'
             . '</label>';
         $output .= '<p class="jankx-credits-balance">'
-            . esc_html__('Số dư tín dụng:', 'jankx') . ' <strong class="jankx-credits-balance-value">'
+            . esc_html__('Số dư tín dụng:', 'base-ecommerce') . ' <strong class="jankx-credits-balance-value">'
             . esc_html($this->formatPrice($balance))
             . '</strong></p>';
         $output .= '<span class="jankx-credits-message" role="status"></span>';

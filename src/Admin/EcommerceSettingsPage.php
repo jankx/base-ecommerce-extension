@@ -24,8 +24,8 @@ class EcommerceSettingsPage
     public function addMenuPage(): void
     {
         add_menu_page(
-            __('Cài đặt Ecommerce', 'jankx'),
-            __('Ecommerce', 'jankx'),
+            __('Cài đặt Ecommerce', 'base-ecommerce'),
+            __('Ecommerce', 'base-ecommerce'),
             'manage_options',
             self::PAGE_SLUG,
             [$this, 'renderPage'],
@@ -38,11 +38,11 @@ class EcommerceSettingsPage
     {
         $parent = self::PAGE_SLUG;
 
-        add_submenu_page($parent, __('Cài đặt chung', 'jankx'), __('Cài đặt chung', 'jankx'), 'manage_options', 'jankx-ecommerce-general', [$this, 'renderGeneralPage']);
-        add_submenu_page($parent, __('Tiền tệ', 'jankx'), __('Tiền tệ', 'jankx'), 'manage_options', 'jankx-ecommerce-currency', [$this, 'renderCurrencyPage']);
-        add_submenu_page($parent, __('Phương thức thanh toán', 'jankx'), __('Thanh toán', 'jankx'), 'manage_options', 'jankx-ecommerce-payment', [$this, 'renderPaymentPage']);
-        add_submenu_page($parent, __('Mã giảm giá', 'jankx'), __('Mã giảm giá', 'jankx'), 'manage_options', 'jankx-ecommerce-coupons', [$this, 'renderCouponsPage']);
-        add_submenu_page($parent, __('Thuế', 'jankx'), __('Thuế', 'jankx'), 'manage_options', 'jankx-ecommerce-tax', [$this, 'renderTaxPage']);
+        add_submenu_page($parent, __('Cài đặt chung', 'base-ecommerce'), __('Cài đặt chung', 'base-ecommerce'), 'manage_options', 'jankx-ecommerce-general', [$this, 'renderGeneralPage']);
+        add_submenu_page($parent, __('Tiền tệ', 'base-ecommerce'), __('Tiền tệ', 'base-ecommerce'), 'manage_options', 'jankx-ecommerce-currency', [$this, 'renderCurrencyPage']);
+        add_submenu_page($parent, __('Phương thức thanh toán', 'base-ecommerce'), __('Thanh toán', 'base-ecommerce'), 'manage_options', 'jankx-ecommerce-payment', [$this, 'renderPaymentPage']);
+        add_submenu_page($parent, __('Mã giảm giá', 'base-ecommerce'), __('Mã giảm giá', 'base-ecommerce'), 'manage_options', 'jankx-ecommerce-coupons', [$this, 'renderCouponsPage']);
+        add_submenu_page($parent, __('Thuế', 'base-ecommerce'), __('Thuế', 'base-ecommerce'), 'manage_options', 'jankx-ecommerce-tax', [$this, 'renderTaxPage']);
 
         remove_submenu_page($parent, $parent);
     }
@@ -265,7 +265,7 @@ class EcommerceSettingsPage
         $tabs = $this->getTabs();
         ?>
         <div class="wrap jankx-ecommerce-settings">
-            <h1><?php esc_html_e('Cài đặt Ecommerce', 'jankx'); ?></h1>
+            <h1><?php esc_html_e('Cài đặt Ecommerce', 'base-ecommerce'); ?></h1>
 
             <nav class="nav-tab-wrapper">
                 <?php foreach ($tabs as $slug => $label): ?>
@@ -321,11 +321,11 @@ class EcommerceSettingsPage
     protected function getTabs(): array
     {
         $tabs = [
-            'general'  => __('Chung', 'jankx'),
-            'currency' => __('Tiền tệ', 'jankx'),
-            'payment'  => __('Thanh toán', 'jankx'),
-            'coupons'  => __('Mã giảm giá', 'jankx'),
-            'tax'      => __('Thuế', 'jankx'),
+            'general'  => __('Chung', 'base-ecommerce'),
+            'currency' => __('Tiền tệ', 'base-ecommerce'),
+            'payment'  => __('Thanh toán', 'base-ecommerce'),
+            'coupons'  => __('Mã giảm giá', 'base-ecommerce'),
+            'tax'      => __('Thuế', 'base-ecommerce'),
         ];
 
         /**
@@ -334,7 +334,7 @@ class EcommerceSettingsPage
          * Third-party extensions can append their own tab by hooking here:
          *
          *   add_filter('jankx/ecommerce/settings/tabs', function (array $tabs) {
-         *       $tabs['my-tab'] = __('My Tab', 'jankx');
+         *       $tabs['my-tab'] = __('My Tab', 'base-ecommerce');
          *       return $tabs;
          *   });
          *
@@ -352,7 +352,7 @@ class EcommerceSettingsPage
         <?php settings_fields(self::OPTION_GROUP); ?>
         <table class="form-table">
             <tr>
-                <th scope="row"><label for="jankx_store_name"><?php esc_html_e('Tên cửa hàng', 'jankx'); ?></label></th>
+                <th scope="row"><label for="jankx_store_name"><?php esc_html_e('Tên cửa hàng', 'base-ecommerce'); ?></label></th>
                 <td>
                     <input type="text" id="jankx_store_name" name="jankx_store_name"
                            value="<?php echo esc_attr(get_option('jankx_store_name', get_bloginfo('name'))); ?>"
@@ -360,7 +360,7 @@ class EcommerceSettingsPage
                 </td>
             </tr>
             <tr>
-                <th scope="row"><label for="jankx_store_address"><?php esc_html_e('Địa chỉ', 'jankx'); ?></label></th>
+                <th scope="row"><label for="jankx_store_address"><?php esc_html_e('Địa chỉ', 'base-ecommerce'); ?></label></th>
                 <td>
                     <textarea id="jankx_store_address" name="jankx_store_address" rows="3" class="large-text"><?php
                         echo esc_textarea(get_option('jankx_store_address', ''));
@@ -368,7 +368,7 @@ class EcommerceSettingsPage
                 </td>
             </tr>
             <tr>
-                <th scope="row"><label for="jankx_store_phone"><?php esc_html_e('Số điện thoại', 'jankx'); ?></label></th>
+                <th scope="row"><label for="jankx_store_phone"><?php esc_html_e('Số điện thoại', 'base-ecommerce'); ?></label></th>
                 <td>
                     <input type="tel" id="jankx_store_phone" name="jankx_store_phone"
                            value="<?php echo esc_attr(get_option('jankx_store_phone', '')); ?>"
@@ -376,7 +376,7 @@ class EcommerceSettingsPage
                 </td>
             </tr>
             <tr>
-                <th scope="row"><label for="jankx_store_email"><?php esc_html_e('Email liên hệ', 'jankx'); ?></label></th>
+                <th scope="row"><label for="jankx_store_email"><?php esc_html_e('Email liên hệ', 'base-ecommerce'); ?></label></th>
                 <td>
                     <input type="email" id="jankx_store_email" name="jankx_store_email"
                            value="<?php echo esc_attr(get_option('jankx_store_email', get_option('admin_email'))); ?>"
@@ -407,8 +407,8 @@ class EcommerceSettingsPage
         // Sort by name
         uasort($allCurrencies, fn($a, $b) => strcmp($a['name'], $b['name']));
         ?>
-        <h2><?php esc_html_e('Quản lý tiền tệ', 'jankx'); ?></h2>
-        <p class="description"><?php esc_html_e('Chọn các loại tiền tệ muốn hiển thị trên trang web. Đánh dấu vào ô bên cạnh để bật/tắt.', 'jankx'); ?></p>
+        <h2><?php esc_html_e('Quản lý tiền tệ', 'base-ecommerce'); ?></h2>
+        <p class="description"><?php esc_html_e('Chọn các loại tiền tệ muốn hiển thị trên trang web. Đánh dấu vào ô bên cạnh để bật/tắt.', 'base-ecommerce'); ?></p>
 
         <form method="post" action="options.php">
         <?php settings_fields(self::OPTION_GROUP); ?>
@@ -416,16 +416,16 @@ class EcommerceSettingsPage
         <table class="widefat striped jankx-currency-table" style="margin-top: 16px;">
             <thead>
                 <tr>
-                    <th style="width:50px;"><?php esc_html_e('Bật', 'jankx'); ?></th>
-                    <th style="width:60px;"><?php esc_html_e('Mã', 'jankx'); ?></th>
+                    <th style="width:50px;"><?php esc_html_e('Bật', 'base-ecommerce'); ?></th>
+                    <th style="width:60px;"><?php esc_html_e('Mã', 'base-ecommerce'); ?></th>
                     <th style="width:50px;"></th>
-                    <th><?php esc_html_e('Tên tiền tệ', 'jankx'); ?></th>
-                    <th style="width:70px;"><?php esc_html_e('Ký hiệu', 'jankx'); ?></th>
-                    <th style="width:100px;"><?php esc_html_e('Mặc định', 'jankx'); ?></th>
-                    <th style="width:80px;" title="<?php esc_attr_e('Số chữ số thập phân', 'jankx'); ?>"><?php esc_html_e('Thập phân', 'jankx'); ?></th>
-                    <th style="width:170px;"><?php esc_html_e('Vị trí ký hiệu', 'jankx'); ?></th>
-                    <th style="width:70px;" title="<?php esc_attr_e('Dấu phân cách hàng nghìn', 'jankx'); ?>"><?php esc_html_e('Dấu nghìn', 'jankx'); ?></th>
-                    <th style="width:70px;" title="<?php esc_attr_e('Dấu phân cách thập phân', 'jankx'); ?>"><?php esc_html_e('Dấu T.phân', 'jankx'); ?></th>
+                    <th><?php esc_html_e('Tên tiền tệ', 'base-ecommerce'); ?></th>
+                    <th style="width:70px;"><?php esc_html_e('Ký hiệu', 'base-ecommerce'); ?></th>
+                    <th style="width:100px;"><?php esc_html_e('Mặc định', 'base-ecommerce'); ?></th>
+                    <th style="width:80px;" title="<?php esc_attr_e('Số chữ số thập phân', 'base-ecommerce'); ?>"><?php esc_html_e('Thập phân', 'base-ecommerce'); ?></th>
+                    <th style="width:170px;"><?php esc_html_e('Vị trí ký hiệu', 'base-ecommerce'); ?></th>
+                    <th style="width:70px;" title="<?php esc_attr_e('Dấu phân cách hàng nghìn', 'base-ecommerce'); ?>"><?php esc_html_e('Dấu nghìn', 'base-ecommerce'); ?></th>
+                    <th style="width:70px;" title="<?php esc_attr_e('Dấu phân cách thập phân', 'base-ecommerce'); ?>"><?php esc_html_e('Dấu T.phân', 'base-ecommerce'); ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -462,11 +462,11 @@ class EcommerceSettingsPage
                         </td>
                         <td>
                             <select name="jankx_currency_fmt_<?php echo esc_attr($code); ?>[position]" class="small-text">
-                                <option value="" <?php selected($perPosition, ''); ?>><?php esc_html_e('— Mặc định —', 'jankx'); ?></option>
-                                <option value="left"        <?php selected($perPosition, 'left'); ?>><?php esc_html_e('Trước ($100)', 'jankx'); ?></option>
-                                <option value="right"       <?php selected($perPosition, 'right'); ?>><?php esc_html_e('Sau (100$)', 'jankx'); ?></option>
-                                <option value="left_space"  <?php selected($perPosition, 'left_space'); ?>><?php esc_html_e('Trước, cách ($ 100)', 'jankx'); ?></option>
-                                <option value="right_space" <?php selected($perPosition, 'right_space'); ?>><?php esc_html_e('Sau, cách (100 $)', 'jankx'); ?></option>
+                                <option value="" <?php selected($perPosition, ''); ?>><?php esc_html_e('— Mặc định —', 'base-ecommerce'); ?></option>
+                                <option value="left"        <?php selected($perPosition, 'left'); ?>><?php esc_html_e('Trước ($100)', 'base-ecommerce'); ?></option>
+                                <option value="right"       <?php selected($perPosition, 'right'); ?>><?php esc_html_e('Sau (100$)', 'base-ecommerce'); ?></option>
+                                <option value="left_space"  <?php selected($perPosition, 'left_space'); ?>><?php esc_html_e('Trước, cách ($ 100)', 'base-ecommerce'); ?></option>
+                                <option value="right_space" <?php selected($perPosition, 'right_space'); ?>><?php esc_html_e('Sau, cách (100 $)', 'base-ecommerce'); ?></option>
                             </select>
                         </td>
                         <td>
@@ -486,29 +486,29 @@ class EcommerceSettingsPage
             </tbody>
         </table>
 
-        <h3><?php esc_html_e('Định dạng mặc định (Fallback)', 'jankx'); ?></h3>
-        <p class="description"><?php esc_html_e('Áp dụng khi đồng tiền không có tuỳ chỉnh riêng hoặc vị trí ký hiệu chọn "— Mặc định —".', 'jankx'); ?></p>
+        <h3><?php esc_html_e('Định dạng mặc định (Fallback)', 'base-ecommerce'); ?></h3>
+        <p class="description"><?php esc_html_e('Áp dụng khi đồng tiền không có tuỳ chỉnh riêng hoặc vị trí ký hiệu chọn "— Mặc định —".', 'base-ecommerce'); ?></p>
         <table class="form-table">
             <tr>
-                <th scope="row"><?php esc_html_e('Vị trí ký hiệu mặc định', 'jankx'); ?></th>
+                <th scope="row"><?php esc_html_e('Vị trí ký hiệu mặc định', 'base-ecommerce'); ?></th>
                 <td>
                     <select name="jankx_currency_position">
-                        <option value="left"        <?php selected($position, 'left'); ?>><?php esc_html_e('Trước số tiền ($100)', 'jankx'); ?></option>
-                        <option value="right"       <?php selected($position, 'right'); ?>><?php esc_html_e('Sau số tiền (100$)', 'jankx'); ?></option>
-                        <option value="left_space"  <?php selected($position, 'left_space'); ?>><?php esc_html_e('Trước số tiền, cách ($ 100)', 'jankx'); ?></option>
-                        <option value="right_space" <?php selected($position, 'right_space'); ?>><?php esc_html_e('Sau số tiền, cách (100 $)', 'jankx'); ?></option>
+                        <option value="left"        <?php selected($position, 'left'); ?>><?php esc_html_e('Trước số tiền ($100)', 'base-ecommerce'); ?></option>
+                        <option value="right"       <?php selected($position, 'right'); ?>><?php esc_html_e('Sau số tiền (100$)', 'base-ecommerce'); ?></option>
+                        <option value="left_space"  <?php selected($position, 'left_space'); ?>><?php esc_html_e('Trước số tiền, cách ($ 100)', 'base-ecommerce'); ?></option>
+                        <option value="right_space" <?php selected($position, 'right_space'); ?>><?php esc_html_e('Sau số tiền, cách (100 $)', 'base-ecommerce'); ?></option>
                     </select>
                 </td>
             </tr>
             <tr>
-                <th scope="row"><label for="jankx_currency_thousand_sep"><?php esc_html_e('Dấu phân cách hàng nghìn mặc định', 'jankx'); ?></label></th>
+                <th scope="row"><label for="jankx_currency_thousand_sep"><?php esc_html_e('Dấu phân cách hàng nghìn mặc định', 'base-ecommerce'); ?></label></th>
                 <td>
                     <input type="text" id="jankx_currency_thousand_sep" name="jankx_currency_thousand_sep"
                            value="<?php echo esc_attr($thousandSep); ?>" class="small-text">
                 </td>
             </tr>
             <tr>
-                <th scope="row"><label for="jankx_currency_decimal_sep"><?php esc_html_e('Dấu phân cách thập phân mặc định', 'jankx'); ?></label></th>
+                <th scope="row"><label for="jankx_currency_decimal_sep"><?php esc_html_e('Dấu phân cách thập phân mặc định', 'base-ecommerce'); ?></label></th>
                 <td>
                     <input type="text" id="jankx_currency_decimal_sep" name="jankx_currency_decimal_sep"
                            value="<?php echo esc_attr($decimalSep); ?>" class="small-text">
@@ -516,8 +516,8 @@ class EcommerceSettingsPage
             </tr>
         </table>
 
-        <h3><?php esc_html_e('Xem trước', 'jankx'); ?></h3>
-        <p class="description"><?php esc_html_e('Minh hoạ hiển thị số tiền "1.000.000" của đồng tiền mặc định (Base) sau khi áp dụng Format và Tỷ giá (nếu có cấu hình Converter).', 'jankx'); ?></p>
+        <h3><?php esc_html_e('Xem trước', 'base-ecommerce'); ?></h3>
+        <p class="description"><?php esc_html_e('Minh hoạ hiển thị số tiền "1.000.000" của đồng tiền mặc định (Base) sau khi áp dụng Format và Tỷ giá (nếu có cấu hình Converter).', 'base-ecommerce'); ?></p>
         <div class="jankx-price-preview" style="padding:16px; background:#f9f9f9; border:1px solid #ddd; border-radius:4px;">
             <?php 
             $managerConverer = \Jankx\Extensions\Ecommerce\Currency\Converters\CurrencyConverterManager::getInstance();
@@ -554,8 +554,8 @@ class EcommerceSettingsPage
         // Get registered gateways from payment-system extension
         $registeredGateways = $this->getRegisteredGateways();
         ?>
-        <h2><?php esc_html_e('Phương thức thanh toán', 'jankx'); ?></h2>
-        <p class="description"><?php esc_html_e('Kích hoạt và cấu hình các phương thức thanh toán từ các extension.', 'jankx'); ?></p>
+        <h2><?php esc_html_e('Phương thức thanh toán', 'base-ecommerce'); ?></h2>
+        <p class="description"><?php esc_html_e('Kích hoạt và cấu hình các phương thức thanh toán từ các extension.', 'base-ecommerce'); ?></p>
 
         <form method="post" action="options.php">
         <?php settings_fields(self::OPTION_GROUP); ?>
@@ -563,13 +563,13 @@ class EcommerceSettingsPage
         <table class="widefat striped" style="margin-top: 16px;">
             <thead>
                 <tr>
-                    <th style="width:50px;"><?php esc_html_e('Bật', 'jankx'); ?></th>
+                    <th style="width:50px;"><?php esc_html_e('Bật', 'base-ecommerce'); ?></th>
                     <th style="width:50px;"></th>
-                    <th><?php esc_html_e('Phương thức', 'jankx'); ?></th>
-                    <th><?php esc_html_e('Mô tả', 'jankx'); ?></th>
-                    <th style="width:100px;"><?php esc_html_e('Trạng thái', 'jankx'); ?></th>
-                    <th style="width:100px;"><?php esc_html_e('Chế độ', 'jankx'); ?></th>
-                    <th style="width:120px;"><?php esc_html_e('Thao tác', 'jankx'); ?></th>
+                    <th><?php esc_html_e('Phương thức', 'base-ecommerce'); ?></th>
+                    <th><?php esc_html_e('Mô tả', 'base-ecommerce'); ?></th>
+                    <th style="width:100px;"><?php esc_html_e('Trạng thái', 'base-ecommerce'); ?></th>
+                    <th style="width:100px;"><?php esc_html_e('Chế độ', 'base-ecommerce'); ?></th>
+                    <th style="width:120px;"><?php esc_html_e('Thao tác', 'base-ecommerce'); ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -580,16 +580,16 @@ class EcommerceSettingsPage
 
                 $builtInGateways = [
                     'cod' => [
-                        'name' => __('Thanh toán khi nhận hàng (COD)', 'jankx'),
-                        'description' => __('Khách hàng thanh toán bằng tiền mặt khi nhận hàng.', 'jankx'),
+                        'name' => __('Thanh toán khi nhận hàng (COD)', 'base-ecommerce'),
+                        'description' => __('Khách hàng thanh toán bằng tiền mặt khi nhận hàng.', 'base-ecommerce'),
                         'icon' => '💵',
                         'available' => true,
                         'sandbox_mode' => false,
                         'settings_url' => admin_url('admin.php?page=jankx-ecommerce-settings&tab=payment&gateway=cod'),
                     ],
                     'bank_transfer' => [
-                        'name' => __('Chuyển khoản ngân hàng', 'jankx'),
-                        'description' => __('Khách hàng chuyển khoản trực tiếp vào tài khoản ngân hàng.', 'jankx'),
+                        'name' => __('Chuyển khoản ngân hàng', 'base-ecommerce'),
+                        'description' => __('Khách hàng chuyển khoản trực tiếp vào tài khoản ngân hàng.', 'base-ecommerce'),
                         'icon' => '🏦',
                         'available' => !empty($bankConfig['bank_name']) && !empty($bankConfig['account_number']),
                         'sandbox_mode' => false,
@@ -612,22 +612,22 @@ class EcommerceSettingsPage
                         <td><?php echo esc_html($gateway['description'] ?? ''); ?></td>
                         <td>
                             <?php if (!empty($gateway['available'])): ?>
-                                <span class="jankx-status-badge jankx-status-active"><?php esc_html_e('Sẵn sàng', 'jankx'); ?></span>
+                                <span class="jankx-status-badge jankx-status-active"><?php esc_html_e('Sẵn sàng', 'base-ecommerce'); ?></span>
                             <?php else: ?>
-                                <span class="jankx-status-badge jankx-status-inactive"><?php esc_html_e('Chưa cấu hình', 'jankx'); ?></span>
+                                <span class="jankx-status-badge jankx-status-inactive"><?php esc_html_e('Chưa cấu hình', 'base-ecommerce'); ?></span>
                             <?php endif; ?>
                         </td>
                         <td>
                             <?php if (!empty($gateway['sandbox_mode'])): ?>
-                                <span class="jankx-status-badge" style="background:#fff3cd; color:#856404;"><?php esc_html_e('Sandbox', 'jankx'); ?></span>
+                                <span class="jankx-status-badge" style="background:#fff3cd; color:#856404;"><?php esc_html_e('Sandbox', 'base-ecommerce'); ?></span>
                             <?php else: ?>
-                                <span class="jankx-status-badge" style="background:#d1ecf1; color:#0c5460;"><?php esc_html_e('Production', 'jankx'); ?></span>
+                                <span class="jankx-status-badge" style="background:#d1ecf1; color:#0c5460;"><?php esc_html_e('Production', 'base-ecommerce'); ?></span>
                             <?php endif; ?>
                         </td>
                         <td>
                             <?php if (!empty($gateway['settings_url'])): ?>
                                 <a href="<?php echo esc_url($gateway['settings_url']); ?>" class="button button-small">
-                                    <?php esc_html_e('Cài đặt', 'jankx'); ?>
+                                    <?php esc_html_e('Cài đặt', 'base-ecommerce'); ?>
                                 </a>
                             <?php endif; ?>
                         </td>
@@ -653,7 +653,7 @@ class EcommerceSettingsPage
         }
 
         if (!class_exists('\\Jankx\\Extensions\\PaymentSystem\\Gateways\\GatewayManager')) {
-            echo '<div class="wrap"><p>' . esc_html__('Payment System extension is not active.', 'jankx') . '</p></div>';
+            echo '<div class="wrap"><p>' . esc_html__('Payment System extension is not active.', 'base-ecommerce') . '</p></div>';
             return;
         }
 
@@ -661,7 +661,7 @@ class EcommerceSettingsPage
         $gateway = $manager->get($gatewaySlug);
 
         if (!$gateway) {
-            echo '<div class="wrap"><p>' . esc_html__('Gateway not found.', 'jankx') . '</p></div>';
+            echo '<div class="wrap"><p>' . esc_html__('Gateway not found.', 'base-ecommerce') . '</p></div>';
             return;
         }
 
@@ -685,7 +685,7 @@ class EcommerceSettingsPage
 
             $saved = $manager->saveConfig($gatewaySlug, $merged);
             if ($saved) {
-                echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Settings saved.', 'jankx') . '</p></div>';
+                echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Settings saved.', 'base-ecommerce') . '</p></div>';
                 $gateway = $manager->get($gatewaySlug);
             }
         }
@@ -699,7 +699,7 @@ class EcommerceSettingsPage
                    style="text-decoration:none;">&larr;</a>
                 <?php
                 printf(
-                    esc_html__('Cài đặt %s', 'jankx'),
+                    esc_html__('Cài đặt %s', 'base-ecommerce'),
                     esc_html($gateway->getName())
                 );
                 ?>
@@ -781,7 +781,7 @@ class EcommerceSettingsPage
                     <?php endforeach; ?>
                 </table>
 
-                <?php submit_button(__('Lưu cài đặt', 'jankx'), 'primary', 'jankx_save_gateway_settings'); ?>
+                <?php submit_button(__('Lưu cài đặt', 'base-ecommerce'), 'primary', 'jankx_save_gateway_settings'); ?>
             </form>
         </div>
         <?php
@@ -794,20 +794,20 @@ class EcommerceSettingsPage
         // Handle form save
         if (isset($_POST['jankx_save_gateway_settings']) && check_admin_referer('jankx_gateway_settings_' . $gatewaySlug)) {
             update_option($optionKey, $_POST['gateway'] ?? []);
-            echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Settings saved.', 'jankx') . '</p></div>';
+            echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Settings saved.', 'base-ecommerce') . '</p></div>';
         }
 
         $config = get_option($optionKey, []);
         $fields = $this->getBuiltInGatewayFields($gatewaySlug);
         $gatewayName = $gatewaySlug === 'cod'
-            ? __('Thanh toán khi nhận hàng (COD)', 'jankx')
-            : __('Chuyển khoản ngân hàng', 'jankx');
+            ? __('Thanh toán khi nhận hàng (COD)', 'base-ecommerce')
+            : __('Chuyển khoản ngân hàng', 'base-ecommerce');
         ?>
         <div class="wrap">
             <h1>
                 <a href="<?php echo esc_url(admin_url('admin.php?page=' . self::PAGE_SLUG . '&tab=payment')); ?>"
                    style="text-decoration:none;">&larr;</a>
-                <?php printf(esc_html__('Cài đặt %s', 'jankx'), esc_html($gatewayName)); ?>
+                <?php printf(esc_html__('Cài đặt %s', 'base-ecommerce'), esc_html($gatewayName)); ?>
             </h1>
 
             <form method="post" action="<?php echo esc_url(admin_url('admin.php?page=' . self::PAGE_SLUG . '&tab=payment&gateway=' . $gatewaySlug)); ?>">
@@ -848,7 +848,7 @@ class EcommerceSettingsPage
                     <?php endforeach; ?>
                 </table>
 
-                <?php submit_button(__('Lưu cài đặt', 'jankx'), 'primary', 'jankx_save_gateway_settings'); ?>
+                <?php submit_button(__('Lưu cài đặt', 'base-ecommerce'), 'primary', 'jankx_save_gateway_settings'); ?>
             </form>
         </div>
         <?php
@@ -859,28 +859,28 @@ class EcommerceSettingsPage
         if ($gatewaySlug === 'cod') {
             return [
                 'description' => [
-                    'label'       => __('Mô tả cho khách hàng', 'jankx'),
+                    'label'       => __('Mô tả cho khách hàng', 'base-ecommerce'),
                     'type'        => 'textarea',
-                    'default'     => __('Thanh toán bằng tiền mặt khi nhận hàng. Vui lòng chuẩn bị đúng số tiền.', 'jankx'),
-                    'description' => __('Hiển thị trên trang thanh toán và email xác nhận.', 'jankx'),
+                    'default'     => __('Thanh toán bằng tiền mặt khi nhận hàng. Vui lòng chuẩn bị đúng số tiền.', 'base-ecommerce'),
+                    'description' => __('Hiển thị trên trang thanh toán và email xác nhận.', 'base-ecommerce'),
                 ],
                 'extra_fee' => [
-                    'label'       => __('Phí COD (₫)', 'jankx'),
+                    'label'       => __('Phí COD (₫)', 'base-ecommerce'),
                     'type'        => 'text',
                     'default'     => '0',
-                    'description' => __('Phụ phí nếu có (0 = không phụ phí).', 'jankx'),
+                    'description' => __('Phụ phí nếu có (0 = không phụ phí).', 'base-ecommerce'),
                 ],
                 'min_amount' => [
-                    'label'       => __('Giá trị tối thiểu (₫)', 'jankx'),
+                    'label'       => __('Giá trị tối thiểu (₫)', 'base-ecommerce'),
                     'type'        => 'text',
                     'default'     => '0',
-                    'description' => __('Không hiển thị COD nếu đơn hàng thấp hơn giá trị này (0 = luôn hiển thị).', 'jankx'),
+                    'description' => __('Không hiển thị COD nếu đơn hàng thấp hơn giá trị này (0 = luôn hiển thị).', 'base-ecommerce'),
                 ],
                 'max_amount' => [
-                    'label'       => __('Giá trị tối đa (₫)', 'jankx'),
+                    'label'       => __('Giá trị tối đa (₫)', 'base-ecommerce'),
                     'type'        => 'text',
                     'default'     => '0',
-                    'description' => __('Không hiển thị COD nếu đơn hàng cao hơn giá trị này (0 = không giới hạn).', 'jankx'),
+                    'description' => __('Không hiển thị COD nếu đơn hàng cao hơn giá trị này (0 = không giới hạn).', 'base-ecommerce'),
                 ],
             ];
         }
@@ -888,36 +888,36 @@ class EcommerceSettingsPage
         // bank_transfer
         return [
             'bank_name' => [
-                'label'   => __('Tên ngân hàng', 'jankx'),
+                'label'   => __('Tên ngân hàng', 'base-ecommerce'),
                 'type'    => 'text',
                 'default' => '',
             ],
             'account_number' => [
-                'label'   => __('Số tài khoản', 'jankx'),
+                'label'   => __('Số tài khoản', 'base-ecommerce'),
                 'type'    => 'text',
                 'default' => '',
             ],
             'account_holder' => [
-                'label'   => __('Chủ tài khoản', 'jankx'),
+                'label'   => __('Chủ tài khoản', 'base-ecommerce'),
                 'type'    => 'text',
                 'default' => '',
             ],
             'branch' => [
-                'label'   => __('Chi nhánh', 'jankx'),
+                'label'   => __('Chi nhánh', 'base-ecommerce'),
                 'type'    => 'text',
                 'default' => '',
             ],
             'transfer_content' => [
-                'label'       => __('Nội dung chuyển khoản', 'jankx'),
+                'label'       => __('Nội dung chuyển khoản', 'base-ecommerce'),
                 'type'        => 'textarea',
-                'default'     => __('Vui lòng ghi đúng nội dung chuyển khoản để chúng tôi xác nhận đơn hàng sớm nhất.', 'jankx'),
-                'description' => __('Hướng dẫn khách hàng điền nội dung CK.', 'jankx'),
+                'default'     => __('Vui lòng ghi đúng nội dung chuyển khoản để chúng tôi xác nhận đơn hàng sớm nhất.', 'base-ecommerce'),
+                'description' => __('Hướng dẫn khách hàng điền nội dung CK.', 'base-ecommerce'),
             ],
             'instructions' => [
-                'label'       => __('Hướng dẫn chuyển khoản', 'jankx'),
+                'label'       => __('Hướng dẫn chuyển khoản', 'base-ecommerce'),
                 'type'        => 'textarea',
                 'default'     => '',
-                'description' => __('Thông tin bổ sung hiển thị cho khách hàng (ví dụ: thông tin chuyển khoản nhanh 24/7, QR code...).', 'jankx'),
+                'description' => __('Thông tin bổ sung hiển thị cho khách hàng (ví dụ: thông tin chuyển khoản nhanh 24/7, QR code...).', 'base-ecommerce'),
             ],
         ];
     }
@@ -958,16 +958,16 @@ class EcommerceSettingsPage
     protected function getGatewayDescription(string $gatewayName): string
     {
         $descriptions = [
-            'onepay'          => __('Thanh toán thẻ quốc tế (Visa, Mastercard, JCB) qua OnePay.', 'jankx'),
-            'onepay_domestic' => __('Thanh toán thẻ nội địa (ATM/Napas) qua OnePay.', 'jankx'),
-            'momo'            => __('Ví điện tử MoMo - thanh toán nhanh bằng QR code.', 'jankx'),
-            'vnpay'           => __('Cổng thanh toán VNPay - hỗ trợ ATM, Visa, Mastercard.', 'jankx'),
-            'zalopay'         => __('Ví điện tử ZaloPay - thanh toán bằng QR code.', 'jankx'),
-            'stripe'          => __('Thanh toán quốc tế qua Stripe (Visa, Mastercard, AMEX).', 'jankx'),
-            'paypal'          => __('Thanh toán quốc tế qua PayPal.', 'jankx'),
+            'onepay'          => __('Thanh toán thẻ quốc tế (Visa, Mastercard, JCB) qua OnePay.', 'base-ecommerce'),
+            'onepay_domestic' => __('Thanh toán thẻ nội địa (ATM/Napas) qua OnePay.', 'base-ecommerce'),
+            'momo'            => __('Ví điện tử MoMo - thanh toán nhanh bằng QR code.', 'base-ecommerce'),
+            'vnpay'           => __('Cổng thanh toán VNPay - hỗ trợ ATM, Visa, Mastercard.', 'base-ecommerce'),
+            'zalopay'         => __('Ví điện tử ZaloPay - thanh toán bằng QR code.', 'base-ecommerce'),
+            'stripe'          => __('Thanh toán quốc tế qua Stripe (Visa, Mastercard, AMEX).', 'base-ecommerce'),
+            'paypal'          => __('Thanh toán quốc tế qua PayPal.', 'base-ecommerce'),
         ];
 
-        return $descriptions[$gatewayName] ?? __('Phương thức thanh toán trực tuyến.', 'jankx');
+        return $descriptions[$gatewayName] ?? __('Phương thức thanh toán trực tuyến.', 'base-ecommerce');
     }
 
     protected function getGatewayIcon(string $gatewayName): string
@@ -991,18 +991,18 @@ class EcommerceSettingsPage
     {
         $enabled = get_option('jankx_coupons_enabled', true);
         ?>
-        <h2><?php esc_html_e('Mã giảm giá', 'jankx'); ?></h2>
+        <h2><?php esc_html_e('Mã giảm giá', 'base-ecommerce'); ?></h2>
 
         <form method="post" action="options.php">
         <?php settings_fields(self::OPTION_GROUP); ?>
 
         <table class="form-table">
             <tr>
-                <th scope="row"><?php esc_html_e('Cho phép sử dụng mã giảm giá', 'jankx'); ?></th>
+                <th scope="row"><?php esc_html_e('Cho phép sử dụng mã giảm giá', 'base-ecommerce'); ?></th>
                 <td>
                     <label>
                         <input type="checkbox" name="jankx_coupons_enabled" value="1" <?php checked($enabled, true); ?>>
-                        <?php esc_html_e('Bật tính năng mã giảm giá trên trang thanh toán', 'jankx'); ?>
+                        <?php esc_html_e('Bật tính năng mã giảm giá trên trang thanh toán', 'base-ecommerce'); ?>
                     </label>
                 </td>
             </tr>
@@ -1011,7 +1011,7 @@ class EcommerceSettingsPage
         <?php if (class_exists('\\Jankx\\Extensions\\CouponSystem\\CouponSystemExtension')): ?>
             <p>
                 <a href="<?php echo esc_url(admin_url('edit.php?post_type=jankx_coupon')); ?>" class="button button-primary">
-                    <?php esc_html_e('Quản lý mã giảm giá', 'jankx'); ?>
+                    <?php esc_html_e('Quản lý mã giảm giá', 'base-ecommerce'); ?>
                 </a>
             </p>
         <?php endif; ?>
@@ -1026,8 +1026,8 @@ class EcommerceSettingsPage
     protected function renderTaxTab(): void
     {
         ?>
-        <h2><?php esc_html_e('Cấu hình Thuế', 'jankx'); ?></h2>
-        <p class="description"><?php esc_html_e('Định cấu hình cách tính thuế cho giỏ hàng và thanh toán.', 'jankx'); ?></p>
+        <h2><?php esc_html_e('Cấu hình Thuế', 'base-ecommerce'); ?></h2>
+        <p class="description"><?php esc_html_e('Định cấu hình cách tính thuế cho giỏ hàng và thanh toán.', 'base-ecommerce'); ?></p>
 
         <?php do_action('jankx/ecommerce/settings/tax/before_form'); ?>
 
@@ -1068,11 +1068,11 @@ class EcommerceSettingsPage
         $enabled = get_option('jankx_tax_enabled', false);
         ?>
         <tr>
-            <th scope="row"><?php esc_html_e('Kích hoạt tính thuế', 'jankx'); ?></th>
+            <th scope="row"><?php esc_html_e('Kích hoạt tính thuế', 'base-ecommerce'); ?></th>
             <td>
                 <label>
                     <input type="checkbox" name="jankx_tax_enabled" value="1" <?php checked($enabled, true); ?>>
-                    <?php esc_html_e('Bật việc tính toán thuế ở giỏ hàng và trang thanh toán', 'jankx'); ?>
+                    <?php esc_html_e('Bật việc tính toán thuế ở giỏ hàng và trang thanh toán', 'base-ecommerce'); ?>
                 </label>
             </td>
         </tr>
@@ -1084,20 +1084,20 @@ class EcommerceSettingsPage
         $strategy = get_option('jankx_tax_strategy', 'inclusive');
         ?>
         <tr>
-            <th scope="row"><?php esc_html_e('Chiến lược tính thuế', 'jankx'); ?></th>
+            <th scope="row"><?php esc_html_e('Chiến lược tính thuế', 'base-ecommerce'); ?></th>
             <td>
                 <label style="display:block; margin-bottom:10px;">
                     <input type="radio" name="jankx_tax_strategy" value="inclusive" <?php checked($strategy, 'inclusive'); ?>>
-                    <strong><?php esc_html_e('Đã bao gồm trong giá (Inclusive - Mặc định)', 'jankx'); ?></strong>
+                    <strong><?php esc_html_e('Đã bao gồm trong giá (Inclusive - Mặc định)', 'base-ecommerce'); ?></strong>
                     <p class="description" style="margin-top:2px;">
-                        <?php esc_html_e('Giá hiển thị và giá khách phải trả là giá cuối cùng. Hệ thống tự tách số tiền thuế (Khuyên dùng để tránh làm khách hàng sợ vì tổng giá trị thanh toán cao lên).', 'jankx'); ?>
+                        <?php esc_html_e('Giá hiển thị và giá khách phải trả là giá cuối cùng. Hệ thống tự tách số tiền thuế (Khuyên dùng để tránh làm khách hàng sợ vì tổng giá trị thanh toán cao lên).', 'base-ecommerce'); ?>
                     </p>
                 </label>
                 <label style="display:block;">
                     <input type="radio" name="jankx_tax_strategy" value="exclusive" <?php checked($strategy, 'exclusive'); ?>>
-                    <strong><?php esc_html_e('Cộng thêm vào tổng đơn (Exclusive)', 'jankx'); ?></strong>
+                    <strong><?php esc_html_e('Cộng thêm vào tổng đơn (Exclusive)', 'base-ecommerce'); ?></strong>
                     <p class="description" style="margin-top:2px;">
-                        <?php esc_html_e('Tính thuế đè thêm vào giá các mặt hàng. Tổng thanh toán = Tổng giá trị món hàng + Từng loại Thuế.', 'jankx'); ?>
+                        <?php esc_html_e('Tính thuế đè thêm vào giá các mặt hàng. Tổng thanh toán = Tổng giá trị món hàng + Từng loại Thuế.', 'base-ecommerce'); ?>
                     </p>
                 </label>
             </td>
@@ -1111,13 +1111,13 @@ class EcommerceSettingsPage
         ?>
         <tr>
             <th scope="row">
-                <label for="jankx_tax_rates_raw"><?php esc_html_e('Các loại thuế áp dụng', 'jankx'); ?></label>
+                <label for="jankx_tax_rates_raw"><?php esc_html_e('Các loại thuế áp dụng', 'base-ecommerce'); ?></label>
             </th>
             <td>
                 <textarea name="jankx_tax_rates_raw" id="jankx_tax_rates_raw" rows="5" class="large-text code"><?php echo esc_textarea($ratesRaw); ?></textarea>
                 <p class="description">
-                    <?php esc_html_e('Nhập mỗi loại thuế nằm trên 1 dòng theo cú pháp (SSR Fallback): ', 'jankx'); ?> <code>Tên thuế | Tỉ lệ phần trăm | Độ ưu tiên tính</code><br>
-                    <?php esc_html_e('Ví dụ: ', 'jankx'); ?> <code>VAT | 10 | 10</code> <?php esc_html_e('(Nghĩa là thuế VAT 10% với priority 10)', 'jankx'); ?>
+                    <?php esc_html_e('Nhập mỗi loại thuế nằm trên 1 dòng theo cú pháp (SSR Fallback): ', 'base-ecommerce'); ?> <code>Tên thuế | Tỉ lệ phần trăm | Độ ưu tiên tính</code><br>
+                    <?php esc_html_e('Ví dụ: ', 'base-ecommerce'); ?> <code>VAT | 10 | 10</code> <?php esc_html_e('(Nghĩa là thuế VAT 10% với priority 10)', 'base-ecommerce'); ?>
                 </p>
             </td>
         </tr>

@@ -24,17 +24,17 @@ abstract class AbstractOrderCreationStrategy implements OrderCreationStrategyInt
         $email = trim($data['customer_email'] ?? $data['email'] ?? '');
 
         if ($name === '') {
-            $errors[] = __('Vui lòng nhập họ và tên.', 'jankx');
+            $errors[] = __('Vui lòng nhập họ và tên.', 'base-ecommerce');
         }
 
         if ($phone === '') {
-            $errors[] = __('Vui lòng nhập số điện thoại.', 'jankx');
+            $errors[] = __('Vui lòng nhập số điện thoại.', 'base-ecommerce');
         }
 
         if ($email === '') {
-            $errors[] = __('Vui lòng nhập địa chỉ email.', 'jankx');
+            $errors[] = __('Vui lòng nhập địa chỉ email.', 'base-ecommerce');
         } elseif (!is_email($email)) {
-            $errors[] = __('Địa chỉ email không hợp lệ.', 'jankx');
+            $errors[] = __('Địa chỉ email không hợp lệ.', 'base-ecommerce');
         }
 
         return $errors;

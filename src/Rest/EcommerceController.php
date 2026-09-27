@@ -174,7 +174,7 @@ class EcommerceController
         if (!$added) {
             return new \WP_REST_Response([
                 'success' => false,
-                'message' => __('Sản phẩm không hợp lệ hoặc không thể mua.', 'jankx'),
+                'message' => __('Sản phẩm không hợp lệ hoặc không thể mua.', 'base-ecommerce'),
             ], 400);
         }
 
@@ -211,7 +211,7 @@ class EcommerceController
         if (!$removed) {
             return new \WP_REST_Response([
                 'success' => false,
-                'message' => __('Không tìm thấy sản phẩm trong giỏ hàng.', 'jankx'),
+                'message' => __('Không tìm thấy sản phẩm trong giỏ hàng.', 'base-ecommerce'),
             ], 404);
         }
 
@@ -231,7 +231,7 @@ class EcommerceController
         if (!$updated) {
             return new \WP_REST_Response([
                 'success' => false,
-                'message' => __('Không tìm thấy sản phẩm trong giỏ hàng.', 'jankx'),
+                'message' => __('Không tìm thấy sản phẩm trong giỏ hàng.', 'base-ecommerce'),
             ], 404);
         }
 
@@ -328,7 +328,7 @@ class EcommerceController
         if (!$order) {
             return new \WP_REST_Response([
                 'success' => false,
-                'message' => __('Đơn hàng không tồn tại.', 'jankx'),
+                'message' => __('Đơn hàng không tồn tại.', 'base-ecommerce'),
             ], 404);
         }
 
@@ -336,7 +336,7 @@ class EcommerceController
         if (!in_array($status, [Order::STATUS_PENDING, Order::STATUS_PROCESSING], true)) {
             return new \WP_REST_Response([
                 'success' => false,
-                'message' => __('Đơn hàng này không thể thanh toán lại.', 'jankx'),
+                'message' => __('Đơn hàng này không thể thanh toán lại.', 'base-ecommerce'),
             ], 400);
         }
 
@@ -358,7 +358,7 @@ class EcommerceController
                 'success' => true,
                 'type'    => 'cod',
                 'message' => sprintf(
-                    __('Đơn hàng COD sẽ được xác nhận bởi nhân viên. Vui lòng đặt cọc %s nếu được yêu cầu.', 'jankx'),
+                    __('Đơn hàng COD sẽ được xác nhận bởi nhân viên. Vui lòng đặt cọc %s nếu được yêu cầu.', 'base-ecommerce'),
                     CurrencyManager::formatPrice($order->getTotal() * 0.3)
                 ),
             ]);
@@ -379,7 +379,7 @@ class EcommerceController
 
         return new \WP_REST_Response([
             'success' => false,
-            'message' => __('Không thể tạo liên kết thanh toán. Vui lòng thử lại.', 'jankx'),
+            'message' => __('Không thể tạo liên kết thanh toán. Vui lòng thử lại.', 'base-ecommerce'),
         ], 500);
     }
 
@@ -390,23 +390,23 @@ class EcommerceController
         $accountNumber = $config['account_number'] ?? '';
         $accountHolder = $config['account_holder'] ?? '';
         $branch = $config['branch'] ?? '';
-        $transferContent = $config['transfer_content'] ?? __('Vui lòng ghi đúng nội dung chuyển khoản.', 'jankx');
+        $transferContent = $config['transfer_content'] ?? __('Vui lòng ghi đúng nội dung chuyển khoản.', 'base-ecommerce');
 
         $lines = [];
         if ($bankName) {
-            $lines[] = sprintf(__('Ngân hàng: %s', 'jankx'), $bankName);
+            $lines[] = sprintf(__('Ngân hàng: %s', 'base-ecommerce'), $bankName);
         }
         if ($accountNumber) {
-            $lines[] = sprintf(__('Số tài khoản: %s', 'jankx'), $accountNumber);
+            $lines[] = sprintf(__('Số tài khoản: %s', 'base-ecommerce'), $accountNumber);
         }
         if ($accountHolder) {
-            $lines[] = sprintf(__('Chủ tài khoản: %s', 'jankx'), $accountHolder);
+            $lines[] = sprintf(__('Chủ tài khoản: %s', 'base-ecommerce'), $accountHolder);
         }
         if ($branch) {
-            $lines[] = sprintf(__('Chi nhánh: %s', 'jankx'), $branch);
+            $lines[] = sprintf(__('Chi nhánh: %s', 'base-ecommerce'), $branch);
         }
         $lines[] = '';
-        $lines[] = __('Nội dung CK: Mã đơn hàng của bạn', 'jankx');
+        $lines[] = __('Nội dung CK: Mã đơn hàng của bạn', 'base-ecommerce');
         if ($transferContent) {
             $lines[] = '';
             $lines[] = $transferContent;
@@ -460,7 +460,7 @@ class EcommerceController
 
         return new \WP_REST_Response([
             'success' => false,
-            'message' => __('Tiền tệ không hợp lệ.', 'jankx'),
+            'message' => __('Tiền tệ không hợp lệ.', 'base-ecommerce'),
         ], 400);
     }
 
@@ -485,7 +485,7 @@ class EcommerceController
 
         return rest_ensure_response([
             'success' => true,
-            'message' => __('Gửi thông tin đặt sản phẩm thành công! Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.', 'jankx'),
+            'message' => __('Gửi thông tin đặt sản phẩm thành công! Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.', 'base-ecommerce'),
             'order'   => $order ? $order->toArray() : null,
         ]);
     }

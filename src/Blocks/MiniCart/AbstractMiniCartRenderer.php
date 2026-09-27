@@ -6,15 +6,15 @@ abstract class AbstractMiniCartRenderer implements MiniCartRendererInterface
     protected function renderHead(): string
     {
         return '<div class="jankx-mini-cart-head">'
-            . '<span class="jankx-mini-cart-title">' . esc_html__('Giỏ hàng', 'jankx') . '</span>'
+            . '<span class="jankx-mini-cart-title">' . esc_html__('Giỏ hàng', 'base-ecommerce') . '</span>'
             . '<button type="button" class="jankx-mini-cart-close" data-jankx-mini-cart-close aria-label="'
-            . esc_attr__('Close cart', 'jankx') . '">&times;</button>'
+            . esc_attr__('Close cart', 'base-ecommerce') . '">&times;</button>'
             . '</div>';
     }
 
     protected function renderEmptyState(): string
     {
-        return '<p class="jankx-mini-cart-empty">' . esc_html__('Giỏ hàng của bạn đang trống.', 'jankx') . '</p>';
+        return '<p class="jankx-mini-cart-empty">' . esc_html__('Giỏ hàng của bạn đang trống.', 'base-ecommerce') . '</p>';
     }
 
     protected function renderFooter(string $footerAttr, MiniCartContext $context): string

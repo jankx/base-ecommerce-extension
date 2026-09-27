@@ -114,10 +114,10 @@ class CurrencySwitcherBlock extends Block
         $html .= '<span class="jcs-arrow">▼</span>';
         $html .= '</button>';
 
-        $html .= '<div class="jcs-dropdown-panel" id="' . esc_attr($panelId) . '" role="region" aria-label="' . esc_attr__('Chọn tiền tệ', 'jankx') . '">';
+        $html .= '<div class="jcs-dropdown-panel" id="' . esc_attr($panelId) . '" role="region" aria-label="' . esc_attr__('Chọn tiền tệ', 'base-ecommerce') . '">';
         $html .= '<div class="jcs-dropdown-head">';
-        $html .= '<span class="jcs-dropdown-title">' . esc_html__('Tiền tệ', 'jankx') . '</span>';
-        $html .= '<button type="button" class="jcs-dropdown-close" data-jcs-close aria-label="' . esc_attr__('Close currency', 'jankx') . '">&times;</button>';
+        $html .= '<span class="jcs-dropdown-title">' . esc_html__('Tiền tệ', 'base-ecommerce') . '</span>';
+        $html .= '<button type="button" class="jcs-dropdown-close" data-jcs-close aria-label="' . esc_attr__('Close currency', 'base-ecommerce') . '">&times;</button>';
         $html .= '</div>';
         $html .= '<div class="jcs-dropdown-body">';
         $html .= '<ul class="jcs-dropdown-menu">';

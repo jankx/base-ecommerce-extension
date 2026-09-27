@@ -43,10 +43,10 @@ class CheckoutManager
         $email = trim($customer['email'] ?? '');
 
         if (!$name) {
-            $errors[] = __('Vui lòng nhập họ tên.', 'jankx');
+            $errors[] = __('Vui lòng nhập họ tên.', 'base-ecommerce');
         }
         if (!$email || !is_email($email)) {
-            $errors[] = __('Vui lòng nhập email hợp lệ.', 'jankx');
+            $errors[] = __('Vui lòng nhập email hợp lệ.', 'base-ecommerce');
         }
 
         return apply_filters('jankx/ecommerce/checkout/validate_customer', $errors, $customer);
@@ -89,7 +89,7 @@ class CheckoutManager
         if ($cart->isEmpty()) {
             return [
                 'success' => false,
-                'errors'  => [__('Giỏ hàng của bạn đang trống.', 'jankx')],
+                'errors'  => [__('Giỏ hàng của bạn đang trống.', 'base-ecommerce')],
                 'order'   => null,
                 'redirect_url' => '',
             ];
@@ -119,7 +119,7 @@ class CheckoutManager
         if (!$order) {
             return [
                 'success' => false,
-                'errors'  => [__('Không thể tạo đơn hàng, vui lòng thử lại.', 'jankx')],
+                'errors'  => [__('Không thể tạo đơn hàng, vui lòng thử lại.', 'base-ecommerce')],
                 'order'   => null,
                 'redirect_url' => '',
             ];

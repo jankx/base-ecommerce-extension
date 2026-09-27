@@ -35,7 +35,7 @@ class OrderAdmin
             'status' => $uncompletedStatuses,
         ]);
 
-        $menuTitle = __('Đơn hàng', 'jankx');
+        $menuTitle = __('Đơn hàng', 'base-ecommerce');
         if ($uncompletedCount > 0) {
             $menuTitle .= sprintf(
                 ' <span class="awaiting-mod count-%1$d"><span class="pending-count" aria-hidden="true">%2$s</span><span class="comments-in-moderation-text screen-reader-text">%2$s</span></span>',
@@ -45,7 +45,7 @@ class OrderAdmin
         }
 
         add_menu_page(
-            __('Đơn hàng', 'jankx'),
+            __('Đơn hàng', 'base-ecommerce'),
             $menuTitle,
             OrderPostType::CAP_MANAGE,
             self::PAGE_SLUG,
@@ -272,13 +272,13 @@ class OrderAdmin
         $totalPages = ceil($total / $perPage);
         ?>
         <div class="wrap">
-            <h1 class="wp-heading-inline"><?php esc_html_e('Đơn hàng', 'jankx'); ?></h1>
+            <h1 class="wp-heading-inline"><?php esc_html_e('Đơn hàng', 'base-ecommerce'); ?></h1>
 
             <div style="float: right;">
                 <form method="get" style="display: inline-block;">
                     <input type="hidden" name="page" value="<?php echo esc_attr(self::PAGE_SLUG); ?>">
                     <select name="order_status" onchange="this.form.submit();">
-                        <option value=""><?php esc_html_e('Tất cả trạng thái', 'jankx'); ?></option>
+                        <option value=""><?php esc_html_e('Tất cả trạng thái', 'base-ecommerce'); ?></option>
                         <?php foreach (Order::getStatusLabels() as $status => $label): ?>
                             <option value="<?php echo esc_attr($status); ?>" <?php selected($statusFilter, $status); ?>>
                                 <?php echo esc_html($label); ?>
@@ -289,25 +289,25 @@ class OrderAdmin
 
                 <form method="get" style="display: inline-block; margin-left: 8px;">
                     <input type="hidden" name="page" value="<?php echo esc_attr(self::PAGE_SLUG); ?>">
-                    <input type="search" name="s" value="<?php echo esc_attr($search); ?>" placeholder="<?php esc_attr_e('Tìm kiếm...', 'jankx'); ?>">
-                    <button type="submit" class="button"><?php esc_html_e('Tìm', 'jankx'); ?></button>
+                    <input type="search" name="s" value="<?php echo esc_attr($search); ?>" placeholder="<?php esc_attr_e('Tìm kiếm...', 'base-ecommerce'); ?>">
+                    <button type="submit" class="button"><?php esc_html_e('Tìm', 'base-ecommerce'); ?></button>
                 </form>
             </div>
 
             <table class="wp-list-table widefat fixed striped">
                 <thead>
                     <tr>
-                        <th class="column-order_number" style="width: 120px;"><?php esc_html_e('Mã đơn', 'jankx'); ?></th>
-                        <th class="column-customer"><?php esc_html_e('Khách hàng', 'jankx'); ?></th>
-                        <th class="column-items"><?php esc_html_e('Sản phẩm', 'jankx'); ?></th>
-                        <th class="column-total" style="width: 120px;"><?php esc_html_e('Tổng', 'jankx'); ?></th>
-                        <th class="column-status" style="width: 100px;"><?php esc_html_e('Trạng thái', 'jankx'); ?></th>
-                        <th class="column-date" style="width: 150px;"><?php esc_html_e('Ngày tạo', 'jankx'); ?></th>
+                        <th class="column-order_number" style="width: 120px;"><?php esc_html_e('Mã đơn', 'base-ecommerce'); ?></th>
+                        <th class="column-customer"><?php esc_html_e('Khách hàng', 'base-ecommerce'); ?></th>
+                        <th class="column-items"><?php esc_html_e('Sản phẩm', 'base-ecommerce'); ?></th>
+                        <th class="column-total" style="width: 120px;"><?php esc_html_e('Tổng', 'base-ecommerce'); ?></th>
+                        <th class="column-status" style="width: 100px;"><?php esc_html_e('Trạng thái', 'base-ecommerce'); ?></th>
+                        <th class="column-date" style="width: 150px;"><?php esc_html_e('Ngày tạo', 'base-ecommerce'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($orders)): ?>
-                        <tr><td colspan="6"><?php esc_html_e('Không có đơn hàng nào.', 'jankx'); ?></td></tr>
+                        <tr><td colspan="6"><?php esc_html_e('Không có đơn hàng nào.', 'base-ecommerce'); ?></td></tr>
                     <?php else: ?>
                         <?php foreach ($orders as $order): ?>
                             <tr>
@@ -316,7 +316,7 @@ class OrderAdmin
                                         <strong><?php echo esc_html($order->getOrderNumber()); ?></strong>
                                     </a>
                                     <?php if ($order->getPaymentMethod() === 'manual'): ?>
-                                        <br><span class="jankx-order-badge jankx-order-badge--manual"><?php esc_html_e('Đặt qua form', 'jankx'); ?></span>
+                                        <br><span class="jankx-order-badge jankx-order-badge--manual"><?php esc_html_e('Đặt qua form', 'base-ecommerce'); ?></span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
@@ -341,13 +341,13 @@ class OrderAdmin
                                 </td>
                                 <td style="text-align: right;">
                                     <?php if ($order->getTotal() <= 0 && $order->getPaymentMethod() === 'manual'): ?>
-                                        <span class="jankx-order-badge jankx-order-badge--quote"><?php esc_html_e('Chờ báo giá', 'jankx'); ?></span>
+                                        <span class="jankx-order-badge jankx-order-badge--quote"><?php esc_html_e('Chờ báo giá', 'base-ecommerce'); ?></span>
                                     <?php else: ?>
                                         <strong><?php echo esc_html(CurrencyManager::formatPrice($order->getTotal())); ?></strong>
                                     <?php endif; ?>
                                     <?php if ($order->getPaymentMethod()): ?>
                                         <div class="description">
-                                            <?php echo $order->getPaymentMethod() === 'manual' ? esc_html__('Xử lý thủ công', 'jankx') : esc_html($order->getPaymentMethod()); ?>
+                                            <?php echo $order->getPaymentMethod() === 'manual' ? esc_html__('Xử lý thủ công', 'base-ecommerce') : esc_html($order->getPaymentMethod()); ?>
                                         </div>
                                     <?php endif; ?>
                                 </td>
@@ -391,7 +391,7 @@ class OrderAdmin
     {
         $order = new Order($orderId);
         if (!$order->getId()) {
-            echo '<div class="wrap"><p>' . esc_html__('Đơn hàng không tồn tại.', 'jankx') . '</p></div>';
+            echo '<div class="wrap"><p>' . esc_html__('Đơn hàng không tồn tại.', 'base-ecommerce') . '</p></div>';
             return;
         }
 
@@ -402,11 +402,11 @@ class OrderAdmin
         ?>
         <div class="wrap">
             <h1>
-                <?php echo esc_html(sprintf(__('Edit Order "%s"', 'jankx'), $order->getOrderNumber())); ?>
+                <?php echo esc_html(sprintf(__('Edit Order "%s"', 'base-ecommerce'), $order->getOrderNumber())); ?>
             </h1>
 
             <?php if ($updated): ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e('Đơn hàng đã được cập nhật.', 'jankx'); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e('Đơn hàng đã được cập nhật.', 'base-ecommerce'); ?></p></div>
             <?php endif; ?>
 
             <div id="poststuff">
@@ -419,17 +419,17 @@ class OrderAdmin
 
                         <!-- Order Details Meta Box -->
                         <div id="jankx_order_details" class="postbox">
-                            <h2 class="hndle"><span><?php esc_html_e('Order Details', 'jankx'); ?></span></h2>
+                            <h2 class="hndle"><span><?php esc_html_e('Order Details', 'base-ecommerce'); ?></span></h2>
                             <div class="inside">
                                 <?php if ($order->getPaymentMethod() === 'manual' && $order->getTotal() <= 0): ?>
                                     <div class="notice notice-info inline" style="margin: 12px 12px 0 12px;">
-                                        <p><strong><?php esc_html_e('Đơn đặt qua form (Xử lý thủ công):', 'jankx'); ?></strong> <?php esc_html_e('Đơn hàng này chưa có giá tiền ban đầu. Vui lòng liên hệ với khách hàng để tư vấn và nhập số tiền chốt vào ô "Báo giá / Tổng tiền" ở cột bên phải.', 'jankx'); ?></p>
+                                        <p><strong><?php esc_html_e('Đơn đặt qua form (Xử lý thủ công):', 'base-ecommerce'); ?></strong> <?php esc_html_e('Đơn hàng này chưa có giá tiền ban đầu. Vui lòng liên hệ với khách hàng để tư vấn và nhập số tiền chốt vào ô "Báo giá / Tổng tiền" ở cột bên phải.', 'base-ecommerce'); ?></p>
                                     </div>
                                 <?php endif; ?>
                                 <!-- Summary bar -->
                                 <div class="jankx-order-summary-bar">
                                     <div class="jankx-order-summary-bar__item">
-                                        <span class="jankx-order-summary-bar__label"><?php esc_html_e('STATUS', 'jankx'); ?></span>
+                                        <span class="jankx-order-summary-bar__label"><?php esc_html_e('STATUS', 'base-ecommerce'); ?></span>
                                         <span class="jankx-order-summary-bar__value">
                                             <span class="jankx-order-badge jankx-order-badge--<?php echo esc_attr($order->getStatus()); ?>">
                                                 <?php echo esc_html(strtoupper(Order::getStatusLabel($order->getStatus()))); ?>
@@ -437,25 +437,25 @@ class OrderAdmin
                                         </span>
                                     </div>
                                     <div class="jankx-order-summary-bar__item">
-                                        <span class="jankx-order-summary-bar__label"><?php esc_html_e('ORDER TOTAL', 'jankx'); ?></span>
+                                        <span class="jankx-order-summary-bar__label"><?php esc_html_e('ORDER TOTAL', 'base-ecommerce'); ?></span>
                                         <span class="jankx-order-summary-bar__value jankx-order-summary-bar__value--highlight">
                                             <?php if ($order->getTotal() <= 0 && $order->getPaymentMethod() === 'manual'): ?>
-                                                <span class="jankx-order-badge jankx-order-badge--quote"><?php esc_html_e('CHỜ BÁO GIÁ', 'jankx'); ?></span>
+                                                <span class="jankx-order-badge jankx-order-badge--quote"><?php esc_html_e('CHỜ BÁO GIÁ', 'base-ecommerce'); ?></span>
                                             <?php else: ?>
                                                 <?php echo esc_html(CurrencyManager::formatPrice($order->getTotal())); ?>
                                             <?php endif; ?>
                                         </span>
                                     </div>
                                     <div class="jankx-order-summary-bar__item">
-                                        <span class="jankx-order-summary-bar__label"><?php esc_html_e('ITEMS', 'jankx'); ?></span>
+                                        <span class="jankx-order-summary-bar__label"><?php esc_html_e('ITEMS', 'base-ecommerce'); ?></span>
                                         <span class="jankx-order-summary-bar__value"><?php echo count($items); ?></span>
                                     </div>
                                     <div class="jankx-order-summary-bar__item">
-                                        <span class="jankx-order-summary-bar__label"><?php esc_html_e('PAYMENT', 'jankx'); ?></span>
+                                        <span class="jankx-order-summary-bar__label"><?php esc_html_e('PAYMENT', 'base-ecommerce'); ?></span>
                                         <span class="jankx-order-summary-bar__value">
                                             <?php
                                             if ($order->getPaymentMethod() === 'manual') {
-                                                echo esc_html__('Xử lý thủ công (Đặt qua form)', 'jankx');
+                                                echo esc_html__('Xử lý thủ công (Đặt qua form)', 'base-ecommerce');
                                             } else {
                                                 echo esc_html($order->getPaymentMethod() ?: '—');
                                             }
@@ -463,7 +463,7 @@ class OrderAdmin
                                         </span>
                                     </div>
                                     <div class="jankx-order-summary-bar__item">
-                                        <span class="jankx-order-summary-bar__label"><?php esc_html_e('CREATED', 'jankx'); ?></span>
+                                        <span class="jankx-order-summary-bar__label"><?php esc_html_e('CREATED', 'base-ecommerce'); ?></span>
                                         <span class="jankx-order-summary-bar__value">
                                             <?php
                                             $date = $order->getDateCreated();
@@ -476,7 +476,7 @@ class OrderAdmin
                                     </div>
                                     <?php if ($order->getTrackingNumber()): ?>
                                         <div class="jankx-order-summary-bar__item">
-                                            <span class="jankx-order-summary-bar__label"><?php esc_html_e('TRACKING', 'jankx'); ?></span>
+                                            <span class="jankx-order-summary-bar__label"><?php esc_html_e('TRACKING', 'base-ecommerce'); ?></span>
                                             <span class="jankx-order-summary-bar__value jankx-order-summary-bar__value--highlight">
                                                 <?php echo esc_html($order->getTrackingNumber()); ?>
                                             </span>
@@ -488,18 +488,18 @@ class OrderAdmin
                                 <div class="jankx-order-card" style="margin: 12px;">
                                     <div class="jankx-order-card__header">
                                         <span class="jankx-order-card__header-icon">&#128100;</span>
-                                        <h3 class="jankx-order-card__title"><?php esc_html_e('CUSTOMER INFORMATION', 'jankx'); ?></h3>
+                                        <h3 class="jankx-order-card__title"><?php esc_html_e('CUSTOMER INFORMATION', 'base-ecommerce'); ?></h3>
                                     </div>
                                     <div class="jankx-order-card__body">
                                         <div class="jankx-customer-grid">
                                             <div class="jankx-customer-grid__item">
-                                                <div class="jankx-customer-grid__label"><?php esc_html_e('FULL NAME', 'jankx'); ?></div>
+                                                <div class="jankx-customer-grid__label"><?php esc_html_e('FULL NAME', 'base-ecommerce'); ?></div>
                                                 <div class="jankx-customer-grid__value <?php echo !$order->getCustomerName() ? 'jankx-customer-grid__value--empty' : ''; ?>">
                                                     <?php echo esc_html($order->getCustomerName() ?: '—'); ?>
                                                 </div>
                                             </div>
                                             <div class="jankx-customer-grid__item">
-                                                <div class="jankx-customer-grid__label"><?php esc_html_e('EMAIL', 'jankx'); ?></div>
+                                                <div class="jankx-customer-grid__label"><?php esc_html_e('EMAIL', 'base-ecommerce'); ?></div>
                                                 <div class="jankx-customer-grid__value <?php echo !$order->getCustomerEmail() ? 'jankx-customer-grid__value--empty' : ''; ?>">
                                                     <?php if ($order->getCustomerEmail()): ?>
                                                         <a href="mailto:<?php echo esc_attr($order->getCustomerEmail()); ?>"><?php echo esc_html($order->getCustomerEmail()); ?></a>
@@ -509,13 +509,13 @@ class OrderAdmin
                                                 </div>
                                             </div>
                                             <div class="jankx-customer-grid__item">
-                                                <div class="jankx-customer-grid__label"><?php esc_html_e('PHONE', 'jankx'); ?></div>
+                                                <div class="jankx-customer-grid__label"><?php esc_html_e('PHONE', 'base-ecommerce'); ?></div>
                                                 <div class="jankx-customer-grid__value <?php echo !$order->getCustomerPhone() ? 'jankx-customer-grid__value--empty' : ''; ?>">
                                                     <?php echo esc_html($order->getCustomerPhone() ?: '—'); ?>
                                                 </div>
                                             </div>
                                             <div class="jankx-customer-grid__item">
-                                                <div class="jankx-customer-grid__label"><?php esc_html_e('ADDRESS', 'jankx'); ?></div>
+                                                <div class="jankx-customer-grid__label"><?php esc_html_e('ADDRESS', 'base-ecommerce'); ?></div>
                                                 <div class="jankx-customer-grid__value <?php echo !$order->getCustomerAddress() ? 'jankx-customer-grid__value--empty' : ''; ?>">
                                                     <?php echo esc_html($order->getCustomerAddress() ?: '—'); ?>
                                                 </div>
@@ -528,21 +528,21 @@ class OrderAdmin
                                 <div class="jankx-order-card" style="margin: 12px;">
                                     <div class="jankx-order-card__header">
                                         <span class="jankx-order-card__header-icon">&#128722;</span>
-                                        <h3 class="jankx-order-card__title"><?php esc_html_e('ORDER ITEMS', 'jankx'); ?></h3>
+                                        <h3 class="jankx-order-card__title"><?php esc_html_e('ORDER ITEMS', 'base-ecommerce'); ?></h3>
                                     </div>
                                     <div class="jankx-order-card__body">
                                         <table class="jankx-order-items-table">
                                             <thead>
                                                 <tr>
-                                                    <th><?php esc_html_e('PRODUCT', 'jankx'); ?></th>
-                                                    <th style="width:80px;"><?php esc_html_e('QTY', 'jankx'); ?></th>
-                                                    <th style="width:160px;"><?php esc_html_e('UNIT PRICE', 'jankx'); ?></th>
-                                                    <th style="width:130px;"><?php esc_html_e('TOTAL', 'jankx'); ?></th>
+                                                    <th><?php esc_html_e('PRODUCT', 'base-ecommerce'); ?></th>
+                                                    <th style="width:80px;"><?php esc_html_e('QTY', 'base-ecommerce'); ?></th>
+                                                    <th style="width:160px;"><?php esc_html_e('UNIT PRICE', 'base-ecommerce'); ?></th>
+                                                    <th style="width:130px;"><?php esc_html_e('TOTAL', 'base-ecommerce'); ?></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <?php if (empty($items)): ?>
-                                                    <tr><td colspan="4" style="text-align: center; color: #a7aaad;"><?php esc_html_e('No items.', 'jankx'); ?></td></tr>
+                                                    <tr><td colspan="4" style="text-align: center; color: #a7aaad;"><?php esc_html_e('No items.', 'base-ecommerce'); ?></td></tr>
                                                 <?php else: ?>
                                                     <?php foreach ($items as $idx => $item): ?>
                                                         <?php
@@ -583,7 +583,7 @@ class OrderAdmin
                                             </tbody>
                                             <tfoot>
                                                 <tr>
-                                                    <td colspan="3" class="total-label"><?php esc_html_e('ORDER TOTAL', 'jankx'); ?></td>
+                                                    <td colspan="3" class="total-label"><?php esc_html_e('ORDER TOTAL', 'base-ecommerce'); ?></td>
                                                     <td class="total-value" id="jankx-order-total-display"><?php echo esc_html(CurrencyManager::formatPrice($order->getTotal())); ?></td>
                                                 </tr>
                                             </tfoot>
@@ -591,7 +591,7 @@ class OrderAdmin
                                         <?php if (!empty($items)): ?>
                                         <p style="margin: 8px 12px 0; font-size: 12px; color: #64748b;">
                                             <span style="font-size:14px;">&#9998;</span>
-                                            <?php esc_html_e('Chỉnh sửa số lượng hoặc đơn giá rồi nhấn "Cập nhật đơn hàng" để lưu. Thay đổi sẽ được ghi vào lịch sử.', 'jankx'); ?>
+                                            <?php esc_html_e('Chỉnh sửa số lượng hoặc đơn giá rồi nhấn "Cập nhật đơn hàng" để lưu. Thay đổi sẽ được ghi vào lịch sử.', 'base-ecommerce'); ?>
                                         </p>
                                         <?php endif; ?>
                                     </div>
@@ -600,7 +600,7 @@ class OrderAdmin
                                 <!-- Order History -->
                                 <?php if (!empty($history)): ?>
                                     <div id="jankx_order_history" class="postbox">
-                                        <h2 class="hndle"><span><?php esc_html_e('Order History', 'jankx'); ?></span></h2>
+                                        <h2 class="hndle"><span><?php esc_html_e('Order History', 'base-ecommerce'); ?></span></h2>
                                         <div class="inside">
                                             <ul class="jankx-order-history">
                                                 <?php foreach (array_reverse($history) as $entry): ?>
@@ -630,7 +630,7 @@ class OrderAdmin
                                                                     case 'status_changed':
                                                                         printf(
                                                                             /* translators: 1: old status label, 2: new status label */
-                                                                            esc_html__('đã chuyển trạng thái từ %s sang %s', 'jankx'),
+                                                                            esc_html__('đã chuyển trạng thái từ %s sang %s', 'base-ecommerce'),
                                                                             '<strong>' . esc_html(Order::getStatusLabel($entry['from'] ?? '')) . '</strong>',
                                                                             '<strong>' . esc_html(Order::getStatusLabel($entry['to'] ?? '')) . '</strong>'
                                                                         );
@@ -638,7 +638,7 @@ class OrderAdmin
                                                                     case 'price_updated':
                                                                         printf(
                                                                             /* translators: 1: old total, 2: new total */
-                                                                            esc_html__('đã cập nhật tổng tiền từ %s → %s', 'jankx'),
+                                                                            esc_html__('đã cập nhật tổng tiền từ %s → %s', 'base-ecommerce'),
                                                                             '<strong>' . esc_html(CurrencyManager::formatPrice($entry['old_total'] ?? 0)) . '</strong>',
                                                                             '<strong>' . esc_html(CurrencyManager::formatPrice($entry['new_total'] ?? 0)) . '</strong>'
                                                                         );
@@ -648,17 +648,17 @@ class OrderAdmin
                                                                         $newTrk = $entry['new_tracking'] ?? '';
                                                                         if ($oldTrk === '') {
                                                                             printf(
-                                                                                esc_html__('đã thêm mã vận đơn %s', 'jankx'),
+                                                                                esc_html__('đã thêm mã vận đơn %s', 'base-ecommerce'),
                                                                                 '<strong>' . esc_html($newTrk) . '</strong>'
                                                                             );
                                                                         } elseif ($newTrk === '') {
                                                                             printf(
-                                                                                esc_html__('đã xóa mã vận đơn %s', 'jankx'),
+                                                                                esc_html__('đã xóa mã vận đơn %s', 'base-ecommerce'),
                                                                                 '<strong>' . esc_html($oldTrk) . '</strong>'
                                                                             );
                                                                         } else {
                                                                             printf(
-                                                                                esc_html__('đã cập nhật mã vận đơn từ %s → %s', 'jankx'),
+                                                                                esc_html__('đã cập nhật mã vận đơn từ %s → %s', 'base-ecommerce'),
                                                                                 '<strong>' . esc_html($oldTrk) . '</strong>',
                                                                                 '<strong>' . esc_html($newTrk) . '</strong>'
                                                                             );
@@ -673,26 +673,26 @@ class OrderAdmin
                                                                         $changes  = [];
                                                                         if (abs($newUp - $oldUp) > 0.001) {
                                                                             $changes[] = sprintf(
-                                                                                esc_html__('đơn giá %s → %s', 'jankx'),
+                                                                                esc_html__('đơn giá %s → %s', 'base-ecommerce'),
                                                                                 '<strong>' . esc_html(CurrencyManager::formatPrice($oldUp)) . '</strong>',
                                                                                 '<strong>' . esc_html(CurrencyManager::formatPrice($newUp)) . '</strong>'
                                                                             );
                                                                         }
                                                                         if ($newQty !== $oldQty) {
                                                                             $changes[] = sprintf(
-                                                                                esc_html__('số lượng %s → %s', 'jankx'),
+                                                                                esc_html__('số lượng %s → %s', 'base-ecommerce'),
                                                                                 '<strong>' . esc_html($oldQty) . '</strong>',
                                                                                 '<strong>' . esc_html($newQty) . '</strong>'
                                                                             );
                                                                         }
                                                                         printf(
-                                                                            esc_html__('đã chỉnh sửa sản phẩm "%s": %s', 'jankx'),
+                                                                            esc_html__('đã chỉnh sửa sản phẩm "%s": %s', 'base-ecommerce'),
                                                                             esc_html($itemName),
                                                                             implode(', ', $changes)
                                                                         );
                                                                         break;
                                                                     case 'note_added':
-                                                                        echo esc_html__('đã thêm ghi chú', 'jankx');
+                                                                        echo esc_html__('đã thêm ghi chú', 'base-ecommerce');
                                                                         break;
                                                                     default:
                                                                         echo esc_html(ucfirst($action));
@@ -720,20 +720,20 @@ class OrderAdmin
 
                         <!-- Update Status Meta Box -->
                         <div id="jankx_order_status" class="postbox">
-                            <h2 class="hndle"><span><?php esc_html_e('Update Status', 'jankx'); ?></span></h2>
+                            <h2 class="hndle"><span><?php esc_html_e('Update Status', 'base-ecommerce'); ?></span></h2>
                             <div class="inside">
                                 <div class="jankx-status-current">
-                                    <span class="jankx-status-current__label"><?php esc_html_e('CURRENT STATUS', 'jankx'); ?></span>
+                                    <span class="jankx-status-current__label"><?php esc_html_e('CURRENT STATUS', 'base-ecommerce'); ?></span>
                                     <span class="jankx-order-badge jankx-order-badge--<?php echo esc_attr($order->getStatus()); ?>">
                                         <?php echo esc_html(strtoupper(Order::getStatusLabel($order->getStatus()))); ?>
                                     </span>
                                 </div>
                                     <div class="jankx-status-form-inner">
                                         <div class="form-group">
-                                            <label for="order_status"><?php esc_html_e('TRẠNG THÁI', 'jankx'); ?></label>
+                                            <label for="order_status"><?php esc_html_e('TRẠNG THÁI', 'base-ecommerce'); ?></label>
                                             <select name="order_status" id="order_status">
                                                 <option value="<?php echo esc_attr($order->getStatus()); ?>" selected>
-                                                    <?php echo esc_html(sprintf(__('Giữ nguyên (%s)', 'jankx'), Order::getStatusLabel($order->getStatus()))); ?>
+                                                    <?php echo esc_html(sprintf(__('Giữ nguyên (%s)', 'base-ecommerce'), Order::getStatusLabel($order->getStatus()))); ?>
                                                 </option>
                                                 <?php foreach (Order::getAllowedStatusTransitionsFor($order->getStatus()) as $status): ?>
                                                     <option value="<?php echo esc_attr($status); ?>">
@@ -747,7 +747,7 @@ class OrderAdmin
                                         <?php $transitions = Order::getAllowedStatusTransitionsFor($order->getStatus()); ?>
                                         <?php if (!empty($transitions)): ?>
                                         <div class="form-group jankx-quick-status">
-                                            <label><?php esc_html_e('CHUYỂN NGAY', 'jankx'); ?></label>
+                                            <label><?php esc_html_e('CHUYỂN NGAY', 'base-ecommerce'); ?></label>
                                             <div class="jankx-quick-status__buttons">
                                                 <?php
                                                 $buttonStyles = [
@@ -774,12 +774,12 @@ class OrderAdmin
                                         <?php endif; ?>
 
                                         <div class="form-group">
-                                            <label for="order_total"><?php esc_html_e('BÁO GIÁ / TỔNG TIỀN (VND)', 'jankx'); ?></label>
+                                            <label for="order_total"><?php esc_html_e('BÁO GIÁ / TỔNG TIỀN (VND)', 'base-ecommerce'); ?></label>
                                             <input type="number" step="any" min="0" name="order_total" id="order_total"
                                                 value="<?php echo esc_attr($order->getTotal()); ?>"
-                                                placeholder="<?php esc_attr_e('Nhập giá báo cho khách...', 'jankx'); ?>">
+                                                placeholder="<?php esc_attr_e('Nhập giá báo cho khách...', 'base-ecommerce'); ?>">
                                             <?php if ($order->getPaymentMethod() === 'manual'): ?>
-                                                <small class="description" style="display:block;margin-top:4px;color:#64748b;"><?php esc_html_e('Cập nhật số tiền sau khi thỏa thuận báo giá với khách hàng.', 'jankx'); ?></small>
+                                                <small class="description" style="display:block;margin-top:4px;color:#64748b;"><?php esc_html_e('Cập nhật số tiền sau khi thỏa thuận báo giá với khách hàng.', 'base-ecommerce'); ?></small>
                                             <?php endif; ?>
                                         </div>
 
@@ -789,17 +789,17 @@ class OrderAdmin
                                             || in_array(Order::STATUS_SHIPPING, Order::getAllowedStatusTransitionsFor($order->getStatus()), true);
                                         ?>
                                         <div class="form-group" id="tracking-number-group" style="<?php echo $showTracking ? '' : 'display:none;'; ?>">
-                                            <label for="tracking_number"><?php esc_html_e('MÃ VẬN ĐƠN', 'jankx'); ?></label>
+                                            <label for="tracking_number"><?php esc_html_e('MÃ VẬN ĐƠN', 'base-ecommerce'); ?></label>
                                             <input type="text" name="tracking_number" id="tracking_number"
                                                 value="<?php echo esc_attr($order->getTrackingNumber()); ?>"
-                                                placeholder="<?php esc_attr_e('Nhập mã vận đơn...', 'jankx'); ?>">
+                                                placeholder="<?php esc_attr_e('Nhập mã vận đơn...', 'base-ecommerce'); ?>">
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="order_note"><?php esc_html_e('NOTE', 'jankx'); ?></label>
-                                            <textarea name="order_note" id="order_note" rows="4" placeholder="<?php esc_attr_e('Optional note...', 'jankx'); ?>"></textarea>
+                                            <label for="order_note"><?php esc_html_e('NOTE', 'base-ecommerce'); ?></label>
+                                            <textarea name="order_note" id="order_note" rows="4" placeholder="<?php esc_attr_e('Optional note...', 'base-ecommerce'); ?>"></textarea>
                                         </div>
-                                        <button type="submit" name="jankx_update_order_status" class="button-update"><?php esc_html_e('Cập nhật đơn hàng', 'jankx'); ?></button>
+                                        <button type="submit" name="jankx_update_order_status" class="button-update"><?php esc_html_e('Cập nhật đơn hàng', 'base-ecommerce'); ?></button>
                                     </div>
 
                             </div>
@@ -807,16 +807,16 @@ class OrderAdmin
 
                         <!-- Publish Meta Box (mimics WP Publish box) -->
                         <div class="postbox">
-                            <h2 class="hndle"><span><?php esc_html_e('Publish', 'jankx'); ?></span></h2>
+                            <h2 class="hndle"><span><?php esc_html_e('Publish', 'base-ecommerce'); ?></span></h2>
                             <div class="inside">
                                 <div style="padding: 12px 14px;">
                                     <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
                                         <span>&#128273;</span>
-                                        <span><?php esc_html_e('Status:', 'jankx'); ?> <strong><?php echo esc_html(ucfirst($order->getStatus())); ?></strong></span>
+                                        <span><?php esc_html_e('Status:', 'base-ecommerce'); ?> <strong><?php echo esc_html(ucfirst($order->getStatus())); ?></strong></span>
                                     </div>
                                     <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
                                         <span>&#128065;</span>
-                                        <span><?php esc_html_e('Visibility:', 'jankx'); ?> <strong><?php esc_html_e('Public', 'jankx'); ?></strong></span>
+                                        <span><?php esc_html_e('Visibility:', 'base-ecommerce'); ?> <strong><?php esc_html_e('Public', 'base-ecommerce'); ?></strong></span>
                                     </div>
                                     <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 12px;">
                                         <span>&#128197;</span>
@@ -825,7 +825,7 @@ class OrderAdmin
                                             $date = $order->getDateCreated();
                                             if ($date) {
                                                 printf(
-                                                    esc_html__('Published on: %s', 'jankx'),
+                                                    esc_html__('Published on: %s', 'base-ecommerce'),
                                                     esc_html(date_i18n(get_option('date_format') . ' \a\t ' . get_option('time_format'), strtotime($date)))
                                                 );
                                             }

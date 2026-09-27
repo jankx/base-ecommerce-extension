@@ -80,12 +80,12 @@ class OpenExchangeRatesConverter implements CurrencyConverterInterface
 
     public function getName(): string
     {
-        return __('OpenExchangeRates.io', 'jankx');
+        return __('OpenExchangeRates.io', 'base-ecommerce');
     }
 
     public function getDescription(): string
     {
-        return __('Live exchange rates from OpenExchangeRates.io API. Requires API key (free tier available).', 'jankx');
+        return __('Live exchange rates from OpenExchangeRates.io API. Requires API key (free tier available).', 'base-ecommerce');
     }
 
     /**
@@ -123,7 +123,7 @@ class OpenExchangeRatesConverter implements CurrencyConverterInterface
         $statusCode = wp_remote_retrieve_response_code($response);
         if ($statusCode !== 200) {
             $this->fetchError = sprintf(
-                __('OpenExchangeRates API error: HTTP %d', 'jankx'),
+                __('OpenExchangeRates API error: HTTP %d', 'base-ecommerce'),
                 $statusCode
             );
             return null;
@@ -133,7 +133,7 @@ class OpenExchangeRatesConverter implements CurrencyConverterInterface
         $data = json_decode($body, true);
 
         if (!is_array($data) || !isset($data['rates'])) {
-            $this->fetchError = __('Invalid response from OpenExchangeRates API', 'jankx');
+            $this->fetchError = __('Invalid response from OpenExchangeRates API', 'base-ecommerce');
             return null;
         }
 

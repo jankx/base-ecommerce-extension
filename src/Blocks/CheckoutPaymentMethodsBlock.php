@@ -15,7 +15,7 @@ class CheckoutPaymentMethodsBlock extends CheckoutSectionBlock
         );
 
         $output .= '<div class="jankx-field">';
-        $output .= '<label>' . esc_html__('Payment method', 'jankx') . '</label>';
+        $output .= '<label>' . esc_html__('Payment method', 'base-ecommerce') . '</label>';
         $output .= '<div class="jankx-payment-methods">';
 
         $methods = $this->getPaymentMethods();

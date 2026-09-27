@@ -19,7 +19,7 @@ class CartItemCheckboxBlock extends Block
         return sprintf(
             '<label class="jankx-cart-item__check"><input type="checkbox" class="jankx-cart-item__checkbox" data-item-key="%s" aria-label="%s"></label>',
             esc_attr($item->getItemKey()),
-            esc_attr__('Chọn sản phẩm', 'jankx')
+            esc_attr__('Chọn sản phẩm', 'base-ecommerce')
         );
     }
 }

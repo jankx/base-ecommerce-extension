@@ -61,7 +61,7 @@ class AddToCartBlock extends Block
 
         if (!empty($attributes['show_departure'])) {
             $output .= '<div class="jankx-add-to-cart__field">'
-                . '<label>' . esc_html__('Ngày khởi hành', 'jankx') . '</label>'
+                . '<label>' . esc_html__('Ngày khởi hành', 'base-ecommerce') . '</label>'
                 . '<input type="date" class="jankx-input" value="' . esc_attr(current_time('Y-m-d')) . '" tabindex="-1" aria-hidden="true" disabled>'
                 . '</div>';
         }
@@ -74,13 +74,13 @@ class AddToCartBlock extends Block
         }
 
         $output .= '<button type="button" class="jankx-btn jankx-btn-primary jankx-add-to-cart__btn" tabindex="-1">'
-            . esc_html__('Thêm vào giỏ hàng', 'jankx')
+            . esc_html__('Thêm vào giỏ hàng', 'base-ecommerce')
             . '</button>';
 
         $output .= '</div>';
 
         $output .= '<p class="jankx-add-to-cart__status">'
-            . esc_html__('Bản xem trước trong trình soạn thảo — biểu mẫu thêm vào giỏ hàng cho sản phẩm hiện tại.', 'jankx')
+            . esc_html__('Bản xem trước trong trình soạn thảo — biểu mẫu thêm vào giỏ hàng cho sản phẩm hiện tại.', 'base-ecommerce')
             . '</p>';
 
         $output .= '</div>';

@@ -19,7 +19,7 @@ final class DropdownMiniCartRenderer extends AbstractMiniCartRenderer
         $limit = $context->getLimit();
 
         $output = '<div class="jankx-mini-cart-dropdown" id="' . esc_attr($this->panelId()) . '" role="region" '
-            . 'aria-label="' . esc_attr__('Shopping cart', 'jankx') . '" data-jankx-dropdown-limit="' . $limit . '">';
+            . 'aria-label="' . esc_attr__('Shopping cart', 'base-ecommerce') . '" data-jankx-dropdown-limit="' . $limit . '">';
 
         $output .= $this->renderHead();
 
@@ -41,7 +41,7 @@ final class DropdownMiniCartRenderer extends AbstractMiniCartRenderer
             $remaining = $count - $limit;
             if ($remaining > 0) {
                 $output .= '<button type="button" class="jankx-mini-cart-viewall" data-jankx-mini-cart-viewall aria-expanded="false">'
-                    . sprintf(esc_html__('Xem tất cả (%d)', 'jankx'), $remaining) . '</button>';
+                    . sprintf(esc_html__('Xem tất cả (%d)', 'base-ecommerce'), $remaining) . '</button>';
                 $output .= '<div class="jankx-mini-cart-extra" data-jankx-viewall-extra hidden>' . $extraRows . '</div>';
             }
         }

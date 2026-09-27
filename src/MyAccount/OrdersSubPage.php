@@ -13,7 +13,7 @@ class OrdersSubPage extends AbstractSubPage
 
     public function getLabel(): string
     {
-        return __('Orders', 'jankx');
+        return __('Orders', 'base-ecommerce');
     }
 
     public function getIcon(): string

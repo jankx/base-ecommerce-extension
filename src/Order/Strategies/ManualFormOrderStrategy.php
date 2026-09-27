@@ -30,11 +30,11 @@ class ManualFormOrderStrategy extends AbstractOrderCreationStrategy
 
         $productId = (int) ($data['product_id'] ?? 0);
         if ($productId <= 0) {
-            $errors[] = __('Sản phẩm không hợp lệ.', 'jankx');
+            $errors[] = __('Sản phẩm không hợp lệ.', 'base-ecommerce');
         } else {
             $post = get_post($productId);
             if (!$post || $post->post_status !== 'publish') {
-                $errors[] = __('Sản phẩm không tồn tại hoặc chưa được công khai.', 'jankx');
+                $errors[] = __('Sản phẩm không tồn tại hoặc chưa được công khai.', 'base-ecommerce');
             }
         }
 
@@ -50,7 +50,7 @@ class ManualFormOrderStrategy extends AbstractOrderCreationStrategy
 
         $productId = (int) ($data['product_id'] ?? 0);
         $post = get_post($productId);
-        $productTitle = $post ? get_the_title($post) : __('Sản phẩm không xác định', 'jankx');
+        $productTitle = $post ? get_the_title($post) : __('Sản phẩm không xác định', 'base-ecommerce');
         $postType = $post ? $post->post_type : 'product';
 
         $name = sanitize_text_field($data['customer_name'] ?? $data['name'] ?? '');
@@ -98,7 +98,7 @@ class ManualFormOrderStrategy extends AbstractOrderCreationStrategy
         if ($unitPrice > 0) {
             $builder->addNote(
                 sprintf(
-                    __('Đơn hàng được đặt qua form sản phẩm "%s" với đơn giá %s.', 'jankx'),
+                    __('Đơn hàng được đặt qua form sản phẩm "%s" với đơn giá %s.', 'base-ecommerce'),
                     $productTitle,
                     CurrencyManager::formatPrice($unitPrice)
                 ),
@@ -107,7 +107,7 @@ class ManualFormOrderStrategy extends AbstractOrderCreationStrategy
         } else {
             $builder->addNote(
                 sprintf(
-                    __('Đơn hàng được đặt qua form sản phẩm "%s". Sản phẩm chưa có giá, cần liên hệ và xử lý báo giá thủ công.', 'jankx'),
+                    __('Đơn hàng được đặt qua form sản phẩm "%s". Sản phẩm chưa có giá, cần liên hệ và xử lý báo giá thủ công.', 'base-ecommerce'),
                     $productTitle
                 ),
                 false

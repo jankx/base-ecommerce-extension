@@ -52,7 +52,7 @@ class CartTotalsBlock extends Block
             $output = sprintf('<div %s>', $wrapperAttrs);
         }
 
-        $output .= '<h2 class="jankx-section-title">' . esc_html__('Cart totals', 'jankx') . '</h2>';
+        $output .= '<h2 class="jankx-section-title">' . esc_html__('Cart totals', 'base-ecommerce') . '</h2>';
         $output .= $this->renderCouponSection($cart);
         $output .= $this->renderCreditsSection($cart);
 
@@ -60,28 +60,28 @@ class CartTotalsBlock extends Block
         $otherDiscount = max(0, $cart->getDiscount() - $creditDiscount);
 
         $output .= '<div class="jankx-total-row jankx-subtotal-row"' . ($cart->getDiscount() > 0 ? '' : ' hidden') . '>'
-            . '<span>' . esc_html__('Subtotal', 'jankx') . '</span>'
+            . '<span>' . esc_html__('Subtotal', 'base-ecommerce') . '</span>'
             . '<span>' . esc_html($this->formatPrice($cart->getSubtotal())) . '</span>'
             . '</div>';
 
         $output .= '<div class="jankx-total-row jankx-discount-row"' . ($otherDiscount > 0 ? '' : ' hidden') . '>'
-            . '<span>' . esc_html__('Discount', 'jankx') . '</span>'
+            . '<span>' . esc_html__('Discount', 'base-ecommerce') . '</span>'
             . '<span class="jankx-discount-value">' . esc_html('-' . $this->formatPrice($otherDiscount)) . '</span>'
             . '</div>';
 
         $output .= '<div class="jankx-total-row jankx-credit-discount-row"' . ($creditDiscount > 0 ? '' : ' hidden') . '>'
-            . '<span>' . esc_html__('Credits', 'jankx') . '</span>'
+            . '<span>' . esc_html__('Credits', 'base-ecommerce') . '</span>'
             . '<span class="jankx-credit-discount-value">' . esc_html('-' . $this->formatPrice($creditDiscount)) . '</span>'
             . '</div>';
 
         $output .= '<div class="jankx-total-row jankx-total-grand">'
-            . '<span>' . esc_html__('Total', 'jankx') . '</span>'
+            . '<span>' . esc_html__('Total', 'base-ecommerce') . '</span>'
             . '<span class="jankx-total-grand-value">' . esc_html($this->formatPrice($cart->getTotal())) . '</span>'
             . '</div>';
 
         $output .= '<div class="jankx-cart-actions">'
             . '<a href="' . esc_url($checkoutUrl) . '" class="jankx-btn jankx-btn-primary jankx-btn-checkout">'
-            . esc_html__('Proceed to checkout', 'jankx') . '</a>'
+            . esc_html__('Proceed to checkout', 'base-ecommerce') . '</a>'
             . '</div>';
 
         $output .= '</div>';
@@ -109,13 +109,13 @@ class CartTotalsBlock extends Block
             $output .= '<div class="jankx-coupon-applied">'
                 . '<span class="jankx-coupon-applied-code">' . esc_html($appliedCode) . '</span>'
                 . '<button type="button" class="jankx-btn jankx-btn-outline jankx-coupon-remove">'
-                . esc_html__('Gỡ mã', 'jankx') . '</button>'
+                . esc_html__('Gỡ mã', 'base-ecommerce') . '</button>'
                 . '</div>';
         } else {
             $output .= '<div class="jankx-coupon-input-row">'
-                . '<input type="text" class="jankx-coupon-code" placeholder="' . esc_attr__('Nhập mã giảm giá', 'jankx') . '" autocomplete="off">'
+                . '<input type="text" class="jankx-coupon-code" placeholder="' . esc_attr__('Nhập mã giảm giá', 'base-ecommerce') . '" autocomplete="off">'
                 . '<button type="button" class="jankx-btn jankx-btn-primary jankx-coupon-apply">'
-                . esc_html__('Áp dụng', 'jankx') . '</button>'
+                . esc_html__('Áp dụng', 'base-ecommerce') . '</button>'
                 . '</div>';
             $output .= '<span class="jankx-coupon-message" role="status"></span>';
         }
@@ -153,7 +153,7 @@ class CartTotalsBlock extends Block
             . '<span>' . esc_html($integration->getLabel()) . '</span>'
             . '</label>';
         $output .= '<p class="jankx-credits-balance">'
-            . esc_html__('Số dư tín dụng:', 'jankx') . ' <strong class="jankx-credits-balance-value">'
+            . esc_html__('Số dư tín dụng:', 'base-ecommerce') . ' <strong class="jankx-credits-balance-value">'
             . esc_html($this->formatPrice($balance))
             . '</strong></p>';
         $output .= '<span class="jankx-credits-message" role="status"></span>';

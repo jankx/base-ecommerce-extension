@@ -17,7 +17,7 @@ class CheckoutActionsBlock extends CheckoutSectionBlock
         $output .= '<div class="jankx-checkout-error" role="alert" hidden></div>';
 
         $output .= '<button type="submit" class="jankx-btn jankx-btn-primary jankx-btn-place-order">'
-            . esc_html__('Place order', 'jankx') . '</button>';
+            . esc_html__('Place order', 'base-ecommerce') . '</button>';
 
         $output .= '</div>';
 

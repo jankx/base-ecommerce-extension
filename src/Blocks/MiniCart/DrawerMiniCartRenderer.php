@@ -19,7 +19,7 @@ final class DrawerMiniCartRenderer extends AbstractMiniCartRenderer
 
         $output = '<div class="jankx-mini-cart-overlay" data-jankx-mini-cart-close></div>';
         $output .= '<aside class="jankx-mini-cart-drawer" id="' . esc_attr($this->panelId()) . '" role="dialog" '
-            . 'aria-modal="true" aria-label="' . esc_attr__('Shopping cart', 'jankx') . '">';
+            . 'aria-modal="true" aria-label="' . esc_attr__('Shopping cart', 'base-ecommerce') . '">';
 
         $output .= $this->renderHead();
 
