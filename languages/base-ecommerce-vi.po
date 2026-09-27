@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: base-ecommerce\n"
 "Report-Msgid-Bugs-To: https://nibitour.vn\n"
-"POT-Creation-Date: 2026-09-27 04:03:43+0000\n"
+"POT-Creation-Date: 2026-09-27 04:21:14+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -15,55 +15,55 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: base-ecommerce i18n build\n"
 
-#: EcommerceExtension.php:327
+#: EcommerceExtension.php:368
 msgid "Order placed successfully!"
 msgstr "Đặt hàng thành công!"
 
-#: EcommerceExtension.php:328
+#: EcommerceExtension.php:369
 #, php-format
 msgid "Your order number is %s."
 msgstr "Mã đơn hàng của bạn là %s."
 
-#: EcommerceExtension.php:329
+#: EcommerceExtension.php:370
 msgid "Đang thêm..."
 msgstr "Đang thêm..."
 
-#: EcommerceExtension.php:330
+#: EcommerceExtension.php:371
 msgid "Đã thêm ✓"
 msgstr "Đã thêm ✓"
 
-#: EcommerceExtension.php:368 src/Blocks/CartItemBlock.php:59
+#: EcommerceExtension.php:409 src/Blocks/CartItemBlock.php:59
 #: src/Blocks/MiniCart/AbstractMiniCartRenderer.php:9
 msgid "Giỏ hàng"
 msgstr "Giỏ hàng"
 
-#: EcommerceExtension.php:388 src/Admin/EcommerceSettingsPage.php:43
+#: EcommerceExtension.php:429 src/Admin/EcommerceSettingsPage.php:43
 #: src/Admin/EcommerceSettingsPage.php:326 src/Blocks/CartItemBlock.php:62
 #: src/Blocks/MiniCart/CartFooterRenderer.php:22
 msgid "Thanh toán"
 msgstr "Thanh toán"
 
-#: EcommerceExtension.php:564
+#: EcommerceExtension.php:605
 #, php-format
 msgid "Đơn hàng #%s đã được tạo"
 msgstr "Đơn hàng #%s đã được tạo"
 
-#: EcommerceExtension.php:566
+#: EcommerceExtension.php:607
 #, php-format
 msgid "Đơn hàng của bạn với tổng %s đã được tiếp nhận và đang chờ xử lý."
 msgstr "Đơn hàng của bạn với tổng %s đã được tiếp nhận và đang chờ xử lý."
 
-#: EcommerceExtension.php:598
+#: EcommerceExtension.php:639
 #, php-format
 msgid "Trạng thái đơn hàng #%s đã chuyển từ \"%s\" sang \"%s\"."
 msgstr "Trạng thái đơn hàng #%s đã chuyển từ \"%s\" sang \"%s\"."
 
-#: EcommerceExtension.php:617
+#: EcommerceExtension.php:658
 #, php-format
 msgid " Mã vận đơn: %s"
 msgstr " Mã vận đơn: %s"
 
-#: EcommerceExtension.php:627
+#: EcommerceExtension.php:668
 #, php-format
 msgid "Đơn hàng #%s: %s"
 msgstr "Đơn hàng #%s: %s"
