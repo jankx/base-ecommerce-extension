@@ -154,11 +154,19 @@ class CheckoutManager
 
         do_action('jankx/ecommerce/checkout/completed', $order);
 
+        // Checkouts without their own gateway/browser redirect (COD, bank
+        // transfer, ...) may be redirected by extensions — e.g. straight to
+        // the order detail page where payment info (VietQR) is shown.
+        $redirectUrl = $result['redirect_url'];
+        if ($redirectUrl === '') {
+            $redirectUrl = (string) apply_filters('jankx/ecommerce/checkout/redirect_url', '', $order, $result);
+        }
+
         return [
             'success'        => true,
             'errors'         => [],
             'order'          => $order,
-            'redirect_url'   => $result['redirect_url'],
+            'redirect_url'   => $redirectUrl,
             'payment_status' => $result['payment_status'] ?? '',
             'qr_image'       => $result['qr_image'] ?? '',
             'qr_code'        => $result['qr_code'] ?? '',

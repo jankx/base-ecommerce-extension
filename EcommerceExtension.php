@@ -148,6 +148,33 @@ class EcommerceExtension extends AbstractExtension
         // Send notifications on order lifecycle events.
         add_action('jankx/ecommerce/order/created', [$this, 'on_order_created'], 10, 2);
         add_action('jankx/ecommerce/order/status_changed', [$this, 'on_order_status_changed'], 10, 4);
+
+        // Default post-checkout redirect: order detail page (payment info,
+        // VietQR, pay button) for orders without a gateway redirect.
+        add_filter('jankx/ecommerce/checkout/redirect_url', [$this, 'get_checkout_redirect_url'], 10, 3);
+    }
+
+    /**
+     * Redirect to the order detail page after checkouts that have no
+     * gateway/browser redirect of their own.
+     *
+     * @param string                              $redirect Already computed redirect ('' = none).
+     * @param \Jankx\Extensions\Ecommerce\Order\Order|null $order   The created order.
+     * @param array                                $result   Checkout result payload.
+     * @return string
+     */
+    public function get_checkout_redirect_url($redirect, $order, $result)
+    {
+        if ($redirect !== '' || !is_object($order) || !method_exists($order, 'getOrderNumber')) {
+            return $redirect;
+        }
+
+        $ordersUrl = self::get_orders_page_url();
+        if (!$ordersUrl) {
+            return $redirect;
+        }
+
+        return trailingslashit($ordersUrl) . $order->getOrderNumber() . '/';
     }
 
     /**
