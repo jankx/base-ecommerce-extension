@@ -724,3 +724,42 @@ class EcommerceExtension extends AbstractExtension
         return add_query_arg('order', $order->getOrderNumber(), $accountUrl);
     }
 }
+
+/**
+ * Site-specific payment content code. Generated once from the current domain
+ * and persisted in wp_options, so it always stays fixed and never changes
+ * later even if the site domain or the generation logic changes. Prefixing it
+ * to transfer content keeps orders placed on different websites that share the
+ * same bank account distinguishable.
+ */
+function jankx_payment_content_code(): string
+{
+    $optionName = 'jankx_payment_content_code';
+
+    $code = get_option($optionName, '');
+    if ($code !== '') {
+        return $code;
+    }
+
+    $host = parse_url(home_url(), PHP_URL_HOST) ?: '';
+    if ($host === '') {
+        $host = (string) wp_parse_url(ABSPATH, PHP_URL_HOST);
+    }
+
+    $code = strtoupper(substr(md5($host), 0, 4));
+    update_option($optionName, $code, false);
+
+    return $code;
+}
+
+/**
+ * Transfer content for an order: the fixed site code prefix + order number.
+ * Shown in every place that asks the customer to write transfer content
+ * (order detail, REST pay response, VietQR card, dynamic QR gateway).
+ */
+function jankx_payment_content($order): string
+{
+    $orderNumber = method_exists($order, 'getOrderNumber') ? (string) $order->getOrderNumber() : '';
+
+    return jankx_payment_content_code() . '-' . $orderNumber;
+}

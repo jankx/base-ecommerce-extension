@@ -120,7 +120,7 @@ class PaymentManager
             'currency'       => $order->getCurrency(),
             'returnUrl'      => rest_url('jankx/v1/payment/' . $transactionId . '/process'),
             'cancelUrl'      => add_query_arg('order', $order->getOrderNumber(), $accountUrl),
-            'description'    => sprintf('Order #%s', $order->getOrderNumber()),
+            'description'    => sprintf('%s-%s', \Jankx\Extensions\Ecommerce\jankx_payment_content_code(), $order->getOrderNumber()),
             'customer_email' => $order->getCustomerEmail(),
             'customer_phone' => $order->getCustomerPhone(),
             'customer_name'  => $order->getCustomerName(),

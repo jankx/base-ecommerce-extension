@@ -462,7 +462,7 @@ class AccountTabOrdersBlock extends Block
             if ($accountHolder) {
                 $output .= '<p><strong>' . esc_html__('Chủ TK:', 'base-ecommerce') . '</strong> ' . esc_html($accountHolder) . '</p>';
             }
-            $output .= '<p><strong>' . esc_html__('Nội dung CK:', 'base-ecommerce') . '</strong> <code>' . esc_html($order->getOrderNumber()) . '</code></p>';
+            $output .= '<p><strong>' . esc_html__('Nội dung CK:', 'base-ecommerce') . '</strong> <code>' . esc_html($this->getPaymentContent($order)) . '</code></p>';
             if ($transferContent) {
                 $output .= '<p class="description">' . esc_html($transferContent) . '</p>';
             }
@@ -753,5 +753,18 @@ class AccountTabOrdersBlock extends Block
         $output .= '</nav>';
 
         return $output;
+    }
+
+    /**
+     * Transfer content shown to the customer, prefixed with the fixed
+     * site-specific payment content code.
+     */
+    protected function getPaymentContent(Order $order): string
+    {
+        if (function_exists('Jankx\\Extensions\\Ecommerce\\jankx_payment_content')) {
+            return \Jankx\Extensions\Ecommerce\jankx_payment_content($order);
+        }
+
+        return $order->getOrderNumber();
     }
 }

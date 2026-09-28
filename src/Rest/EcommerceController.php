@@ -594,9 +594,11 @@ class EcommerceController
         // Bank transfer: return info, no redirect
         if ($gateway === 'bank_transfer') {
             return rest_ensure_response([
-                'success' => true,
-                'type'    => 'bank_transfer',
-                'message' => $this->getBankTransferInfo(),
+                'success'        => true,
+                'type'           => 'bank_transfer',
+                'message'        => $this->getBankTransferInfo($order),
+                'order_number'   => $order->getOrderNumber(),
+                'payment_content' => \Jankx\Extensions\Ecommerce\jankx_payment_content($order),
             ]);
         }
 
@@ -691,7 +693,7 @@ class EcommerceController
         ], 500);
     }
 
-    protected function getBankTransferInfo(): string
+    protected function getBankTransferInfo(?Order $order = null): string
     {
         $config = get_option('jankx_built_in_gateway_bank_transfer', []);
         $bankName = $config['bank_name'] ?? '';
@@ -714,7 +716,9 @@ class EcommerceController
             $lines[] = sprintf(__('Chi nhánh: %s', 'base-ecommerce'), $branch);
         }
         $lines[] = '';
-        $lines[] = __('Nội dung CK: Mã đơn hàng của bạn', 'base-ecommerce');
+        $lines[] = $order
+            ? sprintf(__('Nội dung CK: %s', 'base-ecommerce'), \Jankx\Extensions\Ecommerce\jankx_payment_content($order))
+            : __('Nội dung CK: Mã đơn hàng của bạn', 'base-ecommerce');
         if ($transferContent) {
             $lines[] = '';
             $lines[] = $transferContent;
