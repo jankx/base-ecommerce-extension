@@ -174,21 +174,23 @@ class CheckoutPaymentMethodsBlock extends CheckoutSectionBlock
         }
         $output .= '</div>'; // .jankx-payment-panels
 
-        // Terms checkbox
-        $output .= '<div class="jankx-field jankx-field-checkbox jankx-terms-field">'
-            . '<label class="jankx-checkbox-label">'
-            . '<input type="checkbox" id="jankx_accept_terms" name="accept_terms" value="1" required>'
-            . '<span class="jankx-checkbox-custom"></span>'
-            . '<span class="jankx-checkbox-text">'
-            . sprintf(
-                /* translators: 1: terms link, 2: refund policy link */
-                __('Tôi đã đọc và đồng ý với <a href="%1$s" target="_blank">Điều khoản sử dụng</a> và <a href="%2$s" target="_blank">Chính sách hoàn hủy</a> của Nobitour', 'base-ecommerce'),
-                esc_url(get_privacy_policy_url() ?: '#'),
-                esc_url(get_permalink(get_page_by_path('chinh-sach-hoan-huy')) ?: '#')
-            )
-            . '</span>'
-            . '</label>'
-            . '</div>';
+        // Terms checkbox (only when required by the Payment settings)
+        if (get_option('jankx_require_terms_acceptance')) {
+            $output .= '<div class="jankx-field jankx-field-checkbox jankx-terms-field">'
+                . '<label class="jankx-checkbox-label">'
+                . '<input type="checkbox" id="jankx_accept_terms" name="accept_terms" value="1" required>'
+                . '<span class="jankx-checkbox-custom"></span>'
+                . '<span class="jankx-checkbox-text">'
+                . sprintf(
+                    /* translators: 1: terms link, 2: refund policy link */
+                    __('Tôi đã đọc và đồng ý với <a href="%1$s" target="_blank">Điều khoản sử dụng</a> và <a href="%2$s" target="_blank">Chính sách hoàn hủy</a> của Nobitour', 'base-ecommerce'),
+                    esc_url(get_privacy_policy_url() ?: '#'),
+                    esc_url(get_permalink(get_page_by_path('chinh-sach-hoan-huy')) ?: '#')
+                )
+                . '</span>'
+                . '</label>'
+                . '</div>';
+        }
 
         $output .= '</div>'; // .jankx-section-body
         $output .= '</div>';

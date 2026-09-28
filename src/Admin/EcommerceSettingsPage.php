@@ -182,6 +182,15 @@ class EcommerceSettingsPage
             'default' => [],
         ]);
 
+        // Require customers to agree to terms before placing an order
+        register_setting(self::GROUP_PAYMENT, 'jankx_require_terms_acceptance', [
+            'type' => 'boolean',
+            'sanitize_callback' => static function ($value) {
+                return !empty($value);
+            },
+            'default' => false,
+        ]);
+
         // Coupons
         register_setting(self::GROUP_COUPONS, 'jankx_coupons_enabled', [
             'type' => 'boolean',
@@ -670,6 +679,21 @@ class EcommerceSettingsPage
                     </tr>
                 <?php endforeach; ?>
             </tbody>
+        </table>
+
+        <table class="form-table">
+            <tr>
+                <th scope="row">
+                    <?php esc_html_e('Bắt buộc đồng ý điều khoản sử dụng', 'base-ecommerce'); ?>
+                </th>
+                <td>
+                    <label>
+                        <input type="checkbox" name="jankx_require_terms_acceptance" value="1"
+                               <?php checked((bool) get_option('jankx_require_terms_acceptance')); ?>>
+                        <?php esc_html_e('Hiển thị checkbox "Tôi đã đọc và đồng ý với Điều khoản sử dụng và Chính sách hoàn hủy" trên trang thanh toán. Khách hàng phải đồng ý mới tạo được đơn hàng.', 'base-ecommerce'); ?>
+                    </label>
+                </td>
+            </tr>
         </table>
 
         <?php submit_button(); ?>

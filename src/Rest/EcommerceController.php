@@ -386,6 +386,14 @@ class EcommerceController
 
         $createAccount = (bool) $request->get_param('create_account');
 
+        // Terms acceptance is enforced only when required by the Payment settings.
+        if (get_option('jankx_require_terms_acceptance') && !$request->get_param('accept_terms')) {
+            return new \WP_REST_Response([
+                'success' => false,
+                'message' => [__('Bạn phải đồng ý với Điều khoản sử dụng và Chính sách hoàn hủy để tạo đơn hàng.', 'base-ecommerce')],
+            ], 400);
+        }
+
         $cart = Cart::get_active_cart();
         if ($request->get_param('mode') === 'quick') {
             $cart->setScope(Cart::SCOPE_QUICK);

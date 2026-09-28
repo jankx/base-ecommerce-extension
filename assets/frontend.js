@@ -279,8 +279,20 @@
             var createAccountCheckbox = checkoutForm.querySelector('#jankx_create_account');
             var createAccount = createAccountCheckbox ? createAccountCheckbox.checked : false;
 
+            var termsCheckbox = checkoutForm.querySelector('#jankx_accept_terms');
+            if (termsCheckbox && !termsCheckbox.checked) {
+                showError(window.jankxEcommerce.i18n.termsRequired || 'Vui lòng đồng ý Điều khoản sử dụng và Chính sách hoàn hủy.');
+                submitButton.disabled = false;
+                return;
+            }
+
             var checkoutMode = checkoutForm.getAttribute('data-jankx-checkout-mode') || 'normal';
-            var checkoutBody = { customer: customer, gateway: gateway, create_account: createAccount };
+            var checkoutBody = {
+                customer: customer,
+                gateway: gateway,
+                create_account: createAccount,
+                accept_terms: termsCheckbox ? termsCheckbox.checked : false
+            };
             if (checkoutMode !== 'normal') {
                 checkoutBody.mode = checkoutMode;
             }

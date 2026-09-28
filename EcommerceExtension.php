@@ -372,6 +372,7 @@ class EcommerceExtension extends AbstractExtension
                 'successMessage' => __('Your order number is %s.', 'base-ecommerce'),
                 'adding' => __('Đang thêm...', 'base-ecommerce'),
                 'added' => __('Đã thêm ✓', 'base-ecommerce'),
+                'termsRequired' => __('Vui lòng đồng ý Điều khoản sử dụng và Chính sách hoàn hủy.', 'base-ecommerce'),
             ],
         ]);
     }
