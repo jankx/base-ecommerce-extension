@@ -5,7 +5,13 @@ use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
 
 class EcommerceSettingsPage
 {
-    const OPTION_GROUP = 'jankx_ecommerce_settings';
+    const GROUP_GENERAL = 'jankx_ecommerce_general';
+    const GROUP_CURRENCY = 'jankx_ecommerce_currency';
+    const GROUP_PAYMENT = 'jankx_ecommerce_payment';
+    const GROUP_COUPONS = 'jankx_ecommerce_coupons';
+    const GROUP_TAX = 'jankx_ecommerce_tax';
+
+    const OPTION_GROUP = self::GROUP_GENERAL;
     const PAGE_SLUG = 'jankx-ecommerce-settings';
 
     public function register(): void
@@ -101,100 +107,100 @@ class EcommerceSettingsPage
     public function registerSettings(): void
     {
         // General
-        register_setting(self::OPTION_GROUP, 'jankx_store_name', [
+        register_setting(self::GROUP_GENERAL, 'jankx_store_name', [
             'type' => 'string',
             'sanitize_callback' => 'sanitize_text_field',
             'default' => get_bloginfo('name'),
         ]);
 
-        register_setting(self::OPTION_GROUP, 'jankx_store_address', [
+        register_setting(self::GROUP_GENERAL, 'jankx_store_address', [
             'type' => 'string',
             'sanitize_callback' => 'sanitize_textarea_field',
             'default' => '',
         ]);
 
-        register_setting(self::OPTION_GROUP, 'jankx_store_phone', [
+        register_setting(self::GROUP_GENERAL, 'jankx_store_phone', [
             'type' => 'string',
             'sanitize_callback' => 'sanitize_text_field',
             'default' => '',
         ]);
 
-        register_setting(self::OPTION_GROUP, 'jankx_store_email', [
+        register_setting(self::GROUP_GENERAL, 'jankx_store_email', [
             'type' => 'string',
             'sanitize_callback' => [$this, 'sanitizeStoreEmail'],
             'default' => get_option('admin_email'),
         ]);
 
         // Currency
-        register_setting(self::OPTION_GROUP, CurrencyManager::OPTION_DEFAULT_CURRENCY, [
+        register_setting(self::GROUP_CURRENCY, CurrencyManager::OPTION_DEFAULT_CURRENCY, [
             'type' => 'string',
             'sanitize_callback' => 'sanitize_text_field',
             'default' => 'USD',
         ]);
 
-        register_setting(self::OPTION_GROUP, CurrencyManager::OPTION_ENABLED_CURRENCIES, [
+        register_setting(self::GROUP_CURRENCY, CurrencyManager::OPTION_ENABLED_CURRENCIES, [
             'type' => 'array',
             'sanitize_callback' => [$this, 'sanitizeEnabledCurrencies'],
             'default' => ['USD', 'VND'],
         ]);
 
-        register_setting(self::OPTION_GROUP, CurrencyManager::OPTION_CURRENCY_POSITION, [
+        register_setting(self::GROUP_CURRENCY, CurrencyManager::OPTION_CURRENCY_POSITION, [
             'type' => 'string',
             'sanitize_callback' => 'sanitize_text_field',
             'default' => 'left',
         ]);
 
-        register_setting(self::OPTION_GROUP, CurrencyManager::OPTION_THOUSAND_SEP, [
+        register_setting(self::GROUP_CURRENCY, CurrencyManager::OPTION_THOUSAND_SEP, [
             'type' => 'string',
             'sanitize_callback' => 'sanitize_text_field',
             'default' => ',',
         ]);
 
-        register_setting(self::OPTION_GROUP, CurrencyManager::OPTION_DECIMAL_SEP, [
+        register_setting(self::GROUP_CURRENCY, CurrencyManager::OPTION_DECIMAL_SEP, [
             'type' => 'string',
             'sanitize_callback' => 'sanitize_text_field',
             'default' => '.',
         ]);
 
-        register_setting(self::OPTION_GROUP, CurrencyManager::OPTION_DECIMALS, [
+        register_setting(self::GROUP_CURRENCY, CurrencyManager::OPTION_DECIMALS, [
             'type' => 'integer',
             'sanitize_callback' => 'absint',
             'default' => 2,
         ]);
 
         // Payment
-        register_setting(self::OPTION_GROUP, 'jankx_payment_gateways', [
+        register_setting(self::GROUP_PAYMENT, 'jankx_payment_gateways', [
             'type' => 'array',
             'sanitize_callback' => [$this, 'sanitizePaymentGateways'],
             'default' => [],
         ]);
 
         // Payment gateway display order (slug => position)
-        register_setting(self::OPTION_GROUP, 'jankx_payment_gateways_order', [
+        register_setting(self::GROUP_PAYMENT, 'jankx_payment_gateways_order', [
             'type' => 'array',
             'sanitize_callback' => [$this, 'sanitizePaymentGatewayPositions'],
             'default' => [],
         ]);
 
         // Coupons
-        register_setting(self::OPTION_GROUP, 'jankx_coupons_enabled', [
+        register_setting(self::GROUP_COUPONS, 'jankx_coupons_enabled', [
             'type' => 'boolean',
             'sanitize_callback' => 'rest_sanitize_boolean',
             'default' => true,
         ]);
 
         // Taxes
-        register_setting(self::OPTION_GROUP, 'jankx_tax_enabled', [
+        register_setting(self::GROUP_TAX, 'jankx_tax_enabled', [
             'type' => 'boolean',
             'sanitize_callback' => 'rest_sanitize_boolean',
             'default' => false,
         ]);
-        register_setting(self::OPTION_GROUP, 'jankx_tax_strategy', [
+        register_setting(self::GROUP_TAX, 'jankx_tax_strategy', [
             'type' => 'string',
             'sanitize_callback' => 'sanitize_text_field',
             'default' => 'inclusive',
         ]);
-        register_setting(self::OPTION_GROUP, 'jankx_tax_rates_raw', [
+        register_setting(self::GROUP_TAX, 'jankx_tax_rates_raw', [
             'type' => 'string',
             'sanitize_callback' => 'sanitize_textarea_field',
             'default' => "VAT | 10 | 10",
@@ -202,7 +208,7 @@ class EcommerceSettingsPage
 
         // Per-currency format overrides (position, thousand_sep, decimal_sep, decimals riêng từng đồng)
         foreach (CurrencyManager::getAllCurrencies() as $code => $unused) {
-            register_setting(self::OPTION_GROUP, 'jankx_currency_fmt_' . $code, [
+            register_setting(self::GROUP_CURRENCY, 'jankx_currency_fmt_' . $code, [
                 'type'              => 'array',
                 'sanitize_callback' => [$this, 'sanitizeCurrencyFormatSettings'],
                 'default'           => [],
@@ -372,7 +378,7 @@ class EcommerceSettingsPage
     {
         ?>
         <form method="post" action="options.php">
-        <?php settings_fields(self::OPTION_GROUP); ?>
+        <?php settings_fields(self::GROUP_GENERAL); ?>
         <table class="form-table">
             <tr>
                 <th scope="row"><label for="jankx_store_name"><?php esc_html_e('Tên cửa hàng', 'base-ecommerce'); ?></label></th>
@@ -434,7 +440,7 @@ class EcommerceSettingsPage
         <p class="description"><?php esc_html_e('Chọn các loại tiền tệ muốn hiển thị trên trang web. Đánh dấu vào ô bên cạnh để bật/tắt.', 'base-ecommerce'); ?></p>
 
         <form method="post" action="options.php">
-        <?php settings_fields(self::OPTION_GROUP); ?>
+        <?php settings_fields(self::GROUP_CURRENCY); ?>
 
         <table class="widefat striped jankx-currency-table" style="margin-top: 16px;">
             <thead>
@@ -582,7 +588,7 @@ class EcommerceSettingsPage
         <p class="description"><?php esc_html_e('Kích hoạt và cấu hình các phương thức thanh toán từ các extension.', 'base-ecommerce'); ?></p>
 
         <form method="post" action="options.php">
-        <?php settings_fields(self::OPTION_GROUP); ?>
+        <?php settings_fields(self::GROUP_PAYMENT); ?>
 
         <table class="widefat striped" style="margin-top: 16px;">
             <thead>
@@ -1024,7 +1030,7 @@ class EcommerceSettingsPage
         <h2><?php esc_html_e('Mã giảm giá', 'base-ecommerce'); ?></h2>
 
         <form method="post" action="options.php">
-        <?php settings_fields(self::OPTION_GROUP); ?>
+        <?php settings_fields(self::GROUP_COUPONS); ?>
 
         <table class="form-table">
             <tr>
@@ -1074,7 +1080,7 @@ class EcommerceSettingsPage
         ?>
 
         <form method="post" action="options.php">
-            <?php settings_fields(self::OPTION_GROUP); ?>
+            <?php settings_fields(self::GROUP_TAX); ?>
             <table class="form-table">
                 <tbody>
                     <?php
