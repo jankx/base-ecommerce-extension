@@ -66,6 +66,12 @@
     transition: transform 0.2s ease;
 }
 
+.jcs-arrow svg {
+    display: block;
+    width: 1em;
+    height: 1em;
+}
+
 .jcs-dropdown-wrapper:hover .jcs-arrow,
 .jcs-dropdown-wrapper.is-open .jcs-arrow {
     transform: rotate(180deg);

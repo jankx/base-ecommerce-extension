@@ -679,6 +679,26 @@
     color: currentColor;
 }
 
+.jankx-payment-tab-icon svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+}
+
+/* Payment method display types (gateway display API) */
+.jankx-payment-tab--text {
+    min-width: auto;
+}
+
+.jankx-payment-tab--icon-text {
+    flex-direction: row;
+    gap: 6px;
+}
+
+.jankx-payment-tab--icon-text.jankx-payment-tab--icon-right {
+    flex-direction: row-reverse;
+}
+
 .jankx-payment-radios {
     display: none;
 }

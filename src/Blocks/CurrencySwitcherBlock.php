@@ -111,7 +111,7 @@ class CurrencySwitcherBlock extends Block
         $html = '<div class="jcs-dropdown-wrapper">';
         $html .= '<button class="jcs-dropdown" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="' . esc_attr($panelId) . '">';
         $html .= $this->buildLabelHtml($currentCurrency, $showFlag, $showCode, $showSymbol, $showName);
-        $html .= '<span class="jcs-arrow">▼</span>';
+        $html .= '<span class="jcs-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#5F5F74" aria-hidden="true" focusable="false"><path d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg></span>';
         $html .= '</button>';
 
         $html .= '<div class="jcs-dropdown-panel" id="' . esc_attr($panelId) . '" role="region" aria-label="' . esc_attr__('Chọn tiền tệ', 'base-ecommerce') . '">';

@@ -22,6 +22,101 @@ class CheckoutPaymentMethodsBlock extends CheckoutSectionBlock
         return $icons[$slug] ?? '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
     }
 
+    /**
+     * Resolve the display payload (type / icon / text / icon position) of a
+     * payment method.
+     *
+     * Registered gateways (AbstractGateway subclasses) provide their own
+     * display via getDisplay() – including icon/text filters and the
+     * icon-empty fallback. Built-in methods (bank transfer, COD) follow the
+     * same contract with the block's own icons so every method on the
+     * checkout page can be controlled through the same filter tags.
+     */
+    protected function getMethodDisplay(string $slug, string $label): array
+    {
+        $managerClass = '\Jankx\Extensions\PaymentSystem\Gateways\GatewayManager';
+        $gatewayClass = '\Jankx\Extensions\PaymentSystem\Gateways\AbstractGateway';
+
+        if (class_exists($managerClass) && class_exists($gatewayClass)) {
+            $gateway = $managerClass::getInstance()->get($slug);
+            if ($gateway instanceof $gatewayClass) {
+                $display = $gateway->getDisplay();
+                if (trim($display['text']) === '') {
+                    $display['text'] = $label;
+                }
+                return $display;
+            }
+        }
+
+        $type = (string) apply_filters("jankx/payment/gateway/{$slug}/display_type", 'icon', $slug);
+        if (!in_array($type, ['icon', 'text', 'icon_text'], true)) {
+            $type = 'icon';
+        }
+
+        $position = (string) apply_filters("jankx/payment/gateway/{$slug}/icon_position", 'left', $slug);
+        if (!in_array($position, ['left', 'right'], true)) {
+            $position = 'left';
+        }
+
+        $icon = (string) apply_filters("jankx/payment/gateway/{$slug}/icon", $this->getMethodIcon($slug), $slug);
+        $text = (string) apply_filters("jankx/payment/gateway/{$slug}/text", $label, $slug);
+
+        if ($type === 'text') {
+            $icon = '';
+        }
+        if (trim($icon) === '') {
+            $type = 'text';
+            $icon = '';
+        }
+
+        return [
+            'type'         => $type,
+            'icon'         => $icon,
+            'text'         => $text,
+            'icon_position' => $position,
+        ];
+    }
+
+    /**
+     * Render a payment method tab according to its display payload.
+     */
+    protected function renderMethodTab(string $slug, array $display, bool $isActive): string
+    {
+        $type = $display['type'];
+        $text = $display['text'];
+
+        $classes = [
+            'jankx-payment-tab',
+            'jankx-payment-tab--' . str_replace('_', '-', $type),
+            'jankx-payment-tab--icon-' . $display['icon_position'],
+        ];
+        if ($isActive) {
+            $classes[] = 'jankx-payment-tab--active';
+        }
+
+        $inner = '';
+        if ($type !== 'text' && $display['icon'] !== '') {
+            $inner .= '<span class="jankx-payment-tab-icon" aria-hidden="true">' . $display['icon'] . '</span>';
+        }
+        if ($type !== 'icon') {
+            $inner .= '<span class="jankx-payment-tab-label">' . esc_html($text) . '</span>';
+        }
+
+        $attributes = ' type="button"'
+            . ' role="tab"'
+            . ' data-method="' . esc_attr($slug) . '"'
+            . ' aria-selected="' . ($isActive ? 'true' : 'false') . '"'
+            . ' title="' . esc_attr($text) . '"';
+        if ($type === 'icon') {
+            // Icon-only tab: keep an accessible name.
+            $attributes .= ' aria-label="' . esc_attr($text) . '"';
+        }
+
+        return '<button' . $attributes . ' class="' . esc_attr(implode(' ', $classes)) . '">'
+            . $inner
+            . '</button>';
+    }
+
     public function render($attributes, $content = '', $block = null): string
     {
         $methods = $this->getPaymentMethods();
@@ -48,18 +143,8 @@ class CheckoutPaymentMethodsBlock extends CheckoutSectionBlock
         // Payment method tabs
         $output .= '<div class="jankx-payment-tabs" role="tablist">';
         foreach ($methods as $slug => $label) {
-            $isActive = ($slug === $firstSlug);
-            $output .= sprintf(
-                '<button type="button" class="jankx-payment-tab%s" role="tab" data-method="%s" aria-selected="%s">'
-                    . '<span class="jankx-payment-tab-icon">%s</span>'
-                    . '<span class="jankx-payment-tab-label">%s</span>'
-                    . '</button>',
-                $isActive ? ' jankx-payment-tab--active' : '',
-                esc_attr($slug),
-                $isActive ? 'true' : 'false',
-                $this->getMethodIcon($slug),
-                esc_html($label)
-            );
+            $display = $this->getMethodDisplay($slug, $label);
+            $output .= $this->renderMethodTab($slug, $display, $slug === $firstSlug);
         }
         $output .= '</div>'; // .jankx-payment-tabs
 
