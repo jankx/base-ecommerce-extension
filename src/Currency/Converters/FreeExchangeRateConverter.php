@@ -53,6 +53,15 @@ class FreeExchangeRateConverter implements CurrencyConverterInterface
      */
     public function getRate(string $fromCode, string $toCode): ?float
     {
+        $fromCode = strtoupper(trim($fromCode));
+        $toCode = strtoupper(trim($toCode));
+
+        // Never call the API without a base currency – `/v6/latest/` (empty
+        // base) returns 404. `/v6/latest/<CURRENCY>` is the valid form.
+        if ($fromCode === '' || $toCode === '') {
+            return null;
+        }
+
         // Same currency, rate is 1
         if ($fromCode === $toCode) {
             return 1.0;
@@ -105,6 +114,12 @@ class FreeExchangeRateConverter implements CurrencyConverterInterface
      */
     private function fetchRates(string $baseCurrency): ?array
     {
+        $baseCurrency = strtoupper(trim($baseCurrency));
+        if ($baseCurrency === '') {
+            Log::error('[FreeExchangeRateConverter] Empty base currency – request skipped');
+            return null;
+        }
+
         $url = self::API_LATEST . '/' . rawurlencode($baseCurrency);
 
         Log::info('[FreeExchangeRateConverter] Fetching rates', ['url' => $url, 'base' => $baseCurrency]);

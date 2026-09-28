@@ -101,6 +101,9 @@ class CheckoutPaymentMethodsBlock extends CheckoutSectionBlock
         if ($type !== 'icon') {
             $inner .= '<span class="jankx-payment-tab-label">' . esc_html($text) . '</span>';
         }
+        if (!$this->isGatewayAvailable($slug) && current_user_can('manage_options')) {
+            $inner .= '<span class="jankx-payment-tab-notice">' . esc_html__('Chưa cấu hình', 'base-ecommerce') . '</span>';
+        }
 
         $attributes = ' type="button"'
             . ' role="tab"'
@@ -194,6 +197,21 @@ class CheckoutPaymentMethodsBlock extends CheckoutSectionBlock
         return $output;
     }
 
+    protected function isGatewayAvailable(string $slug): bool
+    {
+        $managerClass = '\Jankx\Extensions\PaymentSystem\Gateways\GatewayManager';
+        $gatewayClass = '\Jankx\Extensions\PaymentSystem\Gateways\AbstractGateway';
+
+        if (class_exists($managerClass) && class_exists($gatewayClass)) {
+            $gateway = $managerClass::getInstance()->get($slug);
+            if ($gateway instanceof $gatewayClass) {
+                return $gateway->isAvailable();
+            }
+        }
+
+        return true;
+    }
+
     protected function renderMethodPanel(string $slug, string $label): string
     {
         switch ($slug) {
@@ -208,6 +226,21 @@ class CheckoutPaymentMethodsBlock extends CheckoutSectionBlock
                     . esc_html__('Thanh toán bằng tiền mặt khi nhận hàng/dịch vụ.', 'base-ecommerce')
                     . '</p>';
             default:
+                if (!$this->isGatewayAvailable($slug)) {
+                    if (current_user_can('manage_options')) {
+                        return '<p class="jankx-payment-desc jankx-payment-desc--error">'
+                            . sprintf(
+                                /* translators: 1: payment method name, 2: settings url */
+                                esc_html__('Phương thức %1$s chưa được cấu hình. <a href="%2$s">Cấu hình ngay</a>.', 'base-ecommerce'),
+                                esc_html($label),
+                                esc_url(admin_url('admin.php?page=jankx-ecommerce-settings&tab=payment&gateway=' . $slug))
+                            )
+                            . '</p>';
+                    }
+                    return '<p class="jankx-payment-desc jankx-payment-desc--error">'
+                        . esc_html__('Phương thức thanh toán này hiện chưa khả dụng. Vui lòng liên hệ bộ phận hỗ trợ để được hỗ trợ.', 'base-ecommerce')
+                        . '</p>';
+                }
                 // Online gateway: show redirect notice
                 return '<p class="jankx-payment-desc">'
                     . sprintf(

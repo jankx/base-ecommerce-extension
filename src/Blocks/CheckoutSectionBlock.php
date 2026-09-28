@@ -26,8 +26,11 @@ abstract class CheckoutSectionBlock extends Block
         $onlineGateways = [];
         if (class_exists('\Jankx\Extensions\PaymentSystem\Gateways\GatewayManager')) {
             $manager = \Jankx\Extensions\PaymentSystem\Gateways\GatewayManager::getInstance();
-            foreach ($manager->getAvailable() as $slug => $gateway) {
-                $onlineGateways[$slug] = $gateway->getName();
+            foreach ($manager->getAll() as $slug => $unused) {
+                $gateway = $manager->get($slug);
+                if ($gateway) {
+                    $onlineGateways[$slug] = $gateway->getName();
+                }
             }
         }
 
