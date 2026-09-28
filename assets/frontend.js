@@ -270,7 +270,7 @@
                 name: checkoutForm.querySelector('#jankx_customer_name').value,
                 email: checkoutForm.querySelector('#jankx_customer_email').value,
                 phone: checkoutForm.querySelector('#jankx_customer_phone').value,
-                address: checkoutForm.querySelector('#jankx_customer_address').value
+                address: (checkoutForm.querySelector('#jankx_customer_address') || {}).value || ''
             };
 
             var gatewayInput = checkoutForm.querySelector('input[name="payment_method"]:checked');
