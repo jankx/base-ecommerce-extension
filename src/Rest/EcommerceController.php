@@ -424,6 +424,16 @@ class EcommerceController
             $response['redirect_url'] = $result['redirect_url'];
         }
 
+        if (!empty($result['payment_status'])) {
+            $response['payment_status'] = $result['payment_status'];
+        }
+        if (!empty($result['qr_image'])) {
+            $response['qr_image'] = $result['qr_image'];
+        }
+        if (!empty($result['qr_code'])) {
+            $response['qr_code'] = $result['qr_code'];
+        }
+
         return rest_ensure_response($response);
     }
 
@@ -509,6 +519,17 @@ class EcommerceController
         $result = $paymentManager->process($order, $gateway, [
             'return_url' => add_query_arg('order', $order->getOrderNumber(), home_url('/tai-khoan-cua-toi/orders/')),
         ]);
+
+        // QR payment: return the QR payload to render inline (no redirect).
+        if (!empty($result['payment_status']) && $result['payment_status'] === 'qr') {
+            return rest_ensure_response([
+                'success'      => true,
+                'type'         => 'qr',
+                'qr_image'     => $result['qr_image'] ?? '',
+                'qr_code'      => $result['qr_code'] ?? '',
+                'order_number' => $order->getOrderNumber(),
+            ]);
+        }
 
         if (!empty($result['redirect_url'])) {
             return rest_ensure_response([

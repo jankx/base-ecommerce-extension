@@ -366,6 +366,20 @@ class AccountTabOrdersBlock extends Block
         }
 
         $gateway = $order->getPaymentMethod();
+        if ($gateway === 'qrviet') {
+            // A dynamic QR is rendered via
+            // `jankx/ecommerce/order_detail/after_payment_info`; hide the pay
+            // button so there is a single, consistent payment entry point.
+            $txnClass = 'Jankx\Extensions\PaymentSystem\Models\Transaction';
+            $transactionId = $order->getPaymentTransactionId();
+            if ($transactionId && class_exists($txnClass)) {
+                $transaction = new $txnClass((int) $transactionId);
+                if ($transaction->getId() && $transaction->getMeta('_qr_image') !== '') {
+                    return '';
+                }
+            }
+        }
+
         if ($gateway === 'cod' || $gateway === 'bank_transfer') {
             // For COD and bank transfer, show info instead of pay button
             return $this->renderOfflinePaymentInfo($order, $gateway);
@@ -462,6 +476,7 @@ class AccountTabOrdersBlock extends Block
         $labels = [
             'cod'           => __('Cash on delivery', 'base-ecommerce'),
             'bank_transfer' => __('Bank transfer', 'base-ecommerce'),
+            'qrviet'        => __('Quét mã QR', 'base-ecommerce'),
         ];
 
         return $labels[$method] ?? ($method ?: '—');

@@ -64,18 +64,43 @@ class CheckoutManager
     {
         $order = Order::createFromCart($cart, $customer, $options);
         $redirectUrl = '';
+        $qrPayload = [
+            'payment_status' => '',
+            'qr_image'       => '',
+            'qr_code'        => '',
+        ];
 
         if ($order && !empty($options['gateway'])) {
             $gateway = (string) $options['gateway'];
             $paymentResult = PaymentManager::get_instance()->process($order, $gateway, $options['payment_params'] ?? []);
+
             if (!empty($paymentResult['redirect_url'])) {
                 $redirectUrl = $paymentResult['redirect_url'];
+            }
+
+            // QR payments have no browser redirect; send the customer to the
+            // order detail page where the QR code is displayed for scanning.
+            if (!empty($paymentResult['payment_status']) && $paymentResult['payment_status'] === 'qr') {
+                $accountUrl = function_exists('jankx_get_account_endpoint_url')
+                    ? jankx_get_account_endpoint_url('orders')
+                    : home_url('/tai-khoan-cua-toi/orders/');
+
+                $redirectUrl = rtrim($accountUrl, '/') . '/' . $order->getOrderNumber() . '/';
+
+                $qrPayload = [
+                    'payment_status' => 'qr',
+                    'qr_image'       => $paymentResult['qr_image'] ?? '',
+                    'qr_code'        => $paymentResult['qr_code'] ?? '',
+                ];
             }
         }
 
         return [
-            'order' => $order,
-            'redirect_url' => $redirectUrl,
+            'order'          => $order,
+            'redirect_url'   => $redirectUrl,
+            'payment_status' => $qrPayload['payment_status'],
+            'qr_image'       => $qrPayload['qr_image'],
+            'qr_code'        => $qrPayload['qr_code'],
         ];
     }
 
@@ -130,10 +155,13 @@ class CheckoutManager
         do_action('jankx/ecommerce/checkout/completed', $order);
 
         return [
-            'success' => true,
-            'errors'  => [],
-            'order'   => $order,
-            'redirect_url' => $result['redirect_url'],
+            'success'        => true,
+            'errors'         => [],
+            'order'          => $order,
+            'redirect_url'   => $result['redirect_url'],
+            'payment_status' => $result['payment_status'] ?? '',
+            'qr_image'       => $result['qr_image'] ?? '',
+            'qr_code'        => $result['qr_code'] ?? '',
         ];
     }
 

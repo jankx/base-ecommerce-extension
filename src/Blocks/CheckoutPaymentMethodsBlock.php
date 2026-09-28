@@ -218,6 +218,12 @@ class CheckoutPaymentMethodsBlock extends CheckoutSectionBlock
                 return $this->renderBankTransferPanel();
             case 'qr_code':
                 return $this->renderQrCodePanel();
+            case 'qrviet':
+                return '<div class="jankx-qrviet-panel">'
+                    . '<p class="jankx-payment-desc">'
+                    . esc_html__('Sau khi đặt hàng, bạn sẽ được chuyển đến màn hình chi tiết đơn hàng để quét mã QR thanh toán bằng ứng dụng ngân hàng.', 'base-ecommerce')
+                    . '</p>'
+                    . '</div>';
             case 'onepay':
                 return $this->renderCreditCardPanel();
             case 'cod':

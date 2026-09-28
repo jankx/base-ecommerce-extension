@@ -303,6 +303,18 @@
                     return;
                 }
 
+                // QR payment without redirect: render QR to scan directly
+                if (response.payment_status === 'qr' && response.qr_image && response.order) {
+                    checkoutForm.innerHTML = '<div class="jankx-checkout-success">'
+                        + '<span class="jankx-empty-icon" aria-hidden="true">&#10004;</span>'
+                        + '<h2 class="jankx-section-title">' + window.jankxEcommerce.i18n.successTitle + '</h2>'
+                        + '<p>' + window.jankxEcommerce.i18n.successMessage.replace('%s', response.order.order_number) + '</p>'
+                        + '<div class="jankx-qrviet-image"><img src="' + response.qr_image + '" alt="VietQR - ' + response.order.order_number + '" width="280" height="280"></div>'
+                        + '<p class="description">Quét mã QR bằng ứng dụng ngân hàng để hoàn tất thanh toán.</p>'
+                        + '</div>';
+                    return;
+                }
+
                 var redirect = window.jankxEcommerce.ordersUrl;
                 if (redirect) {
                     window.location.href = redirect;
@@ -347,11 +359,30 @@
                 return;
             }
 
-            // Online payment: redirect
-            if (data.type === 'online' && data.redirect_url) {
-                window.location.href = data.redirect_url;
-                return;
-            }
+// Online payment: redirect
+                if (data.type === 'online' && data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                    return;
+                }
+
+                // QR payment: render QR code inline for scanning
+                if (data.type === 'qr') {
+                    var qrCard = button.closest('.jankx-od-card');
+                    var qrBody;
+                    if (data.qr_image) {
+                        qrBody = '<div class="jankx-od-qr">'
+                            + '<p>' + (data.message || 'Quét mã QR bên dưới bằng ứng dụng ngân hàng để thanh toán.') + '</p>'
+                            + '<div class="jankx-qrviet-image"><img src="' + data.qr_image + '" alt="VietQR - ' + (data.order_number || '') + '" width="280" height="280"></div>'
+                            + '<p class="description">Đơn hàng ' + (data.order_number || '') + ' - đơn hàng sẽ tự động cập nhật sau khi thanh toán. Tải lại trang để kiểm tra.</p>'
+                            + '</div>';
+                    } else {
+                        qrBody = '<div class="jankx-od-info-inner"><p>' + (data.message || 'Vui lòng thử lại trong ít phút.') + '</p></div>';
+                    }
+                    if (qrCard) {
+                        qrCard.innerHTML = qrBody;
+                    }
+                    return;
+                }
 
             // Bank transfer or COD: show message
             if (data.message) {

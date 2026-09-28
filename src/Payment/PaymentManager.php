@@ -44,12 +44,12 @@ class PaymentManager
      * @param Order  $order
      * @param string $gateway Gateway slug (e.g. "onepay", "onepay_domestic", "momo").
      * @param array  $params  Gateway params (return_url, cancel_url, ...).
-     * @return array Result: [success, transaction_id, payment, redirect_url]
+     * @return array Result: [success, transaction_id, order_id, order_number, redirect_url, payment_status, payment_type, qr_image, qr_code, qr_link]
      */
     public function process(Order $order, string $gateway = '', array $params = []): array
     {
         $transactionId = 0;
-        $redirectUrl = '';
+        $paymentResult = [];
 
         if ($this->isPaymentSystemAvailable() && $gateway !== '') {
             $transactionId = $this->createTransaction($order, $gateway, $params);
@@ -57,8 +57,8 @@ class PaymentManager
                 $order->setPaymentTransactionId($transactionId);
             }
 
-            // Call the gateway's purchase() to get the redirect URL
-            $redirectUrl = $this->callGatewayPurchase($order, $gateway, $transactionId, $params);
+            // Call the gateway's purchase() to get the redirect URL / QR payload.
+            $paymentResult = $this->callGatewayPurchase($order, $gateway, $transactionId, $params);
         }
 
         $order->updateStatus(Order::STATUS_PENDING);
@@ -70,25 +70,33 @@ class PaymentManager
             'transaction_id' => $transactionId,
             'order_id'       => $order->getId(),
             'order_number'   => $order->getOrderNumber(),
-            'redirect_url'   => $redirectUrl,
+            'redirect_url'   => !empty($paymentResult['redirectUrl']) ? $paymentResult['redirectUrl'] : '',
+            'payment_status' => isset($paymentResult['status']) && is_string($paymentResult['status']) ? $paymentResult['status'] : '',
+            'payment_type'   => ($paymentResult['status'] ?? '') === 'qr' ? 'qr' : 'online',
+            'qr_image'       => isset($paymentResult['qrImage']) ? $paymentResult['qrImage'] : '',
+            'qr_code'        => isset($paymentResult['qrCode']) ? $paymentResult['qrCode'] : '',
+            'qr_link'        => isset($paymentResult['qrLink']) ? $paymentResult['qrLink'] : '',
         ];
     }
 
     /**
-     * Call the gateway's purchase() method to get the redirect URL.
+     * Call the gateway's purchase() method and return the full purchase result.
+     *
+     * Redirect-based gateways set `redirectUrl`; QR-based gateways (e.g. QrViet)
+     * set `status` = "qr" plus `qrImage`/`qrCode`.
      */
-    protected function callGatewayPurchase(Order $order, string $gatewaySlug, int $transactionId, array $params): string
+    protected function callGatewayPurchase(Order $order, string $gatewaySlug, int $transactionId, array $params): array
     {
         $gatewayManager = \Jankx\Extensions\PaymentSystem\Gateways\GatewayManager::getInstance();
 
         $gateway = $gatewayManager->get($gatewaySlug);
 
         if (!$gateway) {
-            return '';
+            return [];
         }
 
         if (!$gateway->isAvailable()) {
-            return '';
+            return [];
         }
 
         $accountUrl = function_exists('jankx_get_account_endpoint_url')
@@ -107,11 +115,11 @@ class PaymentManager
             'customer_name'  => $order->getCustomerName(),
         ]);
 
-        if (!empty($result['redirectUrl'])) {
-            return $result['redirectUrl'];
+        if (!is_array($result)) {
+            return [];
         }
 
-        return '';
+        return $result;
     }
 
     /**
