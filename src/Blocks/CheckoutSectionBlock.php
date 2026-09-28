@@ -33,14 +33,17 @@ abstract class CheckoutSectionBlock extends Block
 
         $allGateways = array_merge($builtIn, $onlineGateways);
 
-        if (!empty($enabledGateways)) {
-            foreach ($enabledGateways as $slug) {
+        $enabledGateways = get_option('jankx_payment_gateways', false);
+
+        if ($enabledGateways === false) {
+            // First install default: built-in methods only
+            $methods = $builtIn;
+        } else {
+            foreach ((array) $enabledGateways as $slug) {
                 if (isset($allGateways[$slug])) {
                     $methods[$slug] = $allGateways[$slug];
                 }
             }
-        } else {
-            $methods = $allGateways;
         }
 
         return (array) apply_filters('jankx/ecommerce/checkout/payment_methods', $methods);
