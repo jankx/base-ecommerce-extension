@@ -15,6 +15,9 @@ use Jankx\Extensions\Ecommerce\Payment\PaymentManager;
  *   GET    /wp-json/jankx/ecommerce/v1/cart
  *   POST   /wp-json/jankx/ecommerce/v1/cart/items
  *   DELETE /wp-json/jankx/ecommerce/v1/cart/items/{item_key}
+ *   POST   /wp-json/jankx/ecommerce/v1/cart/items/{item_key}/quantity
+ *   POST   /wp-json/jankx/ecommerce/v1/coupon/apply
+ *   POST   /wp-json/jankx/ecommerce/v1/coupon/remove
  *   POST   /wp-json/jankx/ecommerce/v1/checkout
  *   POST   /wp-json/jankx/ecommerce/v1/orders/{order_number}/pay
  *
@@ -162,6 +165,31 @@ class EcommerceController
             ],
         ]);
 
+        register_rest_route(self::REST_NAMESPACE, '/coupon/apply', [
+            'methods'             => \WP_REST_Server::CREATABLE,
+            'callback'            => [$this, 'applyCoupon'],
+            'permission_callback' => '__return_true',
+            'args'                => [
+                'code' => [
+                    'required'          => true,
+                    'type'              => 'string',
+                    'sanitize_callback' => 'sanitize_text_field',
+                ],
+            ],
+        ]);
+
+        register_rest_route(self::REST_NAMESPACE, '/coupon/remove', [
+            'methods'             => \WP_REST_Server::CREATABLE,
+            'callback'            => [$this, 'removeCoupon'],
+            'permission_callback' => '__return_true',
+            'args'                => [
+                'code' => [
+                    'type'              => 'string',
+                    'sanitize_callback' => 'sanitize_text_field',
+                ],
+            ],
+        ]);
+
         register_rest_route(self::REST_NAMESPACE, '/orders/form', [
             'methods'             => \WP_REST_Server::CREATABLE,
             'callback'            => [$this, 'createFormOrder'],
@@ -208,6 +236,67 @@ class EcommerceController
         }
 
         return rest_ensure_response(Cart::get_instance()->toArray());
+    }
+
+    /**
+     * Apply a coupon code to the current cart.
+     *
+     * The apply logic is provided by coupon extensions through the
+     * `jankx/ecommerce/cart/coupon/apply` filter. The response shape is
+     * stable so frontends can render the discounted total right away.
+     */
+    public function applyCoupon(\WP_REST_Request $request): \WP_REST_Response
+    {
+        $code = trim((string) $request->get_param('code'));
+        if ($code === '') {
+            return new \WP_REST_Response([
+                'success' => false,
+                'message' => __('Vui lòng nhập mã giảm giá.', 'base-ecommerce'),
+            ], 400);
+        }
+
+        $result = Cart::get_instance()->applyCoupon($code);
+        if (!$result['success']) {
+            return new \WP_REST_Response([
+                'success' => false,
+                'message' => $result['message'],
+            ], 400);
+        }
+
+        return rest_ensure_response($this->couponResponse($result));
+    }
+
+    /**
+     * Remove an applied coupon from the current cart.
+     */
+    public function removeCoupon(\WP_REST_Request $request): \WP_REST_Response
+    {
+        $result = Cart::get_instance()->removeAppliedCoupon(
+            (string) $request->get_param('code')
+        );
+
+        return rest_ensure_response($this->couponResponse($result));
+    }
+
+    /**
+     * Build a normalized coupon response with the refreshed cart totals.
+     *
+     * @param array{success: bool, message: string} $result
+     * @return array<string, mixed>
+     */
+    protected function couponResponse(array $result): array
+    {
+        $cart             = Cart::get_instance();
+        $converterManager = \Jankx\Extensions\Ecommerce\Currency\Converters\CurrencyConverterManager::getInstance();
+
+        return array_merge($result, [
+            'coupons'                    => $cart->getAppliedCoupons(),
+            'coupon_discount'            => $cart->getCouponDiscount(),
+            'coupon_discount_formatted'  => $converterManager->formatPriceWithConversion($cart->getCouponDiscount()),
+            'discount_formatted'         => $converterManager->formatPriceWithConversion($cart->getDiscount()),
+            'total_formatted'            => $converterManager->formatPriceWithConversion($cart->getTotal()),
+            'cart'                       => $cart->toArray(),
+        ]);
     }
 
     public function addCartItem(\WP_REST_Request $request): \WP_REST_Response

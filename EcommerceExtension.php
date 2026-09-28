@@ -26,6 +26,8 @@ use Jankx\Extensions\Ecommerce\Blocks\CheckoutActionsBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CheckoutEmptyBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CheckoutStepsBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CurrencySwitcherBlock;
+use Jankx\Extensions\Ecommerce\Blocks\OrderProgressBlock;
+use Jankx\Extensions\Ecommerce\Blocks\OrderProgressStepBlock;
 use Jankx\Extensions\Ecommerce\Blocks\PostPriceBlock;
 use Jankx\Extensions\Ecommerce\Cart\Cart;
 use Jankx\Extensions\Ecommerce\Checkout\CheckoutManager;
@@ -238,6 +240,8 @@ class EcommerceExtension extends AbstractExtension
             'checkout-actions' => CheckoutActionsBlock::class,
             'checkout-empty' => CheckoutEmptyBlock::class,
             'checkout-steps' => CheckoutStepsBlock::class,
+            'order-progress' => OrderProgressBlock::class,
+            'order-progress-step' => OrderProgressStepBlock::class,
             'account-tab-orders' => AccountTabOrdersBlock::class,
             'add-to-cart' => AddToCartBlock::class,
             'post-price' => PostPriceBlock::class,
@@ -296,6 +300,9 @@ class EcommerceExtension extends AbstractExtension
             'checkout-credits',
             'checkout-actions',
             'checkout-empty',
+            'checkout-steps',
+            'order-progress',
+            'order-progress-step',
             'account-tab-orders',
             'add-to-cart',
             'post-price',

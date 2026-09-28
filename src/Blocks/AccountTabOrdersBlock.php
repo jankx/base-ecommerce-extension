@@ -321,10 +321,10 @@ class AccountTabOrdersBlock extends Block
     protected function renderOrderProgress(string $status): string
     {
         $steps = [
-            Order::STATUS_PENDING    => ['label' => __('Placed', 'base-ecommerce'),    'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'],
-            Order::STATUS_PROCESSING => ['label' => __('Processing', 'base-ecommerce'), 'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>'],
-            Order::STATUS_SHIPPING   => ['label' => __('Shipping', 'base-ecommerce'),   'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>'],
-            Order::STATUS_COMPLETED  => ['label' => __('Completed', 'base-ecommerce'),  'icon' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'],
+            Order::STATUS_PENDING    => ['label' => __('Placed', 'base-ecommerce'),    'icon' => 'check-circle'],
+            Order::STATUS_PROCESSING => ['label' => __('Processing', 'base-ecommerce'), 'icon' => 'spinner'],
+            Order::STATUS_SHIPPING   => ['label' => __('Shipping', 'base-ecommerce'),   'icon' => 'truck'],
+            Order::STATUS_COMPLETED  => ['label' => __('Completed', 'base-ecommerce'),  'icon' => 'check-circle'],
         ];
 
         $isTerminal = in_array($status, [Order::STATUS_FAILED, Order::STATUS_CANCELLED, Order::STATUS_REFUNDED], true);
@@ -333,30 +333,44 @@ class AccountTabOrdersBlock extends Block
             $currentIndex = 0;
         }
 
-        $output = '<div class="jankx-od-progress">';
+        $output = '<div class="wp-block-jankx-order-progress jankx-od-progress">';
         if ($isTerminal) {
-            $output .= '<div class="jankx-od-step jankx-od-step--terminal jankx-od-step--done">'
-                . '<span class="jankx-od-step-dot">' . $this->getStatusIcon($status) . '</span>'
-                . '<span class="jankx-od-step-label">' . esc_html($this->getStatusLabel($status)) . '</span>'
-                . '</div>';
+            $terminalIcons = [
+                Order::STATUS_FAILED     => 'x-circle',
+                Order::STATUS_CANCELLED  => 'x-circle',
+                Order::STATUS_REFUNDED   => 'rotate-ccw',
+            ];
+            $output .= $this->renderProgressStep($this->getStatusLabel($status), $terminalIcons[$status] ?? 'x-circle', 'terminal');
         } else {
             foreach ($steps as $stepStatus => $stepData) {
-                $state = '';
+                $state = 'todo';
                 $stepIndex = array_search($stepStatus, array_keys($steps), true);
                 if ($stepIndex < $currentIndex) {
-                    $state = ' jankx-od-step--done';
+                    $state = 'done';
                 } elseif ($stepIndex === $currentIndex) {
-                    $state = ' jankx-od-step--active';
+                    $state = 'active';
                 }
-                $output .= '<div class="jankx-od-step' . $state . '">'
-                    . '<span class="jankx-od-step-dot">' . $stepData['icon'] . '</span>'
-                    . '<span class="jankx-od-step-label">' . esc_html($stepData['label']) . '</span>'
-                    . '</div>';
+                $output .= $this->renderProgressStep($stepData['label'], $stepData['icon'], $state);
             }
         }
         $output .= '</div>';
 
         return $output;
+    }
+
+    protected function renderProgressStep(string $label, string $icon, string $state): string
+    {
+        return render_block([
+            'blockName'    => 'jankx/order-progress-step',
+            'attrs'        => [
+                'label' => $label,
+                'icon'  => $icon,
+                'state' => $state,
+            ],
+            'innerBlocks'  => [],
+            'innerHTML'    => '',
+            'innerContent' => [],
+        ]);
     }
 
     /**

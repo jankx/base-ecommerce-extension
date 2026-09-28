@@ -1,0 +1,47 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/order-progress-step",
+  "title": "Order Progress Step",
+  "category": "jankx",
+  "icon": "marker",
+  "description": "A single step of the order progress indicator.",
+  "textdomain": "base-ecommerce",
+  "parent": [
+    "jankx/order-progress"
+  ],
+  "attributes": {
+    "label": {
+      "type": "string",
+      "default": "Step"
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "todo",
+        "active",
+        "done",
+        "terminal"
+      ],
+      "default": "todo"
+    },
+    "icon": {
+      "type": "string",
+      "enum": [
+        "none",
+        "check-circle",
+        "clock",
+        "spinner",
+        "truck",
+        "x-circle",
+        "rotate-ccw"
+      ],
+      "default": "check-circle"
+    }
+  },
+  "supports": {
+    "html": false
+  },
+  "style": "file:./build/style-index.css",
+  "editorScript": "file:./build/index.js"
+}

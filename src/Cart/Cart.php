@@ -361,7 +361,87 @@ class Cart implements CartInterface
 
     public function getDiscount(): float
     {
-        return (float) apply_filters('jankx/ecommerce/cart/discount', 0.0, $this);
+        return (float) apply_filters('jankx/ecommerce/cart/discount', 0.0, $this) + $this->getCouponDiscount();
+    }
+
+    /**
+     * Discount produced by applied coupon(s).
+     *
+     * Coupon providers (coupon-system, …) hook
+     * `jankx/ecommerce/cart/coupon_discount` to return the total coupon
+     * discount. By default the discount is computed on the ORDER VALUE
+     * (subtotal): providers may opt into per-product discounts later by
+     * hooking this filter without touching cart totals.
+     *
+     * @return float Coupon discount amount, always >= 0.
+     */
+    public function getCouponDiscount(): float
+    {
+        return (float) max(0, apply_filters('jankx/ecommerce/cart/coupon_discount', 0.0, $this));
+    }
+
+    /**
+     * Coupon codes currently applied to the cart.
+     *
+     * Providers hook `jankx/ecommerce/cart/coupons` to return a list of
+     * applied coupons, each as an array with at least `code` and `discount`.
+     *
+     * @return array{0?: array<string,mixed>, ...}
+     */
+    public function getAppliedCoupons(): array
+    {
+        $coupons = apply_filters('jankx/ecommerce/cart/coupons', [], $this);
+
+        return is_array($coupons) ? $coupons : [];
+    }
+
+    /**
+     * Apply a coupon code to the cart.
+     *
+     * Delegates to providers through `jankx/ecommerce/cart/coupon/apply`
+     * (filters: [result array, Cart, string code]). Default result keeps the
+     * cart working even when no coupon provider is installed.
+     *
+     * @param string $code Coupon code entered by the customer.
+     * @return array{success: bool, message: string, coupon?: array, discount?: float, coupons?: array}
+     */
+    public function applyCoupon(string $code): array
+    {
+        $result = apply_filters(
+            'jankx/ecommerce/cart/coupon/apply',
+            [
+                'success' => false,
+                'message' => __('Chưa có nhà cung cấp mã giảm giá.', 'base-ecommerce'),
+            ],
+            $this,
+            (string) $code
+        );
+
+        return is_array($result) ? $result : ['success' => false, 'message' => ''];
+    }
+
+    /**
+     * Remove an applied coupon from the cart.
+     *
+     * Delegates to providers through `jankx/ecommerce/cart/coupon/remove`
+     * (filters: [result array, Cart, string code]).
+     *
+     * @param string $code Optional coupon code; empty removes the applied one.
+     * @return array{success: bool, message: string, coupons?: array}
+     */
+    public function removeAppliedCoupon(string $code = ''): array
+    {
+        $result = apply_filters(
+            'jankx/ecommerce/cart/coupon/remove',
+            [
+                'success' => false,
+                'message' => __('Không có mã giảm giá nào được áp dụng.', 'base-ecommerce'),
+            ],
+            $this,
+            (string) $code
+        );
+
+        return is_array($result) ? $result : ['success' => false, 'message' => ''];
     }
 
     public function getTaxTotals(): array
@@ -404,11 +484,14 @@ class Cart implements CartInterface
             }, array_values($this->getItems())),
             'subtotal' => $this->getSubtotal(),
             'discount' => $this->getDiscount(),
+            'coupons' => $this->getAppliedCoupons(),
+            'coupon_discount' => $this->getCouponDiscount(),
             'tax_amount' => $this->getTaxAmount(),
             'tax_details' => $this->getTaxTotals(),
             'total' => $this->getTotal(),
             'formatted_subtotal' => $converterManager->formatPriceWithConversion($this->getSubtotal()),
             'formatted_discount' => $converterManager->formatPriceWithConversion($this->getDiscount()),
+            'formatted_coupon_discount' => $converterManager->formatPriceWithConversion($this->getCouponDiscount()),
             'formatted_total' => $converterManager->formatPriceWithConversion($this->getTotal()),
             'count' => $this->getItemCount(),
         ];

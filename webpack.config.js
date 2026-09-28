@@ -54,6 +54,8 @@ module.exports = {
         'blocks/checkout-actions/build/index': './blocks/checkout-actions/src/index.tsx',
         'blocks/checkout-empty/build/index': './blocks/checkout-empty/src/index.tsx',
         'blocks/checkout-steps/build/index': './blocks/checkout-steps/src/index.tsx',
+        'blocks/order-progress/build/index': './blocks/order-progress/src/index.tsx',
+        'blocks/order-progress-step/build/index': './blocks/order-progress-step/src/index.tsx',
         'blocks/account-tab-orders/build/index': './blocks/account-tab-orders/src/index.tsx',
         'blocks/add-to-cart/build/index': './blocks/add-to-cart/src/index.tsx',
         'blocks/post-price/build/index': './blocks/post-price/src/index.tsx',
