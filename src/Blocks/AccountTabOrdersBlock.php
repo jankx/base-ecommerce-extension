@@ -385,6 +385,15 @@ class AccountTabOrdersBlock extends Block
 
         $gateway = $order->getPaymentMethod();
         if ($gateway === 'qrviet') {
+            // If VietQR is not configured, hide the scan-QR pay card entirely.
+            if (class_exists('Jankx\Extensions\PaymentSystem\Gateways\GatewayManager')) {
+                $gatewayManager = \Jankx\Extensions\PaymentSystem\Gateways\GatewayManager::getInstance();
+                $qrGateway = $gatewayManager->get('qrviet');
+                if (!$qrGateway || !$qrGateway->isAvailable()) {
+                    return '';
+                }
+            }
+
             // A dynamic QR is rendered via
             // `jankx/ecommerce/order_detail/after_payment_info`; hide the pay
             // button so there is a single, consistent payment entry point.
