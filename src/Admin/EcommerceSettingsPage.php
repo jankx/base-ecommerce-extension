@@ -169,6 +169,13 @@ class EcommerceSettingsPage
             'default' => [],
         ]);
 
+        // Payment gateway display order (slug => position)
+        register_setting(self::OPTION_GROUP, 'jankx_payment_gateways_order', [
+            'type' => 'array',
+            'sanitize_callback' => [$this, 'sanitizePaymentGatewayPositions'],
+            'default' => [],
+        ]);
+
         // Coupons
         register_setting(self::OPTION_GROUP, 'jankx_coupons_enabled', [
             'type' => 'boolean',
@@ -244,6 +251,22 @@ class EcommerceSettingsPage
             return [];
         }
         return array_map('sanitize_text_field', $value);
+    }
+
+    public function sanitizePaymentGatewayPositions($value): array
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+        $result = [];
+        foreach ($value as $slug => $position) {
+            $slug = sanitize_key($slug);
+            if ($slug === '' || !is_numeric($position)) {
+                continue;
+            }
+            $result[$slug] = (int) $position;
+        }
+        return $result;
     }
 
     public function sanitizeStoreEmail($value): string
@@ -550,6 +573,7 @@ class EcommerceSettingsPage
         }
 
         $enabledGateways = get_option('jankx_payment_gateways', []);
+        $positions = (array) get_option('jankx_payment_gateways_order', []);
 
         // Get registered gateways from payment-system extension
         $registeredGateways = $this->getRegisteredGateways();
@@ -569,6 +593,7 @@ class EcommerceSettingsPage
                     <th><?php esc_html_e('Mô tả', 'base-ecommerce'); ?></th>
                     <th style="width:100px;"><?php esc_html_e('Trạng thái', 'base-ecommerce'); ?></th>
                     <th style="width:100px;"><?php esc_html_e('Chế độ', 'base-ecommerce'); ?></th>
+                    <th style="width:70px;"><?php esc_html_e('Vị trí', 'base-ecommerce'); ?></th>
                     <th style="width:120px;"><?php esc_html_e('Thao tác', 'base-ecommerce'); ?></th>
                 </tr>
             </thead>
@@ -623,6 +648,11 @@ class EcommerceSettingsPage
                             <?php else: ?>
                                 <span class="jankx-status-badge" style="background:#d1ecf1; color:#0c5460;"><?php esc_html_e('Production', 'base-ecommerce'); ?></span>
                             <?php endif; ?>
+                        </td>
+                        <td>
+                            <input type="number" class="small-text" min="0" placeholder="<?php esc_attr_e('Tự động', 'base-ecommerce'); ?>"
+                                   name="jankx_payment_gateways_order[<?php echo esc_attr($id); ?>]"
+                                   value="<?php echo esc_attr($positions[$id] ?? ''); ?>">
                         </td>
                         <td>
                             <?php if (!empty($gateway['settings_url'])): ?>

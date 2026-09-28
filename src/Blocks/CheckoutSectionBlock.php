@@ -18,6 +18,21 @@ abstract class CheckoutSectionBlock extends Block
         $methods = [];
         $enabledGateways = get_option('jankx_payment_gateways', []);
 
+        $shortNames = [
+            'bank_transfer'   => __('Chuyển khoản', 'base-ecommerce'),
+            'cod'             => __('COD', 'base-ecommerce'),
+            'onepay'          => __('Thẻ quốc tế', 'base-ecommerce'),
+            'onepay_domestic' => __('Thẻ nội địa', 'base-ecommerce'),
+            'momo'            => __('Ví Momo', 'base-ecommerce'),
+            'zalopay'         => __('Ví Zalopay', 'base-ecommerce'),
+            'qrviet'          => __('Quét mã QR', 'base-ecommerce'),
+        ];
+
+        $resolveName = function (string $slug, string $fullName) use ($shortNames): string {
+            $label = $shortNames[$slug] ?? $fullName;
+            return (string) apply_filters("jankx/ecommerce/checkout/gateway_name/{$slug}", $label, $fullName);
+        };
+
         $builtIn = [
             'bank_transfer' => __('Chuyển khoản ngân hàng', 'base-ecommerce'),
             'cod' => __('Thanh toán khi nhận hàng (COD)', 'base-ecommerce'),
@@ -40,13 +55,33 @@ abstract class CheckoutSectionBlock extends Block
 
         if ($enabledGateways === false) {
             // First install default: built-in methods only
-            $methods = $builtIn;
+            foreach ($builtIn as $slug => $fullName) {
+                $methods[$slug] = $resolveName($slug, $fullName);
+            }
         } else {
             foreach ((array) $enabledGateways as $slug) {
                 if (isset($allGateways[$slug])) {
-                    $methods[$slug] = $allGateways[$slug];
+                    $methods[$slug] = $resolveName($slug, $allGateways[$slug]);
                 }
             }
+        }
+
+        // Sort by admin-configured position (ascending), keeping the current
+        // order for gateways without a position value.
+        $positions = (array) get_option('jankx_payment_gateways_order', []);
+        if (!empty($positions)) {
+            $scores = [];
+            $defaultPosition = 10000;
+            foreach ($methods as $slug => $label) {
+                $scores[$slug] = isset($positions[$slug]) ? (int) $positions[$slug] : $defaultPosition++;
+            }
+            $orderIndex = array_flip(array_keys($methods));
+            uksort($methods, function ($a, $b) use ($scores, $orderIndex) {
+                if ($scores[$a] === $scores[$b]) {
+                    return $orderIndex[$a] <=> $orderIndex[$b];
+                }
+                return $scores[$a] <=> $scores[$b];
+            });
         }
 
         return (array) apply_filters('jankx/ecommerce/checkout/payment_methods', $methods);

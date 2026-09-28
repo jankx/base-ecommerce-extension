@@ -43,6 +43,8 @@ class CheckoutPaymentMethodsBlock extends CheckoutSectionBlock
                 $display = $gateway->getDisplay();
                 if (trim($display['text']) === '') {
                     $display['text'] = $label;
+                } elseif ($display['text'] === $gateway->getName()) {
+                    $display['text'] = $label;
                 }
                 return $display;
             }
