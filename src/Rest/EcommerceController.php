@@ -628,12 +628,61 @@ class EcommerceController
             ]);
         }
 
+        // Failed gateway attempt: surface the real reason instead of a generic 500.
+        if (($result['payment_status'] ?? '') === 'failed') {
+            $code = (string) ($result['error_code'] ?? '');
+            $message = (string) ($result['error'] ?? '');
+            if ($code === 'GATEWAY_NOT_AVAILABLE' || $code === 'GATEWAY_NOT_FOUND') {
+                $message = __('Cổng thanh toán chưa được cấu hình. Vui lòng liên hệ quản trị.', 'base-ecommerce');
+            } elseif ($message === '') {
+                $message = __('Cổng thanh toán tạm thời lỗi. Vui lòng thử lại sau.', 'base-ecommerce');
+            }
+            if ($code !== '') {
+                $message .= ' (' . $code . ')';
+            }
+
+            error_log(sprintf(
+                '[jankx/payOrder] order=%s gateway=%s code=%s message=%s raw=%s',
+                $order->getOrderNumber(),
+                $gateway,
+                $code,
+                (string) ($result['error'] ?? ''),
+                wp_json_encode($result['raw'] ?? [])
+            ));
+
+            return new \WP_REST_Response([
+                'success'    => false,
+                'message'    => $message,
+                'error_code' => $code,
+            ], 400);
+        }
+
         if (!empty($result['redirect_url'])) {
             return rest_ensure_response([
                 'success'      => true,
                 'type'         => 'online',
                 'redirect_url' => $result['redirect_url'],
             ]);
+        }
+
+        $message = (string) ($result['error'] ?? '');
+        $code = (string) ($result['error_code'] ?? '');
+
+        error_log(sprintf(
+            '[jankx/payOrder] order=%s gateway=%s code=%s message=%s raw=%s',
+            $order->getOrderNumber(),
+            $gateway,
+            $code,
+            $message,
+            wp_json_encode($result['raw'] ?? [])
+        ));
+
+        if ($message !== '' || $code !== '') {
+            return new \WP_REST_Response([
+                'success'    => false,
+                'message'    => $message !== '' ? $message : __('Không thể tạo liên kết thanh toán.', 'base-ecommerce'),
+                'error_code' => $code,
+            ], 400);
         }
 
         return new \WP_REST_Response([

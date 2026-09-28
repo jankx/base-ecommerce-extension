@@ -76,6 +76,9 @@ class PaymentManager
             'qr_image'       => isset($paymentResult['qrImage']) ? $paymentResult['qrImage'] : '',
             'qr_code'        => isset($paymentResult['qrCode']) ? $paymentResult['qrCode'] : '',
             'qr_link'        => isset($paymentResult['qrLink']) ? $paymentResult['qrLink'] : '',
+            'error'          => isset($paymentResult['message']) && is_string($paymentResult['message']) ? $paymentResult['message'] : '',
+            'error_code'     => isset($paymentResult['code']) && is_string($paymentResult['code']) ? $paymentResult['code'] : '',
+            'raw'            => isset($paymentResult['raw']) && is_array($paymentResult['raw']) ? $paymentResult['raw'] : [],
         ];
     }
 
@@ -92,11 +95,19 @@ class PaymentManager
         $gateway = $gatewayManager->get($gatewaySlug);
 
         if (!$gateway) {
-            return [];
+            return [
+                'status'  => 'failed',
+                'message' => __('Payment gateway is not registered.', 'base-ecommerce'),
+                'code'    => 'GATEWAY_NOT_FOUND',
+            ];
         }
 
         if (!$gateway->isAvailable()) {
-            return [];
+            return [
+                'status'  => 'failed',
+                'message' => __('Payment gateway is not configured.', 'base-ecommerce'),
+                'code'    => 'GATEWAY_NOT_AVAILABLE',
+            ];
         }
 
         $accountUrl = function_exists('jankx_get_account_endpoint_url')
@@ -116,7 +127,11 @@ class PaymentManager
         ]);
 
         if (!is_array($result)) {
-            return [];
+            return [
+                'status'  => 'failed',
+                'message' => __('Payment gateway returned an invalid response.', 'base-ecommerce'),
+                'code'    => 'INVALID_GATEWAY_RESPONSE',
+            ];
         }
 
         return $result;
