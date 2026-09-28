@@ -160,7 +160,11 @@ class AccountTabOrdersBlock extends Block
                 $output .= '<span class="jankx-od-item-idx">' . ($idx + 1) . '</span>';
                 $output .= $this->getItemThumbnail($item);
                 $output .= '<div class="jankx-od-item-body">';
-                $output .= '<span class="jankx-od-item-name">' . esc_html($item->getName()) . '</span>';
+                $productUrl = $item->getProductId() ? (string) get_permalink($item->getProductId()) : '';
+                $itemName = esc_html($item->getName());
+                $output .= $productUrl
+                    ? '<a class="jankx-od-item-name" href="' . esc_url($productUrl) . '">' . $itemName . '</a>'
+                    : '<span class="jankx-od-item-name">' . $itemName . '</span>';
                 $output .= '<span class="jankx-od-item-meta">' . esc_html__('Qty', 'base-ecommerce') . ': ' . esc_html($item->getQuantity()) . '</span>';
 
                 $itemMetaLines = $this->getOrderItemMetaLines($item);
@@ -461,14 +465,26 @@ class AccountTabOrdersBlock extends Block
     protected function getItemThumbnail(OrderItem $item): string
     {
         $url = get_the_post_thumbnail_url($item->getProductId(), 'thumbnail');
+        $link = $item->getProductId() ? (string) get_permalink($item->getProductId()) : '';
+        $tag = $link ? 'a' : 'span';
+        $href = $link ? ' href="' . esc_url($link) . '"' : '';
 
         if ($url) {
-            return '<span class="jankx-od-item-thumb"><img src="' . esc_url($url) . '" alt="' . esc_attr($item->getName()) . '" loading="lazy"></span>';
+            return sprintf(
+                '<%1$s class="jankx-od-item-thumb"%2$s><img src="%3$s" alt="%4$s" loading="lazy"></%1$s>',
+                $tag,
+                $href,
+                esc_url($url),
+                esc_attr($item->getName())
+            );
         }
 
-        return '<span class="jankx-od-item-thumb jankx-od-item-thumb--ph">'
-            . esc_html(mb_substr($item->getName(), 0, 1, 'UTF-8'))
-            . '</span>';
+        return sprintf(
+            '<%1$s class="jankx-od-item-thumb jankx-od-item-thumb--ph"%2$s>%3$s</%1$s>',
+            $tag,
+            $href,
+            esc_html(mb_substr($item->getName(), 0, 1, 'UTF-8'))
+        );
     }
 
     protected function getPaymentMethodLabel(string $method): string
