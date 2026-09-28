@@ -48,9 +48,9 @@ class CheckoutPaymentMethodsBlock extends CheckoutSectionBlock
             }
         }
 
-        $type = (string) apply_filters("jankx/payment/gateway/{$slug}/display_type", 'icon', $slug);
+        $type = (string) apply_filters("jankx/payment/gateway/{$slug}/display_type", 'icon_text', $slug);
         if (!in_array($type, ['icon', 'text', 'icon_text'], true)) {
-            $type = 'icon';
+            $type = 'icon_text';
         }
 
         $position = (string) apply_filters("jankx/payment/gateway/{$slug}/icon_position", 'left', $slug);
@@ -100,9 +100,6 @@ class CheckoutPaymentMethodsBlock extends CheckoutSectionBlock
         }
         if ($type !== 'icon') {
             $inner .= '<span class="jankx-payment-tab-label">' . esc_html($text) . '</span>';
-        }
-        if (!$this->isGatewayAvailable($slug) && current_user_can('manage_options')) {
-            $inner .= '<span class="jankx-payment-tab-notice">' . esc_html__('Chưa cấu hình', 'base-ecommerce') . '</span>';
         }
 
         $attributes = ' type="button"'
