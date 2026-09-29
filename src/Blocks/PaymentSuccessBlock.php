@@ -7,54 +7,34 @@ use Jankx\Extensions\Ecommerce\Order\Order;
 
 class PaymentSuccessBlock extends Block
 {
+    const MAGIC_ORDER_NUMBER = '1234567890';
+
     protected $blockId = 'jankx/payment-success';
 
     public function render($attributes = [], $content = '', $block = null)
     {
-        if (!is_user_logged_in()) {
-            return $this->renderAccessNotice(__('Đăng nhập để xem thông tin thanh toán.', 'base-ecommerce'));
-        }
-
         $is_editor = defined('REST_REQUEST') && REST_REQUEST
             && !empty($_SERVER['REQUEST_URI'])
             && strpos($_SERVER['REQUEST_URI'], '/block-renderer/') !== false;
 
         $orderNumber = isset($_GET['order_number']) ? sanitize_text_field($_GET['order_number']) : '';
+
+        // Magic order: auto-generate demo data, no DB / login required.
+        if ($orderNumber === self::MAGIC_ORDER_NUMBER) {
+            return $this->renderMagicSuccess();
+        }
+
+        if (!is_user_logged_in()) {
+            return $this->renderAccessNotice(__('Đăng nhập để xem thông tin thanh toán.', 'base-ecommerce'));
+        }
+
         $order = $orderNumber ? Order::findByOrderNumber($orderNumber) : null;
 
         if (!$order || !$this->orderBelongsToUser($order, wp_get_current_user())) {
             return $this->renderAccessNotice(__('Không tìm thấy đơn hàng tương ứng.', 'base-ecommerce'), $is_editor);
         }
 
-        $wrapperAttrs = get_block_wrapper_attributes([
-            'class' => 'jankx-payment-success',
-        ]);
-
         $paid = in_array($order->getStatus(), [Order::STATUS_COMPLETED], true);
-
-        $output = sprintf('<div %s>', $wrapperAttrs);
-
-        // Hero
-        $output .= '<div class="jankx-payment-success-hero">';
-        $output .= '<span class="jankx-payment-success-icon" aria-hidden="true">';
-        $output .= '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="44" height="44"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
-        $output .= '</span>';
-        $output .= '<h1 class="jankx-payment-success-title">'
-            . esc_html($paid ? __('Thanh toán thành công!', 'base-ecommerce') : __('Thông tin thanh toán', 'base-ecommerce'))
-            . '</h1>';
-        $output .= '<p class="jankx-payment-success-sub">'
-            . esc_html($paid
-                ? __('Cảm ơn bạn! Đơn hàng của bạn đã được thanh toán thành công.', 'base-ecommerce')
-                : __('Cảm ơn bạn đã đặt hàng. Chi tiết thanh toán bên dưới.', 'base-ecommerce'))
-            . '</p>';
-        $output .= '</div>';
-
-        // Info panel
-        $output .= '<div class="jankx-payment-success-card">';
-        $output .= '<div class="jankx-payment-success-card-head">';
-        $output .= '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
-        $output .= '<h2 class="jankx-payment-success-card-title">' . esc_html__('Thông tin thanh toán', 'base-ecommerce') . '</h2>';
-        $output .= '</div>';
 
         $rows = [
             [
@@ -90,6 +70,97 @@ class PaymentSuccessBlock extends Block
             ],
         ];
 
+        return $this->renderSuccessCard($rows, $paid, $order->getOrderNumber(), self::get_orders_url());
+    }
+
+    /**
+     * Render the success screen from a generated (fake) dataset. Used when the
+     * magic order number is requested so the page can be tested without a real
+     * order: every field is auto-generated on the fly.
+     */
+    protected function renderMagicSuccess(): string
+    {
+        $demoNames = ['Ngọc Mai', 'Minh Anh', 'Tuấn Kiệt', 'Thu Hà', 'Đức Huy', 'Phương Linh'];
+        $demoTotals = [1100000, 2350000, 890000, 3600000, 1450000, 5200000];
+        $demoMethods = [
+            'OnePay – Visa/Mastercard',
+            'Quét mã QR',
+            'Chuyển khoản ngân hàng',
+            'MoMo',
+        ];
+
+        $name = $demoNames[array_rand($demoNames)];
+        $phone = '09' . random_int(1000000, 9999999);
+        $total = $demoTotals[array_rand($demoTotals)];
+        $method = $demoMethods[array_rand($demoMethods)];
+
+        $rows = [
+            [
+                'label' => __('Mã đơn hàng', 'base-ecommerce'),
+                'value' => '#' . self::MAGIC_ORDER_NUMBER,
+                'icon'  => 'hash',
+            ],
+            [
+                'label' => __('Thời điểm giao dịch', 'base-ecommerce'),
+                'value' => date_i18n('d/m/Y H:i:s', current_time('timestamp')),
+                'icon'  => 'clock',
+            ],
+            [
+                'label' => __('Thông tin giao hàng', 'base-ecommerce'),
+                'value' => $name . ' - ' . $phone,
+                'icon'  => 'user',
+            ],
+            [
+                'label' => __('Giá trị đơn hàng', 'base-ecommerce'),
+                'value' => CurrencyManager::formatPrice($total),
+                'icon'  => 'tag',
+            ],
+            [
+                'label' => __('Tình trạng đơn hàng', 'base-ecommerce'),
+                'value' => $this->getStatusLabel(Order::STATUS_COMPLETED),
+                'icon'  => 'box',
+                'class' => 'jankx-payment-success-value--status jankx-payment-success-value--completed',
+            ],
+            [
+                'label' => __('Hình thức thanh toán', 'base-ecommerce'),
+                'value' => $method,
+                'icon'  => 'card',
+            ],
+        ];
+
+        return $this->renderSuccessCard($rows, true, '', '');
+    }
+
+    protected function renderSuccessCard(array $rows, bool $paid, string $orderNumber, string $ordersUrl): string
+    {
+        $wrapperAttrs = get_block_wrapper_attributes([
+            'class' => 'jankx-payment-success',
+        ]);
+
+        $output = sprintf('<div %s>', $wrapperAttrs);
+
+        // Hero
+        $output .= '<div class="jankx-payment-success-hero">';
+        $output .= '<span class="jankx-payment-success-icon" aria-hidden="true">';
+        $output .= '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="44" height="44"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+        $output .= '</span>';
+        $output .= '<h1 class="jankx-payment-success-title">'
+            . esc_html($paid ? __('Thanh toán thành công!', 'base-ecommerce') : __('Thông tin thanh toán', 'base-ecommerce'))
+            . '</h1>';
+        $output .= '<p class="jankx-payment-success-sub">'
+            . esc_html($paid
+                ? __('Cảm ơn bạn! Đơn hàng của bạn đã được thanh toán thành công.', 'base-ecommerce')
+                : __('Cảm ơn bạn đã đặt hàng. Chi tiết thanh toán bên dưới.', 'base-ecommerce'))
+            . '</p>';
+        $output .= '</div>';
+
+        // Info panel
+        $output .= '<div class="jankx-payment-success-card">';
+        $output .= '<div class="jankx-payment-success-card-head">';
+        $output .= '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
+        $output .= '<h2 class="jankx-payment-success-card-title">' . esc_html__('Thông tin thanh toán', 'base-ecommerce') . '</h2>';
+        $output .= '</div>';
+
         foreach ($rows as $row) {
             $output .= '<div class="jankx-payment-success-row">';
             $output .= '<span class="jankx-payment-success-row-icon">' . $this->getIcon($row['icon']) . '</span>';
@@ -102,14 +173,16 @@ class PaymentSuccessBlock extends Block
         $output .= '</div>';
 
         // Actions
-        $ordersUrl = self::get_orders_url();
-        if ($ordersUrl) {
-            $output .= '<div class="jankx-payment-success-actions">';
-            $output .= '<a href="' . esc_url(trailingslashit($ordersUrl) . $order->getOrderNumber() . '/') . '" class="jankx-payment-success-btn jankx-payment-success-btn--primary">'
+        $actions = [];
+        if ($orderNumber && $ordersUrl) {
+            $actions[] = '<a href="' . esc_url(trailingslashit($ordersUrl) . $orderNumber . '/') . '" class="jankx-payment-success-btn jankx-payment-success-btn--primary">'
                 . esc_html__('Xem đơn hàng', 'base-ecommerce') . '</a>';
-            $output .= '<a href="' . esc_url(home_url('/')) . '" class="jankx-payment-success-btn">'
-                . esc_html__('Tiếp tục mua sắm', 'base-ecommerce') . '</a>';
-            $output .= '</div>';
+        }
+        $actions[] = '<a href="' . esc_url(home_url('/')) . '" class="jankx-payment-success-btn">'
+            . esc_html__('Tiếp tục mua sắm', 'base-ecommerce') . '</a>';
+
+        if (!empty($actions)) {
+            $output .= '<div class="jankx-payment-success-actions">' . implode('', $actions) . '</div>';
         }
 
         $output .= '</div>';
