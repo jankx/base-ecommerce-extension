@@ -60,6 +60,7 @@ module.exports = {
         'blocks/account-tab-orders-template/build/index': './blocks/account-tab-orders-template/src/index.tsx',
         'blocks/account-tab-orders-filters/build/index': './blocks/account-tab-orders-filters/src/index.tsx',
         'blocks/account-tab-orders-search/build/index': './blocks/account-tab-orders-search/src/index.tsx',
+        'blocks/account-tab-orders-empty/build/index': './blocks/account-tab-orders-empty/src/index.tsx',
         'blocks/order-number/build/index': './blocks/order-number/src/index.tsx',
         'blocks/order-status/build/index': './blocks/order-status/src/index.tsx',
         'blocks/order-date/build/index': './blocks/order-date/src/index.tsx',

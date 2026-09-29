@@ -1,0 +1,27 @@
+{
+    "translation-revision-date": "YEAR-MO-DA HO:MI+ZONE",
+    "generator": "WP-CLI\/2.12.0",
+    "source": "blocks\/order-progress\/build\/index.js",
+    "domain": "messages",
+    "locale_data": {
+        "messages": {
+            "": {
+                "domain": "messages",
+                "lang": "vi",
+                "plural-forms": "nplurals=1; plural=0;"
+            },
+            "Placed": [
+                "\u0110\u00e3 ti\u1ebfp nh\u1eadn"
+            ],
+            "Processing": [
+                "\u0110ang x\u1eed l\u00fd"
+            ],
+            "Shipping": [
+                "\u0110ang giao h\u00e0ng"
+            ],
+            "Completed": [
+                "Ho\u00e0n th\u00e0nh"
+            ]
+        }
+    }
+}

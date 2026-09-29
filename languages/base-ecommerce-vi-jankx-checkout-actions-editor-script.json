@@ -10,9 +10,6 @@
                 "lang": "vi",
                 "plural-forms": "nplurals=1; plural=0;"
             },
-            "Place order": [
-                "\u0110\u1eb7t h\u00e0ng"
-            ],
             "Layout": [
                 "B\u1ed1 c\u1ee5c"
             ],
@@ -27,6 +24,9 @@
             ],
             "Full width": [
                 "Tr\u00e0n to\u00e0n chi\u1ec1u r\u1ed9ng"
+            ],
+            "Place order": [
+                "\u0110\u1eb7t h\u00e0ng"
             ]
         }
     }

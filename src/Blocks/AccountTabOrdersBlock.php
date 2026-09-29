@@ -48,14 +48,19 @@ class AccountTabOrdersBlock extends Block
         $output .= '<h2 class="jankx-section-title">' . esc_html__('Your orders', 'base-ecommerce') . '</h2>';
 
         // Classify saved inner blocks: list-level blocks render in their saved
-        // order; the template block marks where the order loop goes.
+        // order; the template block marks where the order loop goes and the
+        // empty block marks where the "no orders" notice goes.
         $parts = [];
         $templateBlock = null;
+        $emptyBlock = null;
         if ($block && !empty($block->inner_blocks)) {
             foreach ($block->inner_blocks as $innerBlock) {
                 if ($innerBlock->name === 'jankx/account-tab-orders-template') {
                     $templateBlock = $innerBlock;
                     $parts[] = '{{JANKX_ORDER_LIST}}';
+                } elseif ($innerBlock->name === 'jankx/account-tab-orders-empty') {
+                    $emptyBlock = $innerBlock;
+                    $parts[] = '{{JANKX_EMPTY}}';
                 } elseif (in_array($innerBlock->name, ['jankx/account-tab-orders-filters', 'jankx/account-tab-orders-search'], true)) {
                     $parts[] = $innerBlock->render();
                 }
@@ -71,19 +76,33 @@ class AccountTabOrdersBlock extends Block
             $parts[] = '{{JANKX_ORDER_LIST}}';
         }
 
-        $listHtml = '';
-        if (empty($orders)) {
-            $listHtml .= '<div class="jankx-empty-state">'
-                . '<span class="jankx-empty-icon" aria-hidden="true">&#128203;</span>'
-                . '<p>' . esc_html__('You have no orders yet.', 'base-ecommerce') . '</p>'
-                . '</div>';
+        $isEmpty = empty($orders);
+
+        if ($isEmpty) {
+            // The customer picks the layout inside the empty block; pages saved
+            // before it existed fall back to the default notice.
+            $emptyHtml = $emptyBlock
+                ? (string) $emptyBlock->render()
+                : (new AccountTabOrdersEmptyBlock())->renderDefaultHtml();
         } else {
+            $emptyHtml = '';
+        }
+
+        $listHtml = '';
+        if (!$isEmpty) {
             $listHtml .= $this->renderList($orders, $templateBlock);
             $listHtml .= $this->renderPagination($result);
         }
 
         foreach ($parts as $part) {
-            $output .= $part === '{{JANKX_ORDER_LIST}}' ? $listHtml : $part;
+            if ($part === '{{JANKX_ORDER_LIST}}') {
+                // An explicit empty block replaces the list slot when empty.
+                $output .= ($isEmpty && $emptyBlock) ? '' : ($isEmpty ? $emptyHtml : $listHtml);
+            } elseif ($part === '{{JANKX_EMPTY}}') {
+                $output .= $emptyHtml;
+            } else {
+                $output .= $part;
+            }
         }
 
         $output .= '</div>';

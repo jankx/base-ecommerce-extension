@@ -6,6 +6,7 @@ use Jankx\Extensions\Ecommerce\Blocks\AccountTabOrdersBlock;
 use Jankx\Extensions\Ecommerce\Blocks\AccountTabOrdersTemplateBlock;
 use Jankx\Extensions\Ecommerce\Blocks\AccountTabOrdersFiltersBlock;
 use Jankx\Extensions\Ecommerce\Blocks\AccountTabOrdersSearchBlock;
+use Jankx\Extensions\Ecommerce\Blocks\AccountTabOrdersEmptyBlock;
 use Jankx\Extensions\Ecommerce\Blocks\OrderNumberBlock;
 use Jankx\Extensions\Ecommerce\Blocks\OrderStatusBlock;
 use Jankx\Extensions\Ecommerce\Blocks\OrderDateBlock;
@@ -259,6 +260,7 @@ class EcommerceExtension extends AbstractExtension
             'account-tab-orders-template' => AccountTabOrdersTemplateBlock::class,
             'account-tab-orders-filters' => AccountTabOrdersFiltersBlock::class,
             'account-tab-orders-search' => AccountTabOrdersSearchBlock::class,
+            'account-tab-orders-empty' => AccountTabOrdersEmptyBlock::class,
             'order-number' => OrderNumberBlock::class,
             'order-status' => OrderStatusBlock::class,
             'order-date' => OrderDateBlock::class,
@@ -329,6 +331,7 @@ class EcommerceExtension extends AbstractExtension
             'account-tab-orders-template',
             'account-tab-orders-filters',
             'account-tab-orders-search',
+            'account-tab-orders-empty',
             'order-number',
             'order-status',
             'order-date',

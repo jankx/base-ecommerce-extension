@@ -19,12 +19,6 @@
             "Address": [
                 "\u0110\u1ecba ch\u1ec9"
             ],
-            "Billing details": [
-                "Th\u00f4ng tin thanh to\u00e1n"
-            ],
-            "Full name": [
-                "H\u1ecd v\u00e0 t\u00ean"
-            ],
             "Layout": [
                 "B\u1ed1 c\u1ee5c"
             ],
@@ -39,6 +33,12 @@
             ],
             "Full width": [
                 "Tr\u00e0n to\u00e0n chi\u1ec1u r\u1ed9ng"
+            ],
+            "Billing details": [
+                "Th\u00f4ng tin thanh to\u00e1n"
+            ],
+            "Full name": [
+                "H\u1ecd v\u00e0 t\u00ean"
             ]
         }
     }

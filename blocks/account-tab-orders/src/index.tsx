@@ -6,12 +6,14 @@ const ALLOWED_BLOCKS = [
     'jankx/account-tab-orders-filters',
     'jankx/account-tab-orders-search',
     'jankx/account-tab-orders-template',
+    'jankx/account-tab-orders-empty',
 ];
 
 const DEFAULT_TEMPLATE = [
     ['jankx/account-tab-orders-filters'],
     ['jankx/account-tab-orders-search'],
     ['jankx/account-tab-orders-template'],
+    ['jankx/account-tab-orders-empty'],
 ];
 
 function Edit() {
@@ -23,7 +25,8 @@ function Edit() {
         <div {...blockProps}>
             <div className="jankx-tab-orders__editor-note">
                 Danh sách đơn hàng: filters + tìm kiếm hiển thị phía trên; block template lặp lại cho
-                từng đơn hàng (kéo thả các block thành phần để tuỳ chỉnh layout).
+                từng đơn hàng (kéo thả các block thành phần để tuỳ chỉnh layout). Block empty chỉ hiển
+                thị khi khách chưa có đơn nào.
             </div>
             <InnerBlocks
                 allowedBlocks={ALLOWED_BLOCKS}
