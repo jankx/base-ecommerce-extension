@@ -1291,9 +1291,9 @@ public function renderTaxFieldRates(): void
                 'label'       => __('Trang thanh toán', 'base-ecommerce'),
                 'description' => __('Trang chứa block thanh toán (thông tin khách hàng, phương thức thanh toán, tổng kết đơn).', 'base-ecommerce'),
             ],
-            'jankx_payment_success_page_id' => [
-                'label'       => __('Trang thanh toán thành công', 'base-ecommerce'),
-                'description' => __('Trang hiển thị thông tin thanh toán sau khi thanh toán thành công. Extension tự tạo trang này nếu chưa có.', 'base-ecommerce'),
+            'jankx_payment_result_page_id' => [
+                'label'       => __('Trang kết quả thanh toán', 'base-ecommerce'),
+                'description' => __('Trang hiển thị kết quả thanh toán (thành công hoặc thất bại) kèm thông tin đơn hàng. Extension tự tạo trang này nếu chưa có.', 'base-ecommerce'),
             ],
             'jankx_my_account_page_id' => [
                 'label'       => __('Trang tài khoản', 'base-ecommerce'),

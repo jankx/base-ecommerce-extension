@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/payment-result",
+  "title": "Payment Result",
+  "category": "jankx",
+  "icon": "yes-alt",
+  "description": "Màn hình kết quả thanh toán: hiển thị thông báo kèm chi tiết đơn hàng (mã đơn, thời điểm giao dịch, thông tin giao hàng, giá trị đơn, tình trạng, hình thức thanh toán). Hiển thị block thất bại khi đơn hàng chưa được thanh toán.",
+  "textdomain": "base-ecommerce",
+  "supports": {
+    "html": false,
+    "align": ["wide"]
+  }
+}

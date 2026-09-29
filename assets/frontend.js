@@ -573,23 +573,24 @@
     }
 
     // -------------------------------------------------------
-    // Payment success redirect
+    // Payment result redirect
     // On the order detail page while a payment is still pending,
-    // poll the order status. When it flips to "paid" (completed),
-    // redirect to the payment success page.
+    // poll the order status. When it reaches a final state (paid,
+    // failed, cancelled, refunded), redirect to the payment
+    // result page which renders the matching block.
     // -------------------------------------------------------
     var odEl = document.querySelector('.jankx-od');
     if (odEl) {
         var orderNumber = odEl.getAttribute('data-order-number');
         var orderStatus = odEl.getAttribute('data-order-status');
-        var successUrl = window.jankxEcommerce.successUrl;
+        var resultUrl = window.jankxEcommerce.resultUrl;
 
         var pollingStatuses = ['pending', 'processing', 'shipping'];
-        var terminalStatuses = ['cancelled', 'failed', 'refunded'];
+        var terminalStatuses = ['completed', 'failed', 'cancelled', 'refunded'];
         var MAX_ATTEMPTS = 120;
 
-        function initPaymentSuccessPoller(number, status) {
-            if (!number || !successUrl) {
+        function initPaymentResultPoller(number, status) {
+            if (!number || !resultUrl) {
                 return;
             }
 
@@ -612,15 +613,12 @@
                         stop();
                         return;
                     }
-                    if (data.order.status === 'completed') {
-                        stop();
-                        window.location.href = successUrl
-                            + (successUrl.indexOf('?') !== -1 ? '&' : '?')
-                            + 'order_number=' + encodeURIComponent(number);
-                        return;
-                    }
                     if (terminalStatuses.indexOf(data.order.status) !== -1) {
                         stop();
+                        window.location.href = resultUrl
+                            + (resultUrl.indexOf('?') !== -1 ? '&' : '?')
+                            + 'order_number=' + encodeURIComponent(number);
+                        return;
                     }
                 }).catch(function () {
                     attempts += 1;
@@ -635,7 +633,7 @@
         }
 
         if (orderNumber && pollingStatuses.indexOf(orderStatus) !== -1) {
-            initPaymentSuccessPoller(orderNumber, orderStatus);
+            initPaymentResultPoller(orderNumber, orderStatus);
         }
     }
 })();
