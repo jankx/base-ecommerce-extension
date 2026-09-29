@@ -636,6 +636,11 @@ class EcommerceController
             $message = (string) ($result['error'] ?? '');
             if ($code === 'GATEWAY_NOT_AVAILABLE' || $code === 'GATEWAY_NOT_FOUND') {
                 $message = __('Cổng thanh toán chưa được cấu hình. Vui lòng liên hệ quản trị.', 'base-ecommerce');
+            } elseif ($code === 'AUTH_FAILED') {
+                $detail = trim((string) ($result['raw']['detail'] ?? ''));
+                $message = $detail !== ''
+                    ? sprintf(__('Không thể xác thực cổng thanh toán: %s', 'base-ecommerce'), $detail)
+                    : __('Không thể xác thực cổng thanh toán. Vui lòng kiểm tra cấu hình gateway.', 'base-ecommerce');
             } elseif ($message === '') {
                 $message = __('Cổng thanh toán tạm thời lỗi. Vui lòng thử lại sau.', 'base-ecommerce');
             }
