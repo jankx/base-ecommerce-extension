@@ -10,6 +10,7 @@ class EcommerceSettingsPage
     const GROUP_PAYMENT = 'jankx_ecommerce_payment';
     const GROUP_COUPONS = 'jankx_ecommerce_coupons';
     const GROUP_TAX = 'jankx_ecommerce_tax';
+    const GROUP_PAGES = 'jankx_ecommerce_pages';
 
     const OPTION_GROUP = self::GROUP_GENERAL;
     const PAGE_SLUG = 'jankx-ecommerce-settings';
@@ -215,6 +216,15 @@ class EcommerceSettingsPage
             'default' => "VAT | 10 | 10",
         ]);
 
+        // Các trang sử dụng trong luồng mua hàng.
+        foreach (array_keys($this->getPagesTabOptions()) as $optionName) {
+            register_setting(self::GROUP_PAGES, $optionName, [
+                'type'              => 'integer',
+                'sanitize_callback' => [$this, 'sanitizePageId'],
+                'default'           => 0,
+            ]);
+        }
+
         // Per-currency format overrides (position, thousand_sep, decimal_sep, decimals riêng từng đồng)
         foreach (CurrencyManager::getAllCurrencies() as $code => $unused) {
             register_setting(self::GROUP_CURRENCY, 'jankx_currency_fmt_' . $code, [
@@ -293,6 +303,20 @@ class EcommerceSettingsPage
         return sanitize_email($value);
     }
 
+    /**
+     * Sanitize a page-id option: only keep IDs of existing published pages,
+     * otherwise fall back to 0 (auto).
+     */
+    public function sanitizePageId($value): int
+    {
+        $pageId = absint($value);
+        if (!$pageId) {
+            return 0;
+        }
+
+        return get_post_type($pageId) === 'page' && get_post_status($pageId) === 'publish' ? $pageId : 0;
+    }
+
     public function renderPage(): void
     {
         if (!current_user_can('manage_options')) {
@@ -329,8 +353,11 @@ class EcommerceSettingsPage
                     case 'tax':
                         $this->renderTaxTab();
                         break;
+                    case 'pages':
+                        $this->renderPagesTab();
+                        break;
                     default:
-                        $coreHandled = in_array($currentTab, ['general', 'currency', 'payment', 'coupons', 'tax'], true);
+                        $coreHandled = in_array($currentTab, ['general', 'currency', 'payment', 'coupons', 'tax', 'pages'], true);
 
                         if (!$coreHandled) {
                             /**
@@ -364,6 +391,7 @@ class EcommerceSettingsPage
             'payment'  => __('Thanh toán', 'base-ecommerce'),
             'coupons'  => __('Mã giảm giá', 'base-ecommerce'),
             'tax'      => __('Thuế', 'base-ecommerce'),
+            'pages'    => __('Các trang', 'base-ecommerce'),
         ];
 
         /**
@@ -1165,7 +1193,7 @@ class EcommerceSettingsPage
         <?php
     }
 
-    public function renderTaxFieldRates(): void
+public function renderTaxFieldRates(): void
     {
         $ratesRaw = get_option('jankx_tax_rates_raw', "VAT | 10 | 10");
         ?>
@@ -1182,6 +1210,98 @@ class EcommerceSettingsPage
             </td>
         </tr>
         <?php
+    }
+
+    public function renderPagesTab(): void
+    {
+        $pages = get_posts([
+            'post_type'   => 'page',
+            'post_status' => 'publish',
+            'numberposts' => -1,
+            'orderby'     => 'title',
+            'order'       => 'ASC',
+        ]);
+
+        $options = $this->getPagesTabOptions();
+        ?>
+        <h2><?php esc_html_e('Các trang sử dụng', 'base-ecommerce'); ?></h2>
+        <p class="description"><?php esc_html_e('Chọn các trang WordPress dùng trong luồng mua hàng (giỏ hàng, thanh toán, thanh toán thành công, đơn hàng).', 'base-ecommerce'); ?></p>
+
+        <form method="post" action="options.php">
+        <?php settings_fields(self::GROUP_PAGES); ?>
+
+        <table class="form-table">
+            <?php foreach ($options as $optionName => $config): 
+                $currentId = (int) get_option($optionName, 0);
+                $currentUrl = $currentId ? (string) get_permalink($currentId) : '';
+                ?>
+                <tr>
+                    <th scope="row">
+                        <label for="<?php echo esc_attr($optionName); ?>">
+                            <?php echo esc_html($config['label']); ?>
+                        </label>
+                        <?php if (!empty($config['description'])): ?>
+                            <p class="description"><?php echo esc_html($config['description']); ?></p>
+                        <?php endif; ?>
+                    </th>
+                    <td>
+                        <select name="<?php echo esc_attr($optionName); ?>" id="<?php echo esc_attr($optionName); ?>" class="regular-text">
+                            <option value="0"><?php esc_html_e('— Tự động (không chọn) —', 'base-ecommerce'); ?></option>
+                            <?php foreach ($pages as $page): ?>
+                                <option value="<?php echo esc_attr($page->ID); ?>" <?php selected($currentId, $page->ID); ?>>
+                                    <?php echo esc_html($page->post_title); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+
+                        <?php if ($currentId): ?>
+                            <p class="description">
+                                <?php esc_html_e('Đang dùng:', 'base-ecommerce'); ?>
+                                <strong><?php echo esc_html(get_the_title($currentId)); ?></strong>
+                                <?php if ($currentUrl): ?>
+                                    — <a href="<?php echo esc_url($currentUrl); ?>" target="_blank" rel="noopener"><?php esc_html_e('Xem trang', 'base-ecommerce'); ?></a>
+                                <?php endif; ?>
+                            </p>
+                        <?php else: ?>
+                            <p class="description">
+                                <?php esc_html_e('Chưa chọn — trang sẽ được tự động tạo khi cài đặt extension.', 'base-ecommerce'); ?>
+                            </p>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+
+        <?php submit_button(); ?>
+        </form>
+        <?php
+    }
+
+    /**
+     * Các option lưu page-id dùng trong luồng ecommerce.
+     */
+    protected function getPagesTabOptions(): array
+    {
+        $options = [
+            'jankx_cart_page_id' => [
+                'label'       => __('Trang giỏ hàng', 'base-ecommerce'),
+                'description' => __('Trang chứa block giỏ hàng, nơi khách kiểm tra và chỉnh sửa món hàng.', 'base-ecommerce'),
+            ],
+            'jankx_checkout_page_id' => [
+                'label'       => __('Trang thanh toán', 'base-ecommerce'),
+                'description' => __('Trang chứa block thanh toán (thông tin khách hàng, phương thức thanh toán, tổng kết đơn).', 'base-ecommerce'),
+            ],
+            'jankx_payment_success_page_id' => [
+                'label'       => __('Trang thanh toán thành công', 'base-ecommerce'),
+                'description' => __('Trang hiển thị thông tin thanh toán sau khi thanh toán thành công. Extension tự tạo trang này nếu chưa có.', 'base-ecommerce'),
+            ],
+            'jankx_my_account_page_id' => [
+                'label'       => __('Trang tài khoản', 'base-ecommerce'),
+                'description' => __('Trang chứa khu vực tài khoản; URL danh sách & chi tiết đơn hàng được sinh từ trang này.', 'base-ecommerce'),
+            ],
+        ];
+
+        return (array) apply_filters('jankx/ecommerce/settings/pages_tab/options', $options);
     }
 
     protected function getAssetsUrl(string $file): string

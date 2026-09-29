@@ -19,7 +19,9 @@ use Jankx\Extensions\Ecommerce\Payment\PaymentManager;
  *   POST   /wp-json/jankx/ecommerce/v1/coupon/apply
  *   POST   /wp-json/jankx/ecommerce/v1/coupon/remove
  *   POST   /wp-json/jankx/ecommerce/v1/checkout
+ *   GET    /wp-json/jankx/ecommerce/v1/orders/{order_number}
  *   POST   /wp-json/jankx/ecommerce/v1/orders/{order_number}/pay
+ *   POST   /wp-json/jankx/ecommerce/v1/orders/{order_number}/cancel
  *
  * @package Jankx\Extensions\Ecommerce
  */
@@ -149,6 +151,19 @@ class EcommerceController
         register_rest_route(self::REST_NAMESPACE, '/orders/(?P<order_number>[a-zA-Z0-9_-]+)/cancel', [
             'methods'             => \WP_REST_Server::CREATABLE,
             'callback'            => [$this, 'cancelOrder'],
+            'permission_callback' => [$this, 'payOrderPermissionCheck'],
+            'args'                => [
+                'order_number' => [
+                    'required'          => true,
+                    'type'              => 'string',
+                    'sanitize_callback' => 'sanitize_text_field',
+                ],
+            ],
+        ]);
+
+        register_rest_route(self::REST_NAMESPACE, '/orders/(?P<order_number>[a-zA-Z0-9_-]+)', [
+            'methods'             => \WP_REST_Server::READABLE,
+            'callback'            => [$this, 'getOrder'],
             'permission_callback' => [$this, 'payOrderPermissionCheck'],
             'args'                => [
                 'order_number' => [
@@ -622,6 +637,34 @@ class EcommerceController
             'success' => true,
             'message' => __('Đơn hàng đã được hủy.', 'base-ecommerce'),
         ], 200);
+    }
+
+    /**
+     * Get order summary (status) for the current owner.
+     *
+     * Used by the order detail page poller to detect when a payment
+     * transitions to the "paid" state and redirect to the success screen.
+     */
+    public function getOrder(\WP_REST_Request $request): \WP_REST_Response
+    {
+        $orderNumber = $request->get_param('order_number');
+        $order = Order::findByOrderNumber($orderNumber);
+
+        if (!$order) {
+            return new \WP_REST_Response([
+                'success' => false,
+                'message' => __('Đơn hàng không tồn tại.', 'base-ecommerce'),
+            ], 404);
+        }
+
+        return rest_ensure_response([
+            'success' => true,
+            'order'   => [
+                'order_number' => $order->getOrderNumber(),
+                'status'       => $order->getStatus(),
+                'status_label' => Order::getStatusLabel($order->getStatus()),
+            ],
+        ]);
     }
 
     /**

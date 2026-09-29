@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/payment-success",
+  "title": "Payment Success",
+  "category": "jankx",
+  "icon": "yes-alt",
+  "description": "Màn hình thông báo thanh toán thành công kèm thông tin thanh toán (mã đơn, thời điểm giao dịch, thông tin giao hàng, giá trị đơn, tình trạng, hình thức thanh toán).",
+  "textdomain": "base-ecommerce",
+  "supports": {
+    "html": false,
+    "align": ["wide"]
+  }
+}

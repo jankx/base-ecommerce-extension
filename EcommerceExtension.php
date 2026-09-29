@@ -37,6 +37,7 @@ use Jankx\Extensions\Ecommerce\Blocks\CurrencySwitcherBlock;
 use Jankx\Extensions\Ecommerce\Blocks\OrderProgressBlock;
 use Jankx\Extensions\Ecommerce\Blocks\OrderProgressStepBlock;
 use Jankx\Extensions\Ecommerce\Blocks\PostPriceBlock;
+use Jankx\Extensions\Ecommerce\Blocks\PaymentSuccessBlock;
 use Jankx\Extensions\Ecommerce\Cart\Cart;
 use Jankx\Extensions\Ecommerce\Checkout\CheckoutManager;
 use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
@@ -127,6 +128,10 @@ class EcommerceExtension extends AbstractExtension
             (new CurrencyDebugPage())->register();
             add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
         }
+
+        // Self-contained setup: make sure the payment success page exists on
+        // every request (frontend + admin), not only when install() runs.
+        add_action('init', [$this, 'ensure_payment_success_page']);
 
         // Allow hook-based registration of product types on init.
         add_action('init', [ProductRegistry::get_instance(), 'boot'], 10);
@@ -262,6 +267,7 @@ class EcommerceExtension extends AbstractExtension
             'add-to-cart' => AddToCartBlock::class,
             'post-price' => PostPriceBlock::class,
             'currency-switcher' => CurrencySwitcherBlock::class,
+            'payment-success' => PaymentSuccessBlock::class,
         ];
 
         foreach ($blockClasses as $blockName => $blockClass) {
@@ -331,6 +337,7 @@ class EcommerceExtension extends AbstractExtension
             'add-to-cart',
             'post-price',
             'currency-switcher',
+            'payment-success',
         ];
         foreach ($blockSlugs as $slug) {
             $blockJson = $blocksDir . '/' . $slug . '/block.json';
@@ -399,6 +406,7 @@ class EcommerceExtension extends AbstractExtension
         if (
             !is_page(self::get_cart_page_id()) &&
             !is_page(self::get_checkout_page_id()) &&
+            !is_page(self::get_payment_success_page_id()) &&
             !$isProductPage &&
             !$isMyAccount
         ) {
@@ -425,6 +433,7 @@ class EcommerceExtension extends AbstractExtension
             'cartUrl' => self::get_cart_page_url(),
             'checkoutUrl' => self::get_checkout_page_url(),
             'ordersUrl' => self::get_orders_page_url(),
+            'successUrl' => self::get_payment_success_page_url(),
             'i18n' => [
                 'successTitle' => __('Order placed successfully!', 'base-ecommerce'),
                 'successMessage' => __('Your order number is %s.', 'base-ecommerce'),
@@ -454,6 +463,7 @@ class EcommerceExtension extends AbstractExtension
     {
         $this->create_cart_page();
         $this->create_checkout_page();
+        $this->create_payment_success_page();
 
         flush_rewrite_rules();
 
@@ -497,6 +507,60 @@ class EcommerceExtension extends AbstractExtension
 
         if ($pageId && !is_wp_error($pageId)) {
             update_option('jankx_checkout_page_id', $pageId);
+        }
+    }
+
+    protected function create_payment_success_page(): void
+    {
+        $pageId = get_option('jankx_payment_success_page_id', 0);
+        if ($pageId && get_post_status($pageId) === 'publish') {
+            update_option('jankx_payment_success_page_created', 1);
+            return;
+        }
+
+        $pageId = wp_insert_post([
+            'post_title' => __('Thanh toán thành công', 'base-ecommerce'),
+            'post_content' => '<!-- wp:jankx/payment-success {"align":"wide"} /-->',
+            'post_status' => 'publish',
+            'post_type' => 'page',
+            'post_author' => get_current_user_id(),
+        ]);
+
+        if ($pageId && !is_wp_error($pageId)) {
+            update_option('jankx_payment_success_page_id', $pageId);
+            update_option('jankx_payment_success_page_created', 1);
+        }
+    }
+
+    public static function get_payment_success_page_id(): int
+    {
+        return (int) get_option('jankx_payment_success_page_id', 0);
+    }
+
+    public static function get_payment_success_page_url(): string
+    {
+        $pageId = self::get_payment_success_page_id();
+
+        return $pageId ? (string) get_permalink($pageId) : '';
+    }
+
+    public function ensure_payment_success_page(): void
+    {
+        if (get_option('jankx_payment_success_page_created')) {
+            return;
+        }
+
+        // Single-flight lock: only one request performs the setup.
+        if (!add_option('jankx_payment_success_page_created', 1)) {
+            return;
+        }
+
+        $this->create_payment_success_page();
+
+        // Setup failed (e.g. transient DB issue): release the lock so the
+        // next request retries instead of skipping the page forever.
+        if (!self::get_payment_success_page_id()) {
+            delete_option('jankx_payment_success_page_created');
         }
     }
 

@@ -571,4 +571,71 @@
             });
         });
     }
+
+    // -------------------------------------------------------
+    // Payment success redirect
+    // On the order detail page while a payment is still pending,
+    // poll the order status. When it flips to "paid" (completed),
+    // redirect to the payment success page.
+    // -------------------------------------------------------
+    var odEl = document.querySelector('.jankx-od');
+    if (odEl) {
+        var orderNumber = odEl.getAttribute('data-order-number');
+        var orderStatus = odEl.getAttribute('data-order-status');
+        var successUrl = window.jankxEcommerce.successUrl;
+
+        var pollingStatuses = ['pending', 'processing', 'shipping'];
+        var terminalStatuses = ['cancelled', 'failed', 'refunded'];
+        var MAX_ATTEMPTS = 120;
+
+        function initPaymentSuccessPoller(number, status) {
+            if (!number || !successUrl) {
+                return;
+            }
+
+            var attempts = 0;
+            var timer = null;
+
+            function stop() {
+                if (timer) {
+                    clearInterval(timer);
+                    timer = null;
+                }
+            }
+
+            function check() {
+                getJson({
+                    url: window.jankxEcommerce.restUrl + '/orders/' + encodeURIComponent(number),
+                    method: 'GET'
+                }).then(function (data) {
+                    if (!data.success || !data.order) {
+                        stop();
+                        return;
+                    }
+                    if (data.order.status === 'completed') {
+                        stop();
+                        window.location.href = successUrl
+                            + (successUrl.indexOf('?') !== -1 ? '&' : '?')
+                            + 'order_number=' + encodeURIComponent(number);
+                        return;
+                    }
+                    if (terminalStatuses.indexOf(data.order.status) !== -1) {
+                        stop();
+                    }
+                }).catch(function () {
+                    attempts += 1;
+                    if (attempts >= MAX_ATTEMPTS) {
+                        stop();
+                    }
+                });
+            }
+
+            check();
+            timer = setInterval(check, 5000);
+        }
+
+        if (orderNumber && pollingStatuses.indexOf(orderStatus) !== -1) {
+            initPaymentSuccessPoller(orderNumber, orderStatus);
+        }
+    }
 })();

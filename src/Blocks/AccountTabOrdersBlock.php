@@ -137,7 +137,7 @@ class AccountTabOrdersBlock extends Block
         }
 
         $output = '<div class="jankx-tab-panel jankx-tab-orders">';
-        $output .= '<div class="jankx-od">';
+        $output .= '<div class="jankx-od" data-order-number="' . esc_attr($order->getOrderNumber()) . '" data-order-status="' . esc_attr($status) . '">';
 
         // Back link
         $output .= '<div class="jankx-od-nav">'
