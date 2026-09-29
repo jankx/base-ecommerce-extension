@@ -3,6 +3,14 @@ namespace Jankx\Extensions\Ecommerce;
 
 use Jankx\Extensions\AbstractExtension;
 use Jankx\Extensions\Ecommerce\Blocks\AccountTabOrdersBlock;
+use Jankx\Extensions\Ecommerce\Blocks\AccountTabOrdersTemplateBlock;
+use Jankx\Extensions\Ecommerce\Blocks\AccountTabOrdersFiltersBlock;
+use Jankx\Extensions\Ecommerce\Blocks\AccountTabOrdersSearchBlock;
+use Jankx\Extensions\Ecommerce\Blocks\OrderNumberBlock;
+use Jankx\Extensions\Ecommerce\Blocks\OrderStatusBlock;
+use Jankx\Extensions\Ecommerce\Blocks\OrderDateBlock;
+use Jankx\Extensions\Ecommerce\Blocks\OrderTotalBlock;
+use Jankx\Extensions\Ecommerce\Blocks\OrderCancelBlock;
 use Jankx\Extensions\Ecommerce\Blocks\AddToCartBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CartBlock;
 use Jankx\Extensions\Ecommerce\Blocks\CartItemBlock;
@@ -243,6 +251,14 @@ class EcommerceExtension extends AbstractExtension
             'order-progress' => OrderProgressBlock::class,
             'order-progress-step' => OrderProgressStepBlock::class,
             'account-tab-orders' => AccountTabOrdersBlock::class,
+            'account-tab-orders-template' => AccountTabOrdersTemplateBlock::class,
+            'account-tab-orders-filters' => AccountTabOrdersFiltersBlock::class,
+            'account-tab-orders-search' => AccountTabOrdersSearchBlock::class,
+            'order-number' => OrderNumberBlock::class,
+            'order-status' => OrderStatusBlock::class,
+            'order-date' => OrderDateBlock::class,
+            'order-total' => OrderTotalBlock::class,
+            'order-cancel' => OrderCancelBlock::class,
             'add-to-cart' => AddToCartBlock::class,
             'post-price' => PostPriceBlock::class,
             'currency-switcher' => CurrencySwitcherBlock::class,
@@ -304,6 +320,14 @@ class EcommerceExtension extends AbstractExtension
             'order-progress',
             'order-progress-step',
             'account-tab-orders',
+            'account-tab-orders-template',
+            'account-tab-orders-filters',
+            'account-tab-orders-search',
+            'order-number',
+            'order-status',
+            'order-date',
+            'order-total',
+            'order-cancel',
             'add-to-cart',
             'post-price',
             'currency-switcher',

@@ -146,6 +146,19 @@ class EcommerceController
             ],
         ]);
 
+        register_rest_route(self::REST_NAMESPACE, '/orders/(?P<order_number>[a-zA-Z0-9_-]+)/cancel', [
+            'methods'             => \WP_REST_Server::CREATABLE,
+            'callback'            => [$this, 'cancelOrder'],
+            'permission_callback' => [$this, 'payOrderPermissionCheck'],
+            'args'                => [
+                'order_number' => [
+                    'required'          => true,
+                    'type'              => 'string',
+                    'sanitize_callback' => 'sanitize_text_field',
+                ],
+            ],
+        ]);
+
         register_rest_route(self::REST_NAMESPACE, '/currency', [
             'methods'             => \WP_REST_Server::READABLE,
             'callback'            => [$this, 'getCurrencies'],
@@ -560,6 +573,55 @@ class EcommerceController
         }
 
         return $customerId === $userId;
+    }
+
+    /**
+     * Cancel an order owned by the current customer (pending/processing only).
+     */
+    public function cancelOrder(\WP_REST_Request $request): \WP_REST_Response
+    {
+        $orderNumber = $request->get_param('order_number');
+        $order = Order::findByOrderNumber($orderNumber);
+
+        if (!$order) {
+            return new \WP_REST_Response([
+                'success' => false,
+                'message' => __('Đơn hàng không tồn tại.', 'base-ecommerce'),
+            ], 404);
+        }
+
+        $status = $order->getStatus();
+        if (!in_array($status, [Order::STATUS_PENDING, Order::STATUS_PROCESSING], true)) {
+            return new \WP_REST_Response([
+                'success' => false,
+                'message' => __('Đơn hàng này không thể hủy.', 'base-ecommerce'),
+            ], 400);
+        }
+
+        $allowed = Order::getAllowedStatusTransitionsFor($status);
+        if (!in_array(Order::STATUS_CANCELLED, $allowed, true)) {
+            return new \WP_REST_Response([
+                'success' => false,
+                'message' => __('Đơn hàng này không thể hủy.', 'base-ecommerce'),
+            ], 400);
+        }
+
+        $cancelled = $order->updateStatus(
+            Order::STATUS_CANCELLED,
+            __('Khách hàng yêu cầu hủy đơn hàng.', 'base-ecommerce')
+        );
+
+        if (!$cancelled) {
+            return new \WP_REST_Response([
+                'success' => false,
+                'message' => __('Không thể hủy đơn hàng. Vui lòng thử lại.', 'base-ecommerce'),
+            ], 500);
+        }
+
+        return new \WP_REST_Response([
+            'success' => true,
+            'message' => __('Đơn hàng đã được hủy.', 'base-ecommerce'),
+        ], 200);
     }
 
     /**

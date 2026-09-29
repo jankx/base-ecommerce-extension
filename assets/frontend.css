@@ -1333,3 +1333,205 @@
     background: #fdecea;
     color: #c0392b;
 }
+
+/* ── Orders list: filters, search, item template ─────────────── */
+.jankx-order-filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.jankx-order-filter {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 999px;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    text-decoration: none;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.jankx-order-filter:hover {
+    border-color: #cbd5e1;
+}
+
+.jankx-order-filter.is-active {
+    border-color: #007cba;
+    background: color-mix(in srgb, #007cba 10%, #fff);
+    color: #007cba;
+}
+
+.jankx-order-search {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    margin-bottom: 16px;
+}
+
+.jankx-order-search__input {
+    flex: 1 1 220px;
+    padding: 8px 12px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fff;
+}
+
+.jankx-order-search__input:focus {
+    outline: none;
+    border-color: #007cba;
+}
+
+.jankx-order-search__date {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.jankx-order-search__date input {
+    padding: 7px 10px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    background: #fff;
+    color: #1e293b;
+}
+
+.jankx-order-search__date input:focus {
+    outline: none;
+    border-color: #007cba;
+}
+
+.jankx-order-search__submit {
+    align-self: flex-end;
+}
+
+.jankx-order-search__reset {
+    align-self: center;
+    font-size: 13px;
+    color: #64748b;
+    text-decoration: underline;
+}
+
+/* Order item template (loop item) */
+.jankx-order-card--template {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    align-items: flex-start;
+    padding: 16px 18px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    text-decoration: none;
+    box-shadow: none;
+}
+
+.jankx-order-card--template:hover {
+    border-color: #cbd5e1;
+    box-shadow: none;
+}
+
+.jankx-order-card--placeholder {
+    display: block;
+    border: 1.5px dashed #cbd5e1;
+    background: #f8fafc;
+    color: #94a3b8;
+    font-size: 13px;
+    font-style: italic;
+}
+
+.jankx-order-card--template-note {
+    flex: 1 1 100%;
+    font-size: 12px;
+    color: #94a3b8;
+    font-style: italic;
+}
+
+.jankx-order-field {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.jankx-order-field__label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #94a3b8;
+    line-height: 1.3;
+}
+
+.jankx-order-field__value {
+    font-size: 14px;
+    color: #1e293b;
+    line-height: 1.4;
+}
+
+.jankx-order-field--number {
+    flex: 0 1 auto;
+}
+
+.jankx-order-field--number .jankx-order-number {
+    font-size: 16px;
+    font-weight: 700;
+    color: #007cba;
+    text-decoration: none;
+}
+
+.jankx-order-field--number .jankx-order-number:hover {
+    text-decoration: underline;
+}
+
+.jankx-order-field--status {
+    margin-left: auto;
+    align-items: flex-end;
+}
+
+.jankx-order-field--date,
+.jankx-order-field--total {
+    flex: 0 1 auto;
+}
+
+.jankx-order-field--cancel {
+    margin-left: auto;
+    align-self: flex-end;
+}
+
+.jankx-order-field-editor .jankx-order-field__value,
+.jankx-order-field-editor .jankx-order-number,
+.jankx-order-field-editor .jankx-btn {
+    opacity: 0.75;
+}
+
+.jankx-tab-orders__editor-note {
+    font-size: 12px;
+    color: #94a3b8;
+    font-style: italic;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 600px) {
+    .jankx-order-field--status,
+    .jankx-order-field--cancel {
+        margin-left: 0;
+        align-items: flex-start;
+    }
+
+    .jankx-order-search__input {
+        flex-basis: 100%;
+    }
+}

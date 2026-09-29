@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/order-cancel",
+  "title": "Cancel Order Button",
+  "category": "jankx",
+  "icon": "trash",
+  "description": "Cancel button shown for cancellable orders.",
+  "textdomain": "base-ecommerce",
+  "supports": {
+    "html": false
+  },
+  "editorScript": "file:./build/index.js"
+}

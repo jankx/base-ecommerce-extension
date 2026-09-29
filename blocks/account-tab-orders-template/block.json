@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/account-tab-orders-template",
+  "title": "Order Item Template",
+  "category": "jankx",
+  "icon": "index-card",
+  "description": "Template rendered for each order in the orders list. Insert order-number, order-status, order-date, order-total and order-cancel blocks inside.",
+  "textdomain": "base-ecommerce",
+  "supports": {
+    "html": false
+  },
+  "editorScript": "file:./build/index.js"
+}

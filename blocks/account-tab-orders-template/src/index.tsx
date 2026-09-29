@@ -2,31 +2,28 @@ import { registerBlockType } from '@wordpress/blocks';
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 import metadata from '../block.json';
 
-const ALLOWED_BLOCKS = [
-    'jankx/account-tab-orders-filters',
-    'jankx/account-tab-orders-search',
-    'jankx/account-tab-orders-template',
+const ITEM_ALLOWED_BLOCKS = [
+    'jankx/order-number',
+    'jankx/order-status',
+    'jankx/order-date',
+    'jankx/order-total',
+    'jankx/order-cancel',
 ];
 
-const DEFAULT_TEMPLATE = [
-    ['jankx/account-tab-orders-filters'],
-    ['jankx/account-tab-orders-search'],
-    ['jankx/account-tab-orders-template'],
-];
+const DEFAULT_TEMPLATE = ITEM_ALLOWED_BLOCKS.map((name) => [name]);
 
 function Edit() {
     const blockProps = useBlockProps({
-        className: 'jankx-tab-orders',
+        className: 'jankx-order-card jankx-order-card--template',
     });
 
     return (
         <div {...blockProps}>
-            <div className="jankx-tab-orders__editor-note">
-                Danh sách đơn hàng: filters + tìm kiếm hiển thị phía trên; block template lặp lại cho
-                từng đơn hàng (kéo thả các block thành phần để tuỳ chỉnh layout).
+            <div className="jankx-order-card--template-note">
+                Mẫu cho mỗi đơn hàng trong danh sách — thêm/bớt các block thành phần bên dưới.
             </div>
             <InnerBlocks
-                allowedBlocks={ALLOWED_BLOCKS}
+                allowedBlocks={ITEM_ALLOWED_BLOCKS}
                 template={DEFAULT_TEMPLATE}
                 templateLock={false}
             />
@@ -36,7 +33,7 @@ function Edit() {
 
 function Save() {
     const blockProps = useBlockProps.save({
-        className: 'jankx-tab-orders',
+        className: 'jankx-order-card jankx-order-card--template',
     });
 
     return (

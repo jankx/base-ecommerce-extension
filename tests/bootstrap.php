@@ -168,6 +168,46 @@ function stub_wp_ecommerce_functions()
         return trim(sanitize_text_field($email));
     });
     Monkey\Functions\when('sanitize_textarea_field')->returnArg();
+    Monkey\Functions\when('wp_unslash')->alias(function ($value) {
+        return is_string($value) ? stripslashes($value) : $value;
+    });
+    Monkey\Functions\when('remove_query_arg')->alias(function ($key, $url = false) {
+        $key = (array) $key;
+        $url = $url ?: 'http://example.com/';
+        $parts = explode('?', $url, 2);
+        if (count($parts) < 2) {
+            return $parts[0];
+        }
+        parse_str($parts[1], $query);
+        foreach ($key as $k) {
+            unset($query[$k]);
+        }
+        $qs = http_build_query($query);
+        return $parts[0] . ($qs !== '' ? '?' . $qs : '');
+    });
+    Monkey\Functions\when('add_query_arg')->alias(function (...$args) {
+        if (count($args) === 3) {
+            [$key, $value, $url] = $args;
+            $pairs = [$key => $value];
+        } else {
+            [$pairs, $url] = $args;
+        }
+        $parts = explode('?', (string) $url, 2);
+        $query = [];
+        if (count($parts) === 2) {
+            parse_str($parts[1], $query);
+        }
+        foreach ((array) $pairs as $k => $v) {
+            $query[$k] = $v;
+        }
+        $base = $parts[0] ?? 'http://example.com/';
+        $qs = http_build_query($query);
+        return $base . ($qs !== '' ? '?' . $qs : '');
+    });
+    Monkey\Functions\when('wp_create_nonce')->justReturn('test-nonce');
+    Monkey\Functions\when('rest_url')->alias(function ($path = '') {
+        return 'http://example.com/wp-json/' . ltrim($path, '/');
+    });
 
     $GLOBALS['__wp_options'] = [];
 }

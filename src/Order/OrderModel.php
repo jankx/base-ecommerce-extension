@@ -236,6 +236,24 @@ class OrderModel
             $where[] = '(' . implode(' OR ', $customerClauses) . ')';
         }
 
+        if (!empty($args['date_from'])) {
+            $where[] = 'created_at >= %s';
+            $values[] = $args['date_from'];
+        }
+
+        if (!empty($args['date_to'])) {
+            $where[] = 'created_at <= %s';
+            $values[] = $args['date_to'];
+        }
+
+        if (!empty($args['search'])) {
+            $like = '%' . $wpdb->esc_like($args['search']) . '%';
+            $where[] = '(customer_name LIKE %s OR customer_email LIKE %s OR order_number LIKE %s)';
+            $values[] = $like;
+            $values[] = $like;
+            $values[] = $like;
+        }
+
         $whereClause = implode(' AND ', $where);
         $sql = "SELECT COUNT(*) FROM {$table} WHERE {$whereClause}";
 

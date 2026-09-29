@@ -1,0 +1,20 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/order-total",
+  "title": "Order Total",
+  "category": "jankx",
+  "icon": "money",
+  "description": "Order total of the current order item.",
+  "textdomain": "base-ecommerce",
+  "supports": {
+    "html": false
+  },
+  "editorScript": "file:./build/index.js",
+  "attributes": {
+    "showLabel": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

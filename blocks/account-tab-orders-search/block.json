@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/account-tab-orders-search",
+  "title": "Order Search",
+  "category": "jankx",
+  "icon": "search",
+  "description": "Search box and date range filters for the orders list.",
+  "textdomain": "base-ecommerce",
+  "supports": {
+    "html": false
+  },
+  "editorScript": "file:./build/index.js"
+}

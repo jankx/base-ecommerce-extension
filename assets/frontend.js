@@ -414,6 +414,45 @@
         });
     };
 
+    // Expose cancel order function globally for inline onclick
+    window.jankxCancelOrder = function (button) {
+        var restUrl = button.getAttribute('data-rest-url');
+        var nonce = button.getAttribute('data-nonce');
+        var orderNumber = button.getAttribute('data-order');
+
+        if (!window.confirm('Bạn có chắc muốn hủy đơn hàng #' + orderNumber + '?')) {
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = 'Đang hủy...';
+
+        fetch(restUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-WP-Nonce': nonce
+            }
+        })
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            if (!data.success) {
+                alert(data.message || 'Không thể hủy đơn hàng.');
+                button.disabled = false;
+                button.textContent = 'Hủy đơn hàng';
+                return;
+            }
+
+            alert(data.message || 'Đơn hàng đã được hủy.');
+            window.location.reload();
+        })
+        .catch(function (error) {
+            alert('Lỗi: ' + (error.message || 'Vui lòng thử lại.'));
+            button.disabled = false;
+            button.textContent = 'Hủy đơn hàng';
+        });
+    };
+
     // -------------------------------------------------------
     // Payment method tabs (new checkout redesign)
     // -------------------------------------------------------

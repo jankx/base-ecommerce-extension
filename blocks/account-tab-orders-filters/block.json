@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "jankx/account-tab-orders-filters",
+  "title": "Order Status Filters",
+  "category": "jankx",
+  "icon": "filter",
+  "description": "Status filter tabs: Tat ca / Cho thanh toan / Da hoan thanh / Da huy.",
+  "textdomain": "base-ecommerce",
+  "supports": {
+    "html": false
+  },
+  "editorScript": "file:./build/index.js"
+}

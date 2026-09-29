@@ -4,6 +4,7 @@ namespace Jankx\Extensions\Ecommerce\Blocks;
 use Jankx\Extensions\Ecommerce\Block;
 use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
 use Jankx\Extensions\Ecommerce\Order\Order;
+use Jankx\Extensions\Ecommerce\Order\OrderItemContext;
 use Jankx\Extensions\Ecommerce\Order\OrderItem;
 use Jankx\Extensions\Ecommerce\Order\OrderModel;
 
@@ -46,19 +47,66 @@ class AccountTabOrdersBlock extends Block
         $output = sprintf('<div %s>', $wrapperAttrs);
         $output .= '<h2 class="jankx-section-title">' . esc_html__('Your orders', 'base-ecommerce') . '</h2>';
 
+        // Classify saved inner blocks: list-level blocks render in their saved
+        // order; the template block marks where the order loop goes.
+        $parts = [];
+        $templateBlock = null;
+        if ($block && !empty($block->inner_blocks)) {
+            foreach ($block->inner_blocks as $innerBlock) {
+                if ($innerBlock->name === 'jankx/account-tab-orders-template') {
+                    $templateBlock = $innerBlock;
+                    $parts[] = '{{JANKX_ORDER_LIST}}';
+                } elseif (in_array($innerBlock->name, ['jankx/account-tab-orders-filters', 'jankx/account-tab-orders-search'], true)) {
+                    $parts[] = $innerBlock->render();
+                }
+            }
+        } else {
+            // Legacy `<!-- wp:jankx/account-tab-orders /-->` (no saved inner
+            // blocks): render the default filters + search + list.
+            $parts[] = (new AccountTabOrdersFiltersBlock())->render([]);
+            $parts[] = (new AccountTabOrdersSearchBlock())->render([]);
+        }
+
+        if (!in_array('{{JANKX_ORDER_LIST}}', $parts, true)) {
+            $parts[] = '{{JANKX_ORDER_LIST}}';
+        }
+
+        $listHtml = '';
         if (empty($orders)) {
-            $output .= '<div class="jankx-empty-state">'
+            $listHtml .= '<div class="jankx-empty-state">'
                 . '<span class="jankx-empty-icon" aria-hidden="true">&#128203;</span>'
                 . '<p>' . esc_html__('You have no orders yet.', 'base-ecommerce') . '</p>'
                 . '</div>';
         } else {
-            $output .= '<div class="jankx-orders-list">';
-            foreach ($orders as $order) {
-                $output .= $this->renderOrderCard($order);
-            }
-            $output .= '</div>';
+            $listHtml .= $this->renderList($orders, $templateBlock);
+            $listHtml .= $this->renderPagination($result);
+        }
 
-            $output .= $this->renderPagination($result);
+        foreach ($parts as $part) {
+            $output .= $part === '{{JANKX_ORDER_LIST}}' ? $listHtml : $part;
+        }
+
+        $output .= '</div>';
+
+        return $output;
+    }
+
+    /**
+     * Render the order loop: set the order context for each item and render
+     * the template block (or the default template) per order.
+     */
+    protected function renderList(array $orders, $templateBlock = null): string
+    {
+        $output = '<div class="jankx-orders-list">';
+
+        foreach ($orders as $order) {
+            OrderItemContext::set($order);
+            if ($templateBlock) {
+                $output .= $templateBlock->render();
+            } else {
+                $output .= (new AccountTabOrdersTemplateBlock())->render([]);
+            }
+            OrderItemContext::set(null);
         }
 
         $output .= '</div>';
@@ -640,6 +688,27 @@ class AccountTabOrdersBlock extends Block
             $args['customer_email'] = $user->user_email;
         }
 
+        // List filters (status tabs, search, date range).
+        $status = isset($_GET['status']) ? sanitize_text_field(wp_unslash($_GET['status'])) : '';
+        if ($status && array_key_exists($status, Order::getStatusLabels())) {
+            $args['status'] = $status;
+        }
+
+        $search = isset($_GET['s']) ? sanitize_text_field(wp_unslash($_GET['s'])) : '';
+        if ($search !== '') {
+            $args['search'] = $search;
+        }
+
+        $dateFrom = isset($_GET['date_from']) ? sanitize_text_field(wp_unslash($_GET['date_from'])) : '';
+        if ($dateFrom !== '' && strtotime($dateFrom) !== false) {
+            $args['date_from'] = date('Y-m-d 00:00:00', strtotime($dateFrom));
+        }
+
+        $dateTo = isset($_GET['date_to']) ? sanitize_text_field(wp_unslash($_GET['date_to'])) : '';
+        if ($dateTo !== '' && strtotime($dateTo) !== false) {
+            $args['date_to'] = date('Y-m-d 23:59:59', strtotime($dateTo));
+        }
+
         $countArgs = $args;
         unset($countArgs['per_page'], $countArgs['page'], $countArgs['orderby'], $countArgs['order']);
 
@@ -723,12 +792,13 @@ class AccountTabOrdersBlock extends Block
         }
 
         $baseUrl = $this->getOrdersUrl();
+        $listParams = $this->getListParams();
         $output = '<nav class="jankx-pagination" aria-label="' . esc_attr__('Orders pagination', 'base-ecommerce') . '">';
         $output .= '<div class="jankx-pagination-inner">';
 
         // Previous
         if ($currentPage > 1) {
-            $output .= '<a class="jankx-pagination-btn jankx-pagination-prev" href="' . esc_url(add_query_arg('page', $currentPage - 1, $baseUrl)) . '">'
+            $output .= '<a class="jankx-pagination-btn jankx-pagination-prev" href="' . esc_url(add_query_arg(array_merge($listParams, ['page' => $currentPage - 1]), $baseUrl)) . '">'
                 . '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>'
                 . '</a>';
         }
@@ -738,13 +808,13 @@ class AccountTabOrdersBlock extends Block
             if ($i === $currentPage) {
                 $output .= '<span class="jankx-pagination-btn jankx-pagination-current">' . $i . '</span>';
             } else {
-                $output .= '<a class="jankx-pagination-btn" href="' . esc_url(add_query_arg('page', $i, $baseUrl)) . '">' . $i . '</a>';
+                $output .= '<a class="jankx-pagination-btn" href="' . esc_url(add_query_arg(array_merge($listParams, ['page' => $i]), $baseUrl)) . '">' . $i . '</a>';
             }
         }
 
         // Next
         if ($currentPage < $totalPages) {
-            $output .= '<a class="jankx-pagination-btn jankx-pagination-next" href="' . esc_url(add_query_arg('page', $currentPage + 1, $baseUrl)) . '">'
+            $output .= '<a class="jankx-pagination-btn jankx-pagination-next" href="' . esc_url(add_query_arg(array_merge($listParams, ['page' => $currentPage + 1]), $baseUrl)) . '">'
                 . '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>'
                 . '</a>';
         }
@@ -753,6 +823,21 @@ class AccountTabOrdersBlock extends Block
         $output .= '</nav>';
 
         return $output;
+    }
+
+    /**
+     * Current list filter params so pagination links keep them.
+     */
+    protected function getListParams(): array
+    {
+        $params = [];
+        foreach (['status', 's', 'date_from', 'date_to'] as $key) {
+            if (!empty($_GET[$key])) {
+                $params[$key] = sanitize_text_field(wp_unslash($_GET[$key]));
+            }
+        }
+
+        return $params;
     }
 
     /**
