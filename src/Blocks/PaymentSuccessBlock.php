@@ -19,18 +19,15 @@ class PaymentSuccessBlock extends Block
 
         $orderNumber = isset($_GET['order_number']) ? sanitize_text_field($_GET['order_number']) : '';
 
-        // Magic order: auto-generate demo data, no DB / login required.
+        // Magic order: auto-generate demo data, no DB lookup required.
         if ($orderNumber === self::MAGIC_ORDER_NUMBER) {
             return $this->renderMagicSuccess();
         }
 
-        if (!is_user_logged_in()) {
-            return $this->renderAccessNotice(__('Đăng nhập để xem thông tin thanh toán.', 'base-ecommerce'));
-        }
-
+        // Public screen: no login needed, just show the order info.
         $order = $orderNumber ? Order::findByOrderNumber($orderNumber) : null;
 
-        if (!$order || !$this->orderBelongsToUser($order, wp_get_current_user())) {
+        if (!$order) {
             return $this->renderAccessNotice(__('Không tìm thấy đơn hàng tương ứng.', 'base-ecommerce'), $is_editor);
         }
 
@@ -218,20 +215,6 @@ class PaymentSuccessBlock extends Block
             . '</span>'
             . '<p>' . esc_html($message) . '</p>'
             . '</div>';
-    }
-
-    protected function orderBelongsToUser(Order $order, $user): bool
-    {
-        $customerId = $order->getCustomerId();
-        if ($customerId && (int) $customerId === (int) $user->ID) {
-            return true;
-        }
-
-        if (!empty($user->user_email)) {
-            return strcasecmp($order->getCustomerEmail(), $user->user_email) === 0;
-        }
-
-        return false;
     }
 
     protected function getStatusLabel(string $status): string
