@@ -58,7 +58,7 @@ class OrderPostType
             'menu_icon'       => 'dashicons-cart',
             'menu_position'   => 30,
             'show_in_rest'    => true,
-            'supports'        => ['title', 'custom-fields'],
+            'supports'        => ['title'],
             'capability_type' => 'post',
             'capabilities'    => [
                 'create_posts'          => 'do_not_allow',
