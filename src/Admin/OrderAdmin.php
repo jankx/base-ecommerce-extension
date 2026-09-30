@@ -5,6 +5,8 @@ use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
 use Jankx\Extensions\Ecommerce\Order\Order;
 use Jankx\Extensions\Ecommerce\Order\OrderModel;
 use Jankx\Extensions\Ecommerce\Order\OrderPostType;
+use Jankx\Extensions\PaymentSystem\Gateways\GatewayManager;
+use Jankx\Extensions\PaymentSystem\Models\Transaction;
 
 /**
  * Custom Orders admin page using dedicated database tables.
@@ -91,7 +93,183 @@ class OrderAdmin
             if ($orderId && isset($_POST['jankx_update_order_status']) && check_admin_referer('jankx_update_order_status_' . $orderId)) {
                 $this->handleStatusUpdate($orderId);
             }
+
+            // Generate a VietQR payment code for the order (qrviet extension).
+            if ($orderId && isset($_GET['jankx_generate_qr']) && check_admin_referer('jankx_qrviet_generate_' . $orderId)) {
+                $this->handleGenerateQr($orderId);
+            }
         }
+    }
+
+    protected function isQrVietInstalled(): bool
+    {
+        return class_exists('Jankx\Extensions\QrViet\QrVietPaymentGatewayExtension')
+            && class_exists('Jankx\Extensions\PaymentSystem\Models\Transaction');
+    }
+
+    /**
+     * Find the QR Viet transaction linked to the order (via the saved
+     * payment_transaction_id or by matching order id + gateway fallback).
+     */
+    protected function findQrVietTransaction(Order $order): ?Transaction
+    {
+        if (!$this->isQrVietInstalled()) {
+            return null;
+        }
+
+        $transactionId = $order->getPaymentTransactionId();
+        if ($transactionId > 0) {
+            $transaction = new Transaction($transactionId);
+            if ($transaction->getId() && $transaction->getGateway() === 'qrviet') {
+                return $transaction;
+            }
+        }
+
+        $query = new \WP_Query([
+            'post_type'      => Transaction::POST_TYPE,
+            'post_status'    => 'any',
+            'posts_per_page' => 1,
+            'no_found_rows'  => true,
+            'fields'         => 'ids',
+            'meta_query'     => [
+                [
+                    'key'   => '_order_id',
+                    'value' => $order->getId(),
+                ],
+                [
+                    'key'   => '_gateway',
+                    'value' => 'qrviet',
+                ],
+            ],
+        ]);
+
+        if (!$query->have_posts()) {
+            return null;
+        }
+
+        return new Transaction((int) $query->posts[0]);
+    }
+
+    protected function handleGenerateQr(int $orderId): void
+    {
+        if (!current_user_can(OrderPostType::CAP_MANAGE) || !$this->isQrVietInstalled()) {
+            wp_safe_redirect(admin_url('admin.php?page=' . self::PAGE_SLUG . '&view=' . $orderId));
+            exit;
+        }
+
+        $order = new Order($orderId);
+        if (!$order->getId()) {
+            return;
+        }
+
+        $result = $this->generateQrForOrder($order);
+
+        $args = [
+            'page'    => self::PAGE_SLUG,
+            'view'    => $orderId,
+            'updated' => $result['success'] ? 'qr' : 'qr_error',
+        ];
+        if (!$result['success']) {
+            $args['qr_message'] = $result['message'];
+        }
+
+        wp_safe_redirect(admin_url('admin.php?' . http_build_query($args)));
+        exit;
+    }
+
+    /**
+     * Create (or reuse) the QR Viet transaction for an order and generate a
+     * fresh dynamic VietQR code against the configured merchant account.
+     *
+     * @return array{success: bool, message: string, transaction?: Transaction}
+     */
+    protected function generateQrForOrder(Order $order): array
+    {
+        if (!$this->isQrVietInstalled() || !class_exists(GatewayManager::class)) {
+            return [
+                'success' => false,
+                'message' => __('Extension QR Viet chưa được cài đặt.', 'base-ecommerce'),
+            ];
+        }
+
+        $manager = GatewayManager::getInstance();
+        $gateway = $manager->get('qrviet');
+        if (!$gateway) {
+            return [
+                'success' => false,
+                'message' => __('Cổng thanh toán QR Viet chưa được đăng ký.', 'base-ecommerce'),
+            ];
+        }
+
+        $gateway->initialize($manager->hasGateway('qrviet')
+            ? $manager->getConfig('qrviet')
+            : get_option('jankx_payment_gateway_qrviet', []));
+
+        if (!$gateway->isAvailable()) {
+            return [
+                'success' => false,
+                'message' => __('Cấu hình tài khoản QR Viet (username/password/ngân hàng) chưa được thiết lập.', 'base-ecommerce'),
+            ];
+        }
+
+        $amount = (int) round($order->getTotal());
+        if ($amount < 1000) {
+            return [
+                'success' => false,
+                'message' => __('Tổng tiền phải từ 1,000 VND để tạo mã QR thanh toán.', 'base-ecommerce'),
+            ];
+        }
+
+        $transaction = $this->findQrVietTransaction($order);
+        if (!$transaction || !$transaction->getId()) {
+            try {
+                $transaction = Transaction::create([
+                    'title'          => sprintf(__('Order #%s', 'base-ecommerce'), $order->getOrderNumber()),
+                    'gateway'        => 'qrviet',
+                    'amount'         => $amount,
+                    'currency'       => $order->getCurrency(),
+                    'status'         => Transaction::STATUS_PENDING,
+                    'order_id'       => $order->getId(),
+                    'customer_email' => $order->getCustomerEmail(),
+                    'customer_name'  => $order->getCustomerName(),
+                ]);
+            } catch (\Throwable $e) {
+                return [
+                    'success' => false,
+                    'message' => __('Không thể tạo giao dịch thanh toán.', 'base-ecommerce'),
+                ];
+            }
+
+            if ($order->getPaymentTransactionId() === 0) {
+                $order->setPaymentTransactionId($transaction->getId());
+            }
+        }
+
+        // Keep the stored amount in sync with the order total so the
+        // transaction-sync webhook validation stays accurate.
+        if (abs((float) $transaction->getAmount() - $amount) > 0.001) {
+            $transaction->updateMeta('_amount', $amount);
+        }
+
+        $result = $gateway->purchase([
+            'amount'        => $amount,
+            'currency'      => $order->getCurrency(),
+            'transactionId' => $transaction->getId(),
+            'description'   => $order->getOrderNumber(),
+        ]);
+
+        if (($result['status'] ?? '') === 'qr') {
+            return [
+                'success'     => true,
+                'message'     => __('Đã tạo mã QR thanh toán.', 'base-ecommerce'),
+                'transaction' => $transaction,
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => (string) ($result['message'] ?? __('Không thể tạo mã QR thanh toán.', 'base-ecommerce')),
+        ];
     }
 
     protected function handleStatusUpdate(int $orderId): void
@@ -408,7 +586,23 @@ class OrderAdmin
             </h1>
 
             <?php if ($updated): ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e('Đơn hàng đã được cập nhật.', 'base-ecommerce'); ?></p></div>
+                <div class="notice notice-success is-dismissible">
+                    <p>
+                        <?php
+                        if ($_GET['updated'] === 'qr') {
+                            esc_html_e('Đã tạo mã QR thanh toán thành công.', 'base-ecommerce');
+                        } else {
+                            esc_html_e('Đơn hàng đã được cập nhật.', 'base-ecommerce');
+                        }
+                        ?>
+                    </p>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($_GET['updated']) && $_GET['updated'] === 'qr_error'): ?>
+                <div class="notice notice-error is-dismissible">
+                    <p><?php echo esc_html(sanitize_text_field(wp_unslash($_GET['qr_message'] ?? '')) ?: __('Không thể tạo mã QR thanh toán.', 'base-ecommerce')); ?></p>
+                </div>
             <?php endif; ?>
 
             <?php if ($readonly): ?>
@@ -726,6 +920,9 @@ class OrderAdmin
                     <!-- Sidebar -->
                     <div class="jankx-order-sidebar">
 
+                        <!-- QR Viet payment code (rendered when the qrviet extension is installed) -->
+                        <?php $this->renderQrVietBox($order); ?>
+
                         <!-- Update Status Meta Box -->
                         <div id="jankx_order_status" class="postbox">
                             <h2 class="hndle"><span><?php esc_html_e('Update Status', 'base-ecommerce'); ?></span></h2>
@@ -901,6 +1098,84 @@ class OrderAdmin
             });
         })();
         </script>
+        <?php
+    }
+
+    protected function renderQrVietBox(Order $order): void
+    {
+        if (!$this->isQrVietInstalled()) {
+            return;
+        }
+
+        $transaction = $this->findQrVietTransaction($order);
+        $qrImage = '';
+        $qrCode = '';
+        $txStatus = '';
+        if ($transaction && $transaction->getId()) {
+            $qrImage = $transaction->getMeta('_qr_image');
+            $qrCode = $transaction->getMeta('_qr_code');
+            $txStatus = $transaction->getStatus();
+        }
+
+        $canManage = current_user_can(OrderPostType::CAP_MANAGE);
+        $generateUrl = wp_nonce_url(
+            admin_url('admin.php?' . http_build_query([
+                'page'              => self::PAGE_SLUG,
+                'view'              => $order->getId(),
+                'jankx_generate_qr' => 1,
+            ])),
+            'jankx_qrviet_generate_' . $order->getId()
+        );
+        ?>
+        <div id="jankx_order_qr" class="postbox">
+            <h2 class="hndle"><span><?php esc_html_e('Mã QR thanh toán (VietQR)', 'base-ecommerce'); ?></span></h2>
+            <div class="inside">
+                <?php if ($qrImage !== ''): ?>
+                    <div style="text-align:center;margin-bottom:12px;">
+                        <a href="<?php echo esc_url($qrImage); ?>" target="_blank" rel="noopener noreferrer">
+                            <img src="<?php echo esc_url($qrImage); ?>"
+                                alt="<?php esc_attr_e('Mã QR VietQR', 'base-ecommerce'); ?>"
+                                width="220" height="220"
+                                style="max-width:100%;height:auto;border:1px solid #e2e8f0;border-radius:8px;padding:6px;background:#fff;" />
+                        </a>
+                    </div>
+                    <table class="widefat striped" style="margin-bottom:10px;">
+                        <tbody>
+                            <tr>
+                                <td style="width:120px;"><strong><?php esc_html_e('Mã đơn', 'base-ecommerce'); ?></strong></td>
+                                <td><?php echo esc_html($order->getOrderNumber()); ?></td>
+                            </tr>
+                            <tr>
+                                <td><strong><?php esc_html_e('Số tiền', 'base-ecommerce'); ?></strong></td>
+                                <td><?php echo esc_html(CurrencyManager::formatPrice($order->getTotal())); ?></td>
+                            </tr>
+                            <?php if ($qrCode !== ''): ?>
+                                <tr>
+                                    <td><strong><?php esc_html_e('Mã giao dịch', 'base-ecommerce'); ?></strong></td>
+                                    <td><code><?php echo esc_html($qrCode); ?></code></td>
+                                </tr>
+                            <?php endif; ?>
+                            <?php if ($txStatus !== ''): ?>
+                                <tr>
+                                    <td><strong><?php esc_html_e('Trạng thái', 'base-ecommerce'); ?></strong></td>
+                                    <td><?php echo esc_html($txStatus); ?></td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                <?php else: ?>
+                    <p style="margin:0 0 10px;"><em><?php esc_html_e('Chưa có mã QR cho đơn hàng này.', 'base-ecommerce'); ?></em></p>
+                <?php endif; ?>
+
+                <?php if ($canManage): ?>
+                    <a class="button button-primary" href="<?php echo esc_url($generateUrl); ?>">
+                        <?php echo esc_html($qrImage !== ''
+                            ? __('Tạo lại mã QR', 'base-ecommerce')
+                            : __('Tạo mã QR thanh toán', 'base-ecommerce')); ?>
+                    </a>
+                <?php endif; ?>
+            </div>
+        </div>
         <?php
     }
 
