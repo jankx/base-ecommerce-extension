@@ -45,16 +45,9 @@ class CartItemMetaBlock extends Block
         // Tour type label (filterable)
         $typeLabel = (string) apply_filters('jankx/ecommerce/cart/item/type_label', '', $item);
         if ($typeLabel === '') {
-            // Try experience_tour_type meta, then taxonomy experience_type
-            $tourType = get_post_meta($productId, '_experience_tour_type', true);
-            if (!empty($tourType)) {
-                $term = get_term_by('slug', $tourType, 'experience_type');
-                $typeLabel = $term ? $term->name : $this->getTourTypeLabel($tourType);
-            } else {
-                $terms = get_the_terms($productId, 'experience_type');
-                if ($terms && !is_wp_error($terms)) {
-                    $typeLabel = $terms[0]->name;
-                }
+            $terms = get_the_terms($productId, 'tour_tag');
+            if ($terms && !is_wp_error($terms)) {
+                $typeLabel = implode(', ', wp_list_pluck($terms, 'name'));
             }
         }
         if ($typeLabel) {
@@ -94,30 +87,6 @@ class CartItemMetaBlock extends Block
         }
 
         return $lines;
-    }
-
-    /**
-     * Map a tour type slug to a human-readable label.
-     */
-    protected function getTourTypeLabel(string $type): string
-    {
-        $types = [
-            'adventure'  => __('Phiêu lưu', 'base-ecommerce'),
-            'cultural'   => __('Văn hóa', 'base-ecommerce'),
-            'nature'     => __('Thiên nhiên', 'base-ecommerce'),
-            'beach'      => __('Biển đảo', 'base-ecommerce'),
-            'city'       => __('Thành phố', 'base-ecommerce'),
-            'food'       => __('Ẩm thực', 'base-ecommerce'),
-            'wellness'   => __('Sức khỏe', 'base-ecommerce'),
-            'family'     => __('Gia đình', 'base-ecommerce'),
-            'luxury'     => __('Sang trọng', 'base-ecommerce'),
-            'budget'     => __('Tiết kiệm', 'base-ecommerce'),
-            'group'      => __('Nhóm', 'base-ecommerce'),
-            'solo'       => __('Đơn thân', 'base-ecommerce'),
-            'honeymoon'  => __('Trăng mật', 'base-ecommerce'),
-        ];
-
-        return $types[$type] ?? ucfirst($type);
     }
 
     /**

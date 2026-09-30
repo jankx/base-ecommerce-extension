@@ -8,7 +8,7 @@ use Jankx\Extensions\Ecommerce\Registry\ProductRegistry;
 /**
  * Post Price block.
  *
- * Displays the price of the current product (tour, experience, product, ...)
+ * Displays the price of the current product (tour, product, ...)
  * through the shared ProductRegistry API. This is the single source of truth
  * for the displayed price, so it always matches what "Add to Cart" charges.
  *
