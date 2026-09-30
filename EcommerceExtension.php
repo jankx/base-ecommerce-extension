@@ -47,6 +47,7 @@ use Jankx\Extensions\Ecommerce\Currency\Converters\AutoConfigConverter;
 use Jankx\Extensions\Ecommerce\Order\Order;
 use Jankx\Extensions\Ecommerce\Order\OrderDatabaseInstaller;
 use Jankx\Extensions\Ecommerce\Admin\OrderAdmin;
+use Jankx\Extensions\Ecommerce\Admin\OrderRoles;
 use Jankx\Extensions\Ecommerce\Admin\EcommerceSettingsPage;
 use Jankx\Extensions\Ecommerce\Admin\CurrencyDebugPage;
 use Jankx\Extensions\Ecommerce\Payment\PaymentManager;
@@ -125,6 +126,8 @@ class EcommerceExtension extends AbstractExtension
         // Professional Orders management screen (wp-admin).
         if (is_admin()) {
             (new OrderAdmin())->register();
+            // Keep staff roles & order/tour capabilities in sync.
+            (new OrderRoles())->register();
             (new EcommerceSettingsPage())->register();
             (new CurrencyDebugPage())->register();
             add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);

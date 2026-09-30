@@ -47,7 +47,7 @@ class OrderAdmin
         add_menu_page(
             __('Đơn hàng', 'base-ecommerce'),
             $menuTitle,
-            OrderPostType::CAP_MANAGE,
+            OrderPostType::CAP_READ,
             self::PAGE_SLUG,
             [$this, 'renderPage'],
             'dashicons-cart',
@@ -234,7 +234,7 @@ class OrderAdmin
 
     public function renderPage(): void
     {
-        if (!current_user_can(OrderPostType::CAP_MANAGE)) {
+        if (!current_user_can(OrderPostType::CAP_READ)) {
             return;
         }
 
@@ -399,6 +399,8 @@ class OrderAdmin
         $items = $order->getItems();
         $history = $order->getHistory();
         $notes = $order->getNotes();
+        $canManage = current_user_can(OrderPostType::CAP_MANAGE);
+        $readonly = !$canManage;
         ?>
         <div class="wrap">
             <h1>
@@ -407,6 +409,10 @@ class OrderAdmin
 
             <?php if ($updated): ?>
                 <div class="notice notice-success is-dismissible"><p><?php esc_html_e('Đơn hàng đã được cập nhật.', 'base-ecommerce'); ?></p></div>
+            <?php endif; ?>
+
+            <?php if ($readonly): ?>
+                <div class="notice notice-warning"><p><?php esc_html_e('Bạn chỉ có quyền xem đơn hàng này.', 'base-ecommerce'); ?></p></div>
             <?php endif; ?>
 
             <div id="poststuff">
@@ -564,7 +570,8 @@ class OrderAdmin
                                                                     value="<?php echo esc_attr($item->getQuantity()); ?>"
                                                                     class="jankx-item-qty"
                                                                     data-idx="<?php echo esc_attr($idx); ?>"
-                                                                    style="width:60px;">
+                                                                    style="width:60px;"
+                                                                    <?php echo $readonly ? ' disabled' : ''; ?>>
                                                             </td>
                                                             <td class="unit-price">
                                                                 <input type="number" min="0" step="any"
@@ -572,7 +579,8 @@ class OrderAdmin
                                                                     value="<?php echo esc_attr($item->getUnitPrice()); ?>"
                                                                     class="jankx-item-price"
                                                                     data-idx="<?php echo esc_attr($idx); ?>"
-                                                                    style="width:120px;">
+                                                                    style="width:120px;"
+                                                                    <?php echo $readonly ? ' disabled' : ''; ?>>
                                                             </td>
                                                             <td class="item-total" id="jankx-item-total-<?php echo esc_attr($idx); ?>">
                                                                 <?php echo esc_html(CurrencyManager::formatPrice($itemTotal)); ?>
@@ -588,7 +596,7 @@ class OrderAdmin
                                                 </tr>
                                             </tfoot>
                                         </table>
-                                        <?php if (!empty($items)): ?>
+                                        <?php if (!empty($items) && !$readonly): ?>
                                         <p style="margin: 8px 12px 0; font-size: 12px; color: #64748b;">
                                             <span style="font-size:14px;">&#9998;</span>
                                             <?php esc_html_e('Chỉnh sửa số lượng hoặc đơn giá rồi nhấn "Cập nhật đơn hàng" để lưu. Thay đổi sẽ được ghi vào lịch sử.', 'base-ecommerce'); ?>
@@ -731,7 +739,7 @@ class OrderAdmin
                                     <div class="jankx-status-form-inner">
                                         <div class="form-group">
                                             <label for="order_status"><?php esc_html_e('TRẠNG THÁI', 'base-ecommerce'); ?></label>
-                                            <select name="order_status" id="order_status">
+                                            <select name="order_status" id="order_status" <?php echo $readonly ? ' disabled' : ''; ?>>
                                                 <option value="<?php echo esc_attr($order->getStatus()); ?>" selected>
                                                     <?php echo esc_html(sprintf(__('Giữ nguyên (%s)', 'base-ecommerce'), Order::getStatusLabel($order->getStatus()))); ?>
                                                 </option>
@@ -743,6 +751,7 @@ class OrderAdmin
                                             </select>
                                         </div>
 
+                                        <?php if (!$readonly): ?>
                                         <!-- Quick Status Buttons -->
                                         <?php $transitions = Order::getAllowedStatusTransitionsFor($order->getStatus()); ?>
                                         <?php if (!empty($transitions)): ?>
@@ -772,12 +781,14 @@ class OrderAdmin
                                             </div>
                                         </div>
                                         <?php endif; ?>
+                                        <?php endif; ?>
 
                                         <div class="form-group">
                                             <label for="order_total"><?php esc_html_e('BÁO GIÁ / TỔNG TIỀN (VND)', 'base-ecommerce'); ?></label>
                                             <input type="number" step="any" min="0" name="order_total" id="order_total"
                                                 value="<?php echo esc_attr($order->getTotal()); ?>"
-                                                placeholder="<?php esc_attr_e('Nhập giá báo cho khách...', 'base-ecommerce'); ?>">
+                                                placeholder="<?php esc_attr_e('Nhập giá báo cho khách...', 'base-ecommerce'); ?>"
+                                                <?php echo $readonly ? ' disabled' : ''; ?>>
                                             <?php if ($order->getPaymentMethod() === 'manual'): ?>
                                                 <small class="description" style="display:block;margin-top:4px;color:#64748b;"><?php esc_html_e('Cập nhật số tiền sau khi thỏa thuận báo giá với khách hàng.', 'base-ecommerce'); ?></small>
                                             <?php endif; ?>
@@ -792,14 +803,17 @@ class OrderAdmin
                                             <label for="tracking_number"><?php esc_html_e('MÃ VẬN ĐƠN', 'base-ecommerce'); ?></label>
                                             <input type="text" name="tracking_number" id="tracking_number"
                                                 value="<?php echo esc_attr($order->getTrackingNumber()); ?>"
-                                                placeholder="<?php esc_attr_e('Nhập mã vận đơn...', 'base-ecommerce'); ?>">
+                                                placeholder="<?php esc_attr_e('Nhập mã vận đơn...', 'base-ecommerce'); ?>"
+                                                <?php echo $readonly ? ' disabled' : ''; ?>>
                                         </div>
 
                                         <div class="form-group">
                                             <label for="order_note"><?php esc_html_e('NOTE', 'base-ecommerce'); ?></label>
-                                            <textarea name="order_note" id="order_note" rows="4" placeholder="<?php esc_attr_e('Optional note...', 'base-ecommerce'); ?>"></textarea>
+                                            <textarea name="order_note" id="order_note" rows="4" placeholder="<?php esc_attr_e('Optional note...', 'base-ecommerce'); ?>" <?php echo $readonly ? ' disabled' : ''; ?>></textarea>
                                         </div>
+                                        <?php if (!$readonly): ?>
                                         <button type="submit" name="jankx_update_order_status" class="button-update"><?php esc_html_e('Cập nhật đơn hàng', 'base-ecommerce'); ?></button>
+                                        <?php endif; ?>
                                     </div>
 
                             </div>

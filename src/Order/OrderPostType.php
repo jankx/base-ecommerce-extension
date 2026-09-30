@@ -83,11 +83,12 @@ class OrderPostType
     /**
      * Grant the order capabilities to the administrator role and to any
      * staff/manager role allowed by the `jankx/ecommerce/order_manager_roles`
-     * filter (default: administrator + editor).
+     * filter (default: administrator only - staff roles are synchronized by
+     * Jankx\Extensions\Ecommerce\Admin\OrderRoles).
      */
     public function ensure_capabilities(): void
     {
-        $roles = apply_filters('jankx/ecommerce/order_manager_roles', ['administrator', 'editor']);
+        $roles = apply_filters('jankx/ecommerce/order_manager_roles', ['administrator']);
 
         foreach ($roles as $roleName) {
             $role = get_role($roleName);
