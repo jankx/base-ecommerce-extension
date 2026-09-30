@@ -52,6 +52,7 @@ use Jankx\Extensions\Ecommerce\Admin\EcommerceSettingsPage;
 use Jankx\Extensions\Ecommerce\Admin\CurrencyDebugPage;
 use Jankx\Extensions\Ecommerce\Payment\PaymentManager;
 use Jankx\Extensions\Ecommerce\Registry\ProductRegistry;
+use Jankx\Extensions\Ecommerce\Registry\PriceMetaRegistry;
 use Jankx\Extensions\Ecommerce\Rest\EcommerceController;
 use Jankx\Extensions\NotificationSystem\NotificationService;
 
@@ -139,6 +140,10 @@ class EcommerceExtension extends AbstractExtension
 
         // Allow hook-based registration of product types on init.
         add_action('init', [ProductRegistry::get_instance(), 'boot'], 10);
+
+        // Price meta keys are declared by the same extensions, so boot after
+        // ProductRegistry (11) to let the registry derive from product classes.
+        add_action('init', [PriceMetaRegistry::get_instance(), 'boot'], 11);
 
         // REST API for cart & checkout.
         add_action('rest_api_init', [$this, 'register_rest_routes']);
@@ -656,6 +661,36 @@ class EcommerceExtension extends AbstractExtension
     public static function unregister_product_type(string $postType): void
     {
         ProductRegistry::get_instance()->unregister($postType);
+    }
+
+    /**
+     * Register the price meta keys owned by a post type.
+     *
+     * @param string $postType Post type slug, e.g. "tour".
+     * @param string $priceKey Canonical price meta key, e.g. "_tour_price".
+     * @param array  $args     Optional "legacy"/"regular"/"sale" overrides.
+     */
+    public static function register_price_meta(string $postType, string $priceKey, array $args = []): bool
+    {
+        return PriceMetaRegistry::get_instance()->register($postType, $priceKey, $args);
+    }
+
+    /**
+     * Ordered list of meta keys holding the price for a post type.
+     *
+     * @return string[]
+     */
+    public static function get_price_meta_keys(string $postType): array
+    {
+        return PriceMetaRegistry::get_instance()->getPriceKeys($postType);
+    }
+
+    /**
+     * The meta key to write when saving the price of a post type.
+     */
+    public static function get_price_meta_key(string $postType): string
+    {
+        return PriceMetaRegistry::get_instance()->getPriceKey($postType);
     }
 
     /**
