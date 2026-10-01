@@ -61,7 +61,8 @@ class PaymentManager
             $paymentResult = $this->callGatewayPurchase($order, $gateway, $transactionId, $params);
         }
 
-        $order->updateStatus(Order::STATUS_PENDING);
+        // Callback thanh toán là sự kiện hệ thống → bỏ qua kiểm tra luồng.
+        $order->updateStatus(Order::STATUS_PENDING, '', 0, false);
 
         do_action('jankx/ecommerce/payment/created', $order, $gateway, $params);
 
@@ -169,7 +170,8 @@ class PaymentManager
      */
     public function markPaid(Order $order, string $transactionId = ''): void
     {
-        $order->updateStatus(Order::STATUS_COMPLETED);
+        // Gateway xác nhận đã thu tiền → bỏ qua kiểm tra luồng (hệ thống).
+        $order->updateStatus(Order::STATUS_COMPLETED, '', 0, false);
 
         do_action('jankx/ecommerce/payment/paid', $order, $transactionId);
     }
@@ -179,7 +181,8 @@ class PaymentManager
      */
     public function markFailed(Order $order, string $reason = ''): void
     {
-        $order->updateStatus(Order::STATUS_FAILED, $reason);
+        // Gateway báo thất bại → bỏ qua kiểm tra luồng (hệ thống).
+        $order->updateStatus(Order::STATUS_FAILED, $reason, 0, false);
 
         do_action('jankx/ecommerce/payment/failed', $order, $reason);
     }

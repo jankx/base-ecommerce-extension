@@ -3,6 +3,7 @@ namespace Jankx\Extensions\Ecommerce\Admin;
 
 use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
 use Jankx\Extensions\Ecommerce\Order\Order;
+use Jankx\Extensions\Ecommerce\Order\OrderFlow;
 use Jankx\Extensions\Ecommerce\Order\OrderModel;
 use Jankx\Extensions\Ecommerce\Order\OrderPostType;
 use Jankx\Extensions\PaymentSystem\Gateways\GatewayManager;
@@ -372,6 +373,12 @@ class OrderAdmin
         $newStatus = sanitize_text_field($_POST['order_status'] ?? '');
         $oldStatus = (string) ($order['status'] ?? '');
         if ($newStatus && $newStatus !== $oldStatus) {
+            // Chặn chuyển trạng thái ngoài luồng cấu hình (OrderFlow).
+            if (!OrderFlow::canMove($oldStatus, $newStatus)) {
+                wp_redirect(admin_url('admin.php?page=' . self::PAGE_SLUG . '&view=' . $orderId . '&flow_error=1'));
+                exit;
+            }
+
             $history[] = [
                 'action'     => 'status_changed',
                 'from'       => $oldStatus,
@@ -602,6 +609,12 @@ class OrderAdmin
             <?php if (isset($_GET['updated']) && $_GET['updated'] === 'qr_error'): ?>
                 <div class="notice notice-error is-dismissible">
                     <p><?php echo esc_html(sanitize_text_field(wp_unslash($_GET['qr_message'] ?? '')) ?: __('Không thể tạo mã QR thanh toán.', 'base-ecommerce')); ?></p>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($_GET['flow_error'])): ?>
+                <div class="notice notice-error is-dismissible">
+                    <p><?php esc_html_e('Trạng thái mới không nằm trong luồng cho phép của đơn hàng này.', 'base-ecommerce'); ?></p>
                 </div>
             <?php endif; ?>
 

@@ -153,7 +153,7 @@ class Order extends AbstractOrder
      */
     public function getAllowedStatusTransitions(): array
     {
-        return self::getAllowedTransitions()[$this->getStatus()] ?? [];
+        return OrderFlow::allowedNextStatuses($this->getStatus());
     }
 
     /**
@@ -161,18 +161,26 @@ class Order extends AbstractOrder
      */
     public static function getAllowedStatusTransitionsFor(string $status): array
     {
-        return self::getAllowedTransitions()[$status] ?? [];
+        return OrderFlow::allowedNextStatuses($status);
     }
 
     /**
      * Update the order status and record a history entry with the handler.
+     *
+     * @param bool $enforceFlow Khi true (mặc định) chặn chuyển trạng thái
+     *                          ngoài luồng cấu hình (OrderFlow). Hệ thống
+     *                          (payment callback) truyền false.
      */
-    public function updateStatus(string $newStatus, string $note = '', int $handlerId = 0): bool
+    public function updateStatus(string $newStatus, string $note = '', int $handlerId = 0, bool $enforceFlow = true): bool
     {
         $newStatus = sanitize_key($newStatus);
         $oldStatus = $this->getStatus();
         if ($oldStatus === $newStatus) {
             return true;
+        }
+
+        if ($enforceFlow && !OrderFlow::canMove($oldStatus, $newStatus)) {
+            return false;
         }
 
         $result = OrderModel::updateStatus($this->getId(), $newStatus, $note, $handlerId);

@@ -69,6 +69,8 @@ module.exports = {
         'blocks/add-to-cart/build/index': './blocks/add-to-cart/src/index.tsx',
         'blocks/post-price/build/index': './blocks/post-price/src/index.tsx',
         'blocks/currency-switcher/build/index': './blocks/currency-switcher/src/index.tsx',
+        // Trang admin cấu hình luồng trạng thái đơn hàng (Kanban/React).
+        'admin/order-flow/build/index': './admin/order-flow/src/index.tsx',
     },
 
     output: {

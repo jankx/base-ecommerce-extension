@@ -46,7 +46,9 @@ use Jankx\Extensions\Ecommerce\Currency\Converters\CurrencyConverterManager;
 use Jankx\Extensions\Ecommerce\Currency\Converters\AutoConfigConverter;
 use Jankx\Extensions\Ecommerce\Order\Order;
 use Jankx\Extensions\Ecommerce\Order\OrderDatabaseInstaller;
+use Jankx\Extensions\Ecommerce\Order\OrderFlow;
 use Jankx\Extensions\Ecommerce\Admin\OrderAdmin;
+use Jankx\Extensions\Ecommerce\Admin\OrderFlowPage;
 use Jankx\Extensions\Ecommerce\Admin\OrderRoles;
 use Jankx\Extensions\Ecommerce\Admin\EcommerceSettingsPage;
 use Jankx\Extensions\Ecommerce\Admin\CurrencyDebugPage;
@@ -130,6 +132,8 @@ class EcommerceExtension extends AbstractExtension
             // Keep staff roles & order/tour capabilities in sync.
             (new OrderRoles())->register();
             (new EcommerceSettingsPage())->register();
+            // Bảng cấu hình luồng trạng thái đơn hàng (Kanban/React).
+            (new OrderFlowPage())->register();
             (new CurrencyDebugPage())->register();
             add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
         }
@@ -615,6 +619,9 @@ class EcommerceExtension extends AbstractExtension
     {
         $controller = new EcommerceController();
         $controller->register_routes();
+
+        // REST lưu/đọc luồng trạng thái đơn hàng (admin cấu hình Kanban).
+        OrderFlow::registerRoutes();
     }
 
     public function init_ecommerce_core(): void
