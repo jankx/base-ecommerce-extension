@@ -4,6 +4,12 @@ namespace Jankx\Extensions\Ecommerce\Order;
 
 class OrderDatabaseInstaller
 {
+    /**
+     * Bumped whenever createTables()/migrate() changes, so existing installs
+     * pick up new schema without re-running DDL inspection on every request.
+     */
+    protected const DB_VERSION = '1.0.1';
+
     public function register(): void
     {
         add_action('init', [$this, 'maybeCreateTables']);
@@ -13,6 +19,13 @@ class OrderDatabaseInstaller
     {
         global $wpdb;
 
+        // SHOW TABLES + DESCRIBE cost a round trip each on every page load.
+        // Once the stored version matches, the schema is known-good and the
+        // frontend has no business checking it again.
+        if (get_option('jankx_order_db_version') === self::DB_VERSION) {
+            return;
+        }
+
         $ordersTable = $wpdb->prefix . 'jankx_orders';
         $orderPostsTable = $wpdb->prefix . 'jankx_order_posts';
 
@@ -21,14 +34,12 @@ class OrderDatabaseInstaller
             // Run migrations for existing tables
             $this->migrate($ordersTable);
             // Update version if needed
-            if (get_option('jankx_order_db_version') === false) {
-                update_option('jankx_order_db_version', '1.0.0');
-            }
+            update_option('jankx_order_db_version', self::DB_VERSION);
             return;
         }
 
         $this->createTables($ordersTable, $orderPostsTable);
-        update_option('jankx_order_db_version', '1.0.0');
+        update_option('jankx_order_db_version', self::DB_VERSION);
     }
 
     protected function tableExists(string $table): bool
