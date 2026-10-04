@@ -48,10 +48,28 @@
         return getDrawer() || getDropdown();
     }
 
+    function unwrapEnvelope(json) {
+        // The two transports disagree about depth:
+        //   REST  → GET /cart returns the cart flat
+        //   F3    → /ecommerce/cart/get returns { success, data: { cart… } }
+        // 'data' is never a top-level key on the REST cart response, so its
+        // presence is a reliable marker for the fast-AJAX envelope.
+        if (json && typeof json === 'object' &&
+            Object.prototype.hasOwnProperty.call(json, 'data') &&
+            json.data && typeof json.data === 'object') {
+            return json.data;
+        }
+        return json;
+    }
+
     function updateBadge(count) {
+        var total = Number(count);
+        if (!isFinite(total)) {
+            return;
+        }
         document.querySelectorAll('[data-jankx-cart-count]').forEach(function (el) {
-            el.textContent = count;
-            el.classList.toggle('is-empty', count === 0);
+            el.textContent = total;
+            el.classList.toggle('is-empty', total === 0);
         });
     }
 
@@ -102,7 +120,9 @@
             return;
         }
 
-        if (!cart.items.length) {
+        var items = Array.isArray(cart.items) ? cart.items : [];
+
+        if (!items.length) {
             itemsEl.innerHTML = emptyMarkup();
             if (footEl) {
                 footEl.hidden = true;
@@ -110,7 +130,7 @@
             return;
         }
 
-        itemsEl.innerHTML = cart.items.map(itemRowHtml).join('');
+        itemsEl.innerHTML = items.map(itemRowHtml).join('');
 
         var totalEl = drawer.querySelector('[data-jankx-drawer-total]');
         if (totalEl) {
@@ -133,7 +153,9 @@
             return;
         }
 
-        if (!cart.items.length) {
+        var items = Array.isArray(cart.items) ? cart.items : [];
+
+        if (!items.length) {
             itemsEl.innerHTML = emptyMarkup();
             if (footEl) {
                 footEl.hidden = true;
@@ -142,7 +164,7 @@
         }
 
         var limit = Number(dropdown.getAttribute('data-jankx-dropdown-limit')) || 3;
-        var rows = cart.items.map(itemRowHtml);
+        var rows = items.map(itemRowHtml);
         var visible = rows.slice(0, limit);
         var extra = rows.slice(limit);
 
@@ -179,10 +201,19 @@
             ? window.JankxAjax.url + '/ecommerce/cart/get' 
             : restUrl + '/cart';
 
-        return getJson(url, 'GET').then(function (cart) {
+        return getJson(url, 'GET').then(function (response) {
+            var cart = unwrapEnvelope(response);
+            if (!cart || typeof cart !== 'object') {
+                throw new Error('Unexpected cart payload');
+            }
             updateBadge(cart.count);
             renderPanel(cart);
-        }).catch(function () {
+        }).catch(function (error) {
+            // Previously swallowed, which hid both the envelope mismatch and
+            // fast-AJAX 500s. Keep the badge on its server-rendered value.
+            if (window.console && window.console.warn) {
+                window.console.warn('[JankxMiniCart] cart refresh failed:', error);
+            }
             return null;
         });
     }

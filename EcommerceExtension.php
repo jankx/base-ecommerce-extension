@@ -445,6 +445,7 @@ class EcommerceExtension extends AbstractExtension
 
         wp_localize_script('jankx-ecommerce', 'jankxEcommerce', [
             'restUrl' => esc_url_raw(rest_url(EcommerceController::REST_NAMESPACE)),
+            'nonce' => wp_create_nonce('wp_rest'),
             'cartUrl' => self::get_cart_page_url(),
             'checkoutUrl' => self::get_checkout_page_url(),
             'ordersUrl' => self::get_orders_page_url(),
