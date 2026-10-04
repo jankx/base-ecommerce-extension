@@ -4,12 +4,29 @@
     var CONFIG = window.jankxMiniCart || {};
     var restUrl = CONFIG.restUrl || '';
 
+    function nonceFor(url) {
+        // Two transports, two different nonce actions — and they are not
+        // interchangeable:
+        //   fast AJAX → NonceMiddleware verifies against the 'jankx_ajax' action
+        //   REST      → rest_cookie_check_errors() verifies against 'wp_rest'
+        // Sending the fast-AJAX nonce to a REST route fails cookie auth with
+        // 403 rest_cookie_invalid_nonce, so pick per target rather than globally.
+        var fastBase = window.JankxAjax && window.JankxAjax.url;
+        var isFastAjax = !!(fastBase && typeof url === 'string' && url.indexOf(fastBase) === 0);
+
+        if (isFastAjax) {
+            return (window.JankxAjax && window.JankxAjax.nonce) || '';
+        }
+
+        return CONFIG.nonce || '';
+    }
+
     function getJson(url, method, body) {
         var headers = { 'Content-Type': 'application/json' };
-        if (window.JankxAjax && window.JankxAjax.nonce) {
-            headers['X-WP-Nonce'] = window.JankxAjax.nonce;
-        } else if (CONFIG.nonce) {
-            headers['X-WP-Nonce'] = CONFIG.nonce;
+
+        var nonce = nonceFor(url);
+        if (nonce) {
+            headers['X-WP-Nonce'] = nonce;
         }
 
         return fetch(url, {
