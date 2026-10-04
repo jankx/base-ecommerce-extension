@@ -7,6 +7,7 @@ use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
 use Jankx\Extensions\Ecommerce\Order\Order;
 use Jankx\Extensions\Ecommerce\Order\OrderCreationManager;
 use Jankx\Extensions\Ecommerce\Payment\PaymentManager;
+use Jankx\Extensions\Ecommerce\Registry\ProductRegistry;
 
 /**
  * REST API for the shared cart & checkout flow.
@@ -362,7 +363,9 @@ class EcommerceController
         if (!$added) {
             return new \WP_REST_Response([
                 'success' => false,
-                'message' => __('Sản phẩm không hợp lệ hoặc không thể mua.', 'base-ecommerce'),
+                'message' => $this->describeAddFailure([
+                    (int) $request->get_param('product_id'),
+                ]),
             ], 400);
         }
 
@@ -389,6 +392,32 @@ class EcommerceController
         }
 
         return $clean;
+    }
+
+    /**
+     * Friendlier rejection message when the cart refuses a line: a product
+     * without a configured price is the common actionable case, everything
+     * else keeps the generic message.
+     *
+     * @param int[] $productIds
+     */
+    protected function describeAddFailure(array $productIds): string
+    {
+        foreach (array_unique(array_map('intval', $productIds)) as $productId) {
+            if ($productId <= 0) {
+                continue;
+            }
+
+            $product = ProductRegistry::get_instance()->createProduct($productId);
+            if ($product && $product->getPrice() <= 0) {
+                return sprintf(
+                    __('Sản phẩm "%s" chưa được cấu hình giá.', 'jankx'),
+                    $product->getName()
+                );
+            }
+        }
+
+        return __('Sản phẩm không hợp lệ hoặc không thể mua.', 'jankx');
     }
 
     /**
@@ -439,7 +468,9 @@ class EcommerceController
         if ($added === 0) {
             return new \WP_REST_Response([
                 'success' => false,
-                'message' => __('Sản phẩm không hợp lệ hoặc không thể mua.', 'jankx'),
+                'message' => $this->describeAddFailure(
+                    array_column($normalized, 'product_id')
+                ),
             ], 400);
         }
 
