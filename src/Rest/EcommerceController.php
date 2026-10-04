@@ -590,6 +590,50 @@ class EcommerceController
             $response['qr_code'] = $result['qr_code'];
         }
 
+        if (($result['payment_status'] ?? '') === 'qr') {
+            $gatewayConfig = apply_filters('jankx/payment/gateway/qrviet/default_config', []);
+            $savedConfig = get_option('jankx_payment_gateway_qrviet', []);
+            $config = array_merge($gatewayConfig, $savedConfig);
+            $isTest = !empty($config['testMode']);
+            $prefix = $isTest ? 'sandbox' : 'production';
+
+            $bankCode    = (string) ($config["{$prefix}_bank_code"]    ?? '');
+            $bankAccount = (string) ($config["{$prefix}_bank_account"] ?? '');
+            $accountName = (string) ($config["{$prefix}_account_name"] ?? '');
+
+            $bankNames = [
+                'ACB'  => 'ACB',        'VCB'  => 'Vietcombank', 'TCB' => 'Techcombank',
+                'MB'   => 'MBBank',     'VPB'  => 'VPBank',      'VIB' => 'VIB',
+                'MSB'  => 'MSB',        'TPB'  => 'TPBank',      'OCB' => 'OCB',
+                'BIDV' => 'BIDV',       'VTB'  => 'Vietinbank',  'AGR' => 'Agribank',
+                'SHB'  => 'SHB',        'HDB'  => 'HDBank',      'SCB' => 'SCB',
+            ];
+            $bankName = $bankNames[strtoupper($bankCode)] ?? strtoupper($bankCode);
+
+            // Ưu tiên đọc nội dung chuyển khoản đã được lưu vào transaction meta
+            // (ổn định theo session — không tính lại mỗi request).
+            $transferContent = '';
+            $transactionId = $result['transaction_id'] ?? 0;
+            if ($transactionId > 0) {
+                $transaction = new \Jankx\Extensions\PaymentSystem\Models\Transaction((int) $transactionId);
+                if ($transaction->getId()) {
+                    $transferContent = $transaction->getMeta('_transfer_content');
+                }
+            }
+            // Fallback sang giá trị từ gateway nếu transaction chưa được persist
+            if ($transferContent === '') {
+                $transferContent = (string) ($result['qr_transfer_content'] ?? '');
+            }
+
+            $response['bank_info'] = [
+                'bank_code'        => $bankCode,
+                'bank_name'        => $bankName,
+                'bank_account'     => $bankAccount,
+                'account_name'     => $accountName,
+                'transfer_content' => $transferContent,
+            ];
+        }
+
         return rest_ensure_response($response);
     }
 

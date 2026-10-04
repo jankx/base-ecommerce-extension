@@ -67,19 +67,20 @@ class PaymentManager
         do_action('jankx/ecommerce/payment/created', $order, $gateway, $params);
 
         return [
-            'success'        => true,
-            'transaction_id' => $transactionId,
-            'order_id'       => $order->getId(),
-            'order_number'   => $order->getOrderNumber(),
-            'redirect_url'   => !empty($paymentResult['redirectUrl']) ? $paymentResult['redirectUrl'] : '',
-            'payment_status' => isset($paymentResult['status']) && is_string($paymentResult['status']) ? $paymentResult['status'] : '',
-            'payment_type'   => ($paymentResult['status'] ?? '') === 'qr' ? 'qr' : 'online',
-            'qr_image'       => isset($paymentResult['qrImage']) ? $paymentResult['qrImage'] : '',
-            'qr_code'        => isset($paymentResult['qrCode']) ? $paymentResult['qrCode'] : '',
-            'qr_link'        => isset($paymentResult['qrLink']) ? $paymentResult['qrLink'] : '',
-            'error'          => isset($paymentResult['message']) && is_string($paymentResult['message']) ? $paymentResult['message'] : '',
-            'error_code'     => isset($paymentResult['code']) && is_string($paymentResult['code']) ? $paymentResult['code'] : '',
-            'raw'            => isset($paymentResult['raw']) && is_array($paymentResult['raw']) ? $paymentResult['raw'] : [],
+            'success'              => true,
+            'transaction_id'       => $transactionId,
+            'order_id'             => $order->getId(),
+            'order_number'         => $order->getOrderNumber(),
+            'redirect_url'         => !empty($paymentResult['redirectUrl']) ? $paymentResult['redirectUrl'] : '',
+            'payment_status'       => isset($paymentResult['status']) && is_string($paymentResult['status']) ? $paymentResult['status'] : '',
+            'payment_type'         => ($paymentResult['status'] ?? '') === 'qr' ? 'qr' : 'online',
+            'qr_image'             => isset($paymentResult['qrImage']) ? $paymentResult['qrImage'] : '',
+            'qr_code'              => isset($paymentResult['qrCode']) ? $paymentResult['qrCode'] : '',
+            'qr_link'              => isset($paymentResult['qrLink']) ? $paymentResult['qrLink'] : '',
+            'qr_transfer_content'  => isset($paymentResult['transferContent']) ? $paymentResult['transferContent'] : '',
+            'error'                => isset($paymentResult['message']) && is_string($paymentResult['message']) ? $paymentResult['message'] : '',
+            'error_code'           => isset($paymentResult['code']) && is_string($paymentResult['code']) ? $paymentResult['code'] : '',
+            'raw'                  => isset($paymentResult['raw']) && is_array($paymentResult['raw']) ? $paymentResult['raw'] : [],
         ];
     }
 
