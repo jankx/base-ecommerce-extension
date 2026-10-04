@@ -1112,6 +1112,17 @@ class OrderAdmin
         })();
         </script>
         <?php
+
+        /**
+         * Extension point at the bottom of the order detail screen.
+         *
+         * Order-level actions that belong to a separate extension (e.g. issuing
+         * an e-invoice) render themselves here rather than being hardcoded into
+         * this screen.
+         *
+         * @param Order $order
+         */
+        do_action('jankx/ecommerce/order_detail/after_content', $order);
     }
 
     protected function renderQrVietBox(Order $order): void
