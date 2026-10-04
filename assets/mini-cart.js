@@ -5,9 +5,16 @@
     var restUrl = CONFIG.restUrl || '';
 
     function getJson(url, method, body) {
+        var headers = { 'Content-Type': 'application/json' };
+        if (window.JankxAjax && window.JankxAjax.nonce) {
+            headers['X-WP-Nonce'] = window.JankxAjax.nonce;
+        } else if (CONFIG.nonce) {
+            headers['X-WP-Nonce'] = CONFIG.nonce;
+        }
+
         return fetch(url, {
             method: method,
-            headers: { 'Content-Type': 'application/json' },
+            headers: headers,
             body: body ? JSON.stringify(body) : undefined
         }).then(function (response) {
             return response.json().then(function (json) {
@@ -168,7 +175,11 @@
         if (!restUrl) {
             return Promise.resolve();
         }
-        return getJson(restUrl + '/cart', 'GET').then(function (cart) {
+        var url = window.JankxAjax 
+            ? window.JankxAjax.url + '/ecommerce/cart/get' 
+            : restUrl + '/cart';
+
+        return getJson(url, 'GET').then(function (cart) {
             updateBadge(cart.count);
             renderPanel(cart);
         }).catch(function () {
@@ -257,7 +268,11 @@
             var itemKey = removeButton.getAttribute('data-item-key');
             removeButton.disabled = true;
 
-            getJson(restUrl + '/cart/items/' + encodeURIComponent(itemKey), 'DELETE').then(function (response) {
+            var url = window.JankxAjax 
+                ? window.JankxAjax.url + '/ecommerce/cart/remove-item/' + encodeURIComponent(itemKey) 
+                : restUrl + '/cart/items/' + encodeURIComponent(itemKey);
+
+            getJson(url, 'POST').then(function (response) {
                 if (response.success) {
                     refreshCart();
                     return;

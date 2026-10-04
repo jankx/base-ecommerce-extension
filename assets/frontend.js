@@ -2,11 +2,18 @@
     'use strict';
 
     function getJson(data) {
+        var headers = {
+            'Content-Type': 'application/json'
+        };
+        if (window.JankxAjax && window.JankxAjax.nonce) {
+            headers['X-WP-Nonce'] = window.JankxAjax.nonce;
+        } else if (window.jankxEcommerce && window.jankxEcommerce.nonce) {
+            headers['X-WP-Nonce'] = window.jankxEcommerce.nonce;
+        }
+
         return fetch(data.url, {
             method: data.method,
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: headers,
             body: data.body ? JSON.stringify(data.body) : undefined
         }).then(function (response) {
             return response.json().then(function (json) {
@@ -26,10 +33,12 @@
 
         event.preventDefault();
         var itemKey = button.getAttribute('data-item-key');
-        var url = window.jankxEcommerce.restUrl + '/cart/items/' + encodeURIComponent(itemKey);
+        var url = window.JankxAjax 
+            ? window.JankxAjax.url + '/ecommerce/cart/remove-item/' + encodeURIComponent(itemKey) 
+            : window.jankxEcommerce.restUrl + '/cart/items/' + encodeURIComponent(itemKey);
 
         button.disabled = true;
-        getJson({ url: url, method: 'DELETE' }).then(function (response) {
+        getJson({ url: url, method: 'POST' }).then(function (response) {
             if (response.success) {
                 window.location.reload();
                 return;
@@ -59,10 +68,14 @@
         var current = parseInt(valueEl.textContent, 10) || 1;
         var next = Math.max(1, current + step);
 
+        var url = window.JankxAjax
+            ? window.JankxAjax.url + '/ecommerce/cart/update-quantity/' + encodeURIComponent(itemKey)
+            : window.jankxEcommerce.restUrl + '/cart/items/' + encodeURIComponent(itemKey) + '/quantity';
+
         button.disabled = true;
         getJson({
-            url: window.jankxEcommerce.restUrl + '/cart/items/' + encodeURIComponent(itemKey) + '/quantity',
-            method: 'PUT',
+            url: url,
+            method: 'POST',
             body: { quantity: next }
         }).then(function (response) {
             if (response.success) {
@@ -141,8 +154,12 @@
                 var batchOriginalText = button.textContent;
                 button.textContent = window.jankxEcommerce.i18n ? window.jankxEcommerce.i18n.adding : 'Đang thêm...';
 
+                var url = window.JankxAjax
+                    ? window.JankxAjax.url + '/ecommerce/cart/add-batch'
+                    : window.jankxEcommerce.restUrl + '/cart/items/batch';
+
                 getJson({
-                    url: window.jankxEcommerce.restUrl + '/cart/items/batch',
+                    url: url,
                     method: 'POST',
                     body: batchBody
                 }).then(function (response) {
@@ -203,8 +220,12 @@
         var originalText = button.textContent;
         button.textContent = window.jankxEcommerce.i18n ? window.jankxEcommerce.i18n.adding : 'Đang thêm...';
 
+        var url = window.JankxAjax
+            ? window.JankxAjax.url + '/ecommerce/cart/add-item'
+            : window.jankxEcommerce.restUrl + '/cart/items';
+
         getJson({
-            url: window.jankxEcommerce.restUrl + '/cart/items',
+            url: url,
             method: 'POST',
             body: body
         }).then(function (response) {

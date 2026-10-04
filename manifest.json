@@ -21,5 +21,7 @@
         "rest"
     ],
     "auto_activate": true,
-    "settings_url": "admin.php?page=jankx-ecommerce-settings"
+    "settings_url": "admin.php?page=jankx-ecommerce-settings",
+    "ajax_slug": "ecommerce",
+    "ajax_namespace": "Jankx\\Extensions\\Ecommerce\\Ajax\\Controller\\"
 }
