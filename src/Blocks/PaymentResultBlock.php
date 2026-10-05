@@ -244,17 +244,7 @@ class PaymentResultBlock extends Block
 
     protected function getStatusLabel(string $status): string
     {
-        $labels = [
-            Order::STATUS_PENDING    => __('Chờ thanh toán', 'base-ecommerce'),
-            Order::STATUS_PROCESSING => __('Đang xử lý', 'base-ecommerce'),
-            Order::STATUS_COMPLETED  => __('Đã thanh toán', 'base-ecommerce'),
-            Order::STATUS_SHIPPING   => __('Đang vận chuyển', 'base-ecommerce'),
-            Order::STATUS_FAILED     => __('Thanh toán thất bại', 'base-ecommerce'),
-            Order::STATUS_CANCELLED  => __('Đã hủy', 'base-ecommerce'),
-            Order::STATUS_REFUNDED   => __('Đã hoàn tiền', 'base-ecommerce'),
-        ];
-
-        return $labels[$status] ?? Order::getStatusLabel($status);
+        return Order::getStatusLabel($status);
     }
 
     protected function getPaymentMethodLabel(string $method): string

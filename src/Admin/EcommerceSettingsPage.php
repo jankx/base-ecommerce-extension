@@ -2,6 +2,7 @@
 namespace Jankx\Extensions\Ecommerce\Admin;
 
 use Jankx\Extensions\Ecommerce\Currency\CurrencyManager;
+use Jankx\Extensions\Ecommerce\Order\Order;
 
 class EcommerceSettingsPage
 {
@@ -10,6 +11,7 @@ class EcommerceSettingsPage
     const GROUP_PAYMENT = 'jankx_ecommerce_payment';
     const GROUP_COUPONS = 'jankx_ecommerce_coupons';
     const GROUP_TAX = 'jankx_ecommerce_tax';
+    const GROUP_STATUSES = 'jankx_ecommerce_statuses';
     const GROUP_PAGES = 'jankx_ecommerce_pages';
 
     const OPTION_GROUP = self::GROUP_GENERAL;
@@ -216,6 +218,13 @@ class EcommerceSettingsPage
             'default' => "VAT | 10 | 10",
         ]);
 
+        // Nhãn trạng thái đơn hàng (override + trạng thái tùy chỉnh)
+        register_setting(self::GROUP_STATUSES, 'jankx_order_status_labels', [
+            'type' => 'array',
+            'sanitize_callback' => [Order::class, 'sanitizeStatusLabels'],
+            'default' => [],
+        ]);
+
         // Các trang sử dụng trong luồng mua hàng.
         foreach (array_keys($this->getPagesTabOptions()) as $optionName) {
             register_setting(self::GROUP_PAGES, $optionName, [
@@ -353,6 +362,9 @@ class EcommerceSettingsPage
                     case 'tax':
                         $this->renderTaxTab();
                         break;
+                    case 'statuses':
+                        $this->renderStatusesTab();
+                        break;
                     case 'pages':
                         $this->renderPagesTab();
                         break;
@@ -391,6 +403,7 @@ class EcommerceSettingsPage
             'payment'  => __('Thanh toán', 'base-ecommerce'),
             'coupons'  => __('Mã giảm giá', 'base-ecommerce'),
             'tax'      => __('Thuế', 'base-ecommerce'),
+            'statuses' => __('Trạng thái đơn hàng', 'base-ecommerce'),
             'pages'    => __('Các trang', 'base-ecommerce'),
         ];
 
@@ -453,6 +466,93 @@ class EcommerceSettingsPage
         <?php
         submit_button();
         ?>
+        </form>
+        <?php
+    }
+
+    // ── STATUSES TAB ──────────────────────────────────────────────────
+
+    protected function renderStatusesTab(): void
+    {
+        $defaults = Order::defaultStatusLabels();
+        $saved    = get_option('jankx_order_status_labels', []);
+        $saved    = is_array($saved) ? $saved : [];
+        $custom   = array_diff_key($saved, $defaults);
+        ?>
+        <form method="post" action="options.php">
+        <?php settings_fields(self::GROUP_STATUSES); ?>
+
+        <p class="description">
+            <?php esc_html_e('Đổi nhãn hiển thị của từng trạng thái (ví dụ ngành dịch vụ không cần "Đang vận chuyển"). Để trống để giữ nhãn mặc định. Sau khi thêm trạng thái tùy chỉnh, vào "Luồng trạng thái" để xếp vào nhóm và nối chuyển đổi.', 'base-ecommerce'); ?>
+        </p>
+
+        <h2><?php esc_html_e('Trạng thái có sẵn', 'base-ecommerce'); ?></h2>
+        <table class="form-table">
+            <tr>
+                <th><?php esc_html_e('Mã trạng thái', 'base-ecommerce'); ?></th>
+                <th><?php esc_html_e('Nhãn hiển thị', 'base-ecommerce'); ?></th>
+            </tr>
+            <?php foreach ($defaults as $status => $defaultLabel): ?>
+            <tr>
+                <td><code><?php echo esc_html($status); ?></code></td>
+                <td>
+                    <input type="text"
+                           name="jankx_order_status_labels[<?php echo esc_attr($status); ?>]"
+                           value="<?php echo esc_attr($saved[$status] ?? ''); ?>"
+                           placeholder="<?php echo esc_attr($defaultLabel); ?>"
+                           class="regular-text">
+                    <p class="description">
+                        <?php echo esc_html(sprintf(__('Mặc định: %s', 'base-ecommerce'), $defaultLabel)); ?>
+                    </p>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </table>
+
+        <h2><?php esc_html_e('Trạng thái tùy chỉnh', 'base-ecommerce'); ?></h2>
+        <table class="form-table" id="jankx-custom-status-table">
+            <tr>
+                <th><?php esc_html_e('Mã trạng thái', 'base-ecommerce'); ?></th>
+                <th><?php esc_html_e('Nhãn hiển thị', 'base-ecommerce'); ?></th>
+            </tr>
+            <?php foreach ($custom as $status => $label): ?>
+            <tr>
+                <td><code><?php echo esc_html($status); ?></code></td>
+                <td>
+                    <input type="text"
+                           name="jankx_order_status_labels[<?php echo esc_attr($status); ?>]"
+                           value="<?php echo esc_attr($label); ?>"
+                           class="regular-text">
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </table>
+
+        <p>
+            <button type="button" class="button" id="jankx-add-custom-status">
+                <?php esc_html_e('+ Thêm trạng thái', 'base-ecommerce'); ?>
+            </button>
+            <span class="description">
+                <?php esc_html_e('Xóa trắng ô nhãn của trạng thái tùy chỉnh là xóa nó. Mã tối đa 20 ký tự (a-z, 0-9, _).', 'base-ecommerce'); ?>
+            </span>
+        </p>
+        <script>
+        (function () {
+            var btn = document.getElementById('jankx-add-custom-status');
+            if (!btn) return;
+            var i = 0;
+            btn.addEventListener('click', function () {
+                i += 1;
+                var tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td><input type="text" name="jankx_order_status_labels[_new_key_' + i + ']" class="regular-text" placeholder="dang_dien_ra" value=""></td>' +
+                    '<td><input type="text" name="jankx_order_status_labels[_new_label_' + i + ']" class="regular-text" placeholder="Đang diễn ra" value=""></td>';
+                document.querySelector('#jankx-custom-status-table tr:last-child').after(tr);
+            });
+        })();
+        </script>
+
+        <?php submit_button(); ?>
         </form>
         <?php
     }

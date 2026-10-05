@@ -17,9 +17,9 @@ class AccountTabOrdersFiltersBlock extends Block
     {
         $tabs = [
             ''            => __('Tất cả', 'base-ecommerce'),
-            'pending'     => __('Chờ thanh toán', 'base-ecommerce'),
-            'completed'   => __('Đã hoàn thành', 'base-ecommerce'),
-            'cancelled'   => __('Đã hủy', 'base-ecommerce'),
+            'pending'     => Order::getStatusLabel('pending'),
+            'completed'   => Order::getStatusLabel('completed'),
+            'cancelled'   => Order::getStatusLabel('cancelled'),
         ];
 
         $current = isset($_GET['status']) ? sanitize_text_field(wp_unslash($_GET['status'])) : '';
