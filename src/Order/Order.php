@@ -279,11 +279,11 @@ class Order extends AbstractOrder
     }
 
     /**
-     * All order statuses with their labels.
+     * Default statuses with their labels (trước khi override từ option).
      */
-    public static function getStatusLabels(): array
+    public static function defaultStatusLabels(): array
     {
-        $labels = [
+        return [
             self::STATUS_PENDING    => __('Pending', 'base-ecommerce'),
             self::STATUS_PROCESSING => __('Processing', 'base-ecommerce'),
             self::STATUS_SHIPPING   => __('Đang vận chuyển', 'base-ecommerce'),
@@ -292,8 +292,82 @@ class Order extends AbstractOrder
             self::STATUS_CANCELLED  => __('Cancelled', 'base-ecommerce'),
             self::STATUS_REFUNDED   => __('Refunded', 'base-ecommerce'),
         ];
+    }
+
+    /**
+     * All order statuses with their labels.
+     *
+     * Nhãn override từ option `jankx_order_status_labels` (tab "Trạng thái"
+     * trong cài đặt Ecommerce); key mới trong option = trạng thái tùy chỉnh.
+     * Để trống ô nhãn = giữ mặc định (với key có sẵn) / xóa (với key tùy chọn).
+     */
+    public static function getStatusLabels(): array
+    {
+        $labels = self::defaultStatusLabels();
+
+        $saved = get_option('jankx_order_status_labels', []);
+        if (is_array($saved)) {
+            foreach ($saved as $status => $label) {
+                $status = sanitize_key((string) $status);
+                $label  = trim(sanitize_text_field((string) $label));
+                if ($status === '' || $label === '') {
+                    continue;
+                }
+                $labels[$status] = $label;
+            }
+        }
 
         return apply_filters('jankx/ecommerce/order/status_labels', $labels);
+    }
+
+    /**
+     * Sanitize payload nhãn trạng thái từ form cài đặt (Settings API).
+     *
+     * - Ô rỗng → không lưu (giữ mặc định / xóa trạng thái tùy chỉnh).
+     * - Entry `_new_key_N` + `_new_label_N` = thêm trạng thái tùy chỉnh.
+     * - Mã trạng thái tối đa 20 ký tự (khớp varchar(20) của cột status).
+     */
+    public static function sanitizeStatusLabels($input): array
+    {
+        if (!is_array($input)) {
+            return [];
+        }
+
+        $clean = [];
+        $new   = [];
+
+        foreach ($input as $key => $value) {
+            $key = (string) $key;
+
+            if (preg_match('/^_new_key_(\d+)$/', $key, $m)) {
+                $new[$m[1]] = [
+                    'key'   => (string) $value,
+                    'label' => (string) ($input['_new_label_' . $m[1]] ?? ''),
+                ];
+                continue;
+            }
+            if (preg_match('/^_new_label_\d+$/', $key)) {
+                continue;
+            }
+
+            $status = sanitize_key($key);
+            $label  = trim(sanitize_text_field((string) $value));
+            if ($status === '' || strlen($status) > 20 || $label === '') {
+                continue;
+            }
+            $clean[$status] = mb_substr($label, 0, 60);
+        }
+
+        foreach ($new as $row) {
+            $status = sanitize_key($row['key']);
+            $label  = trim(sanitize_text_field($row['label']));
+            if ($status === '' || strlen($status) > 20 || $label === '') {
+                continue;
+            }
+            $clean[$status] = mb_substr($label, 0, 60);
+        }
+
+        return $clean;
     }
 
     public static function getStatusLabel(string $status): string

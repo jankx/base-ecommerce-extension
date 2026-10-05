@@ -275,6 +275,62 @@ class OrderTest extends TestCase
         $this->assertSame('Custom_status', $label);
     }
 
+    public function test_get_status_labels_applies_option_overrides(): void
+    {
+        $GLOBALS['__wp_options']['jankx_order_status_labels'] = [
+            'shipping' => 'Đang chuẩn bị',
+            'broken'   => '',
+        ];
+
+        $labels = Order::getStatusLabels();
+
+        $this->assertSame('Đang chuẩn bị', $labels['shipping']);
+        $this->assertSame('Pending', $labels['pending']);
+        $this->assertArrayNotHasKey('broken', $labels);
+
+        unset($GLOBALS['__wp_options']['jankx_order_status_labels']);
+    }
+
+    public function test_get_status_labels_includes_custom_statuses(): void
+    {
+        $GLOBALS['__wp_options']['jankx_order_status_labels'] = [
+            'dang_dien_ra' => 'Đang diễn ra tour',
+        ];
+
+        $labels = Order::getStatusLabels();
+
+        $this->assertSame('Đang diễn ra tour', $labels['dang_dien_ra']);
+        $this->assertSame('Đang diễn ra tour', Order::getStatusLabel('dang_dien_ra'));
+
+        unset($GLOBALS['__wp_options']['jankx_order_status_labels']);
+    }
+
+    public function test_sanitize_status_labels(): void
+    {
+        $out = Order::sanitizeStatusLabels([
+            'pending'              => '  Chờ xác nhận  ',
+            'shipping'             => '',
+            'dang di ra'           => 'Có dấu cách',
+            str_repeat('k', 25)    => 'Quá dài',
+            '_new_key_1'           => 'dang_dien_ra',
+            '_new_label_1'         => 'Đang diễn ra tour',
+            '_new_key_2'           => 'ok20' . str_repeat('x', 15),
+            '_new_label_2'         => 'Hợp lệ',
+            '_new_label_3'         => 'Mồ côi không key',
+        ]);
+
+        $this->assertSame('Chờ xác nhận', $out['pending']);
+        $this->assertArrayNotHasKey('shipping', $out);
+        $this->assertSame('Có dấu cách', $out['dangdira']);
+        $this->assertArrayNotHasKey(str_repeat('k', 25), $out);
+        $this->assertSame('Đang diễn ra tour', $out['dang_dien_ra']);
+        $this->assertSame('Hợp lệ', $out['ok20' . str_repeat('x', 15)]);
+        $this->assertArrayNotHasKey('_new_label_3', $out);
+        $this->assertCount(4, $out);
+
+        $this->assertSame([], Order::sanitizeStatusLabels('not-an-array'));
+    }
+
     public function test_get_allowed_transitions(): void
     {
         $transitions = Order::getAllowedTransitions();

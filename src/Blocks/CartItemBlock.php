@@ -52,6 +52,7 @@ class CartItemBlock extends Block
 
         wp_localize_script('jankx-mini-cart', 'jankxMiniCart', [
             'restUrl' => esc_url_raw(rest_url(EcommerceController::REST_NAMESPACE)),
+            'nonce' => wp_create_nonce('wp_rest'),
             'cartUrl' => EcommerceExtension::get_cart_page_url(),
             'checkoutUrl' => EcommerceExtension::get_checkout_page_url(),
             'i18n' => [

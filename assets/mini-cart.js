@@ -4,10 +4,34 @@
     var CONFIG = window.jankxMiniCart || {};
     var restUrl = CONFIG.restUrl || '';
 
+    function nonceFor(url) {
+        // Two transports, two different nonce actions — and they are not
+        // interchangeable:
+        //   fast AJAX → NonceMiddleware verifies against the 'jankx_ajax' action
+        //   REST      → rest_cookie_check_errors() verifies against 'wp_rest'
+        // Sending the fast-AJAX nonce to a REST route fails cookie auth with
+        // 403 rest_cookie_invalid_nonce, so pick per target rather than globally.
+        var fastBase = window.JankxAjax && window.JankxAjax.url;
+        var isFastAjax = !!(fastBase && typeof url === 'string' && url.indexOf(fastBase) === 0);
+
+        if (isFastAjax) {
+            return (window.JankxAjax && window.JankxAjax.nonce) || '';
+        }
+
+        return CONFIG.nonce || '';
+    }
+
     function getJson(url, method, body) {
+        var headers = { 'Content-Type': 'application/json' };
+
+        var nonce = nonceFor(url);
+        if (nonce) {
+            headers['X-WP-Nonce'] = nonce;
+        }
+
         return fetch(url, {
             method: method,
-            headers: { 'Content-Type': 'application/json' },
+            headers: headers,
             body: body ? JSON.stringify(body) : undefined
         }).then(function (response) {
             return response.json().then(function (json) {
@@ -41,10 +65,28 @@
         return getDrawer() || getDropdown();
     }
 
+    function unwrapEnvelope(json) {
+        // The two transports disagree about depth:
+        //   REST  → GET /cart returns the cart flat
+        //   F3    → /ecommerce/cart/get returns { success, data: { cart… } }
+        // 'data' is never a top-level key on the REST cart response, so its
+        // presence is a reliable marker for the fast-AJAX envelope.
+        if (json && typeof json === 'object' &&
+            Object.prototype.hasOwnProperty.call(json, 'data') &&
+            json.data && typeof json.data === 'object') {
+            return json.data;
+        }
+        return json;
+    }
+
     function updateBadge(count) {
+        var total = Number(count);
+        if (!isFinite(total)) {
+            return;
+        }
         document.querySelectorAll('[data-jankx-cart-count]').forEach(function (el) {
-            el.textContent = count;
-            el.classList.toggle('is-empty', count === 0);
+            el.textContent = total;
+            el.classList.toggle('is-empty', total === 0);
         });
     }
 
@@ -95,7 +137,9 @@
             return;
         }
 
-        if (!cart.items.length) {
+        var items = Array.isArray(cart.items) ? cart.items : [];
+
+        if (!items.length) {
             itemsEl.innerHTML = emptyMarkup();
             if (footEl) {
                 footEl.hidden = true;
@@ -103,7 +147,7 @@
             return;
         }
 
-        itemsEl.innerHTML = cart.items.map(itemRowHtml).join('');
+        itemsEl.innerHTML = items.map(itemRowHtml).join('');
 
         var totalEl = drawer.querySelector('[data-jankx-drawer-total]');
         if (totalEl) {
@@ -126,7 +170,9 @@
             return;
         }
 
-        if (!cart.items.length) {
+        var items = Array.isArray(cart.items) ? cart.items : [];
+
+        if (!items.length) {
             itemsEl.innerHTML = emptyMarkup();
             if (footEl) {
                 footEl.hidden = true;
@@ -135,7 +181,7 @@
         }
 
         var limit = Number(dropdown.getAttribute('data-jankx-dropdown-limit')) || 3;
-        var rows = cart.items.map(itemRowHtml);
+        var rows = items.map(itemRowHtml);
         var visible = rows.slice(0, limit);
         var extra = rows.slice(limit);
 
@@ -168,10 +214,23 @@
         if (!restUrl) {
             return Promise.resolve();
         }
-        return getJson(restUrl + '/cart', 'GET').then(function (cart) {
+        var url = window.JankxAjax 
+            ? window.JankxAjax.url + '/ecommerce/cart/get' 
+            : restUrl + '/cart';
+
+        return getJson(url, 'GET').then(function (response) {
+            var cart = unwrapEnvelope(response);
+            if (!cart || typeof cart !== 'object') {
+                throw new Error('Unexpected cart payload');
+            }
             updateBadge(cart.count);
             renderPanel(cart);
-        }).catch(function () {
+        }).catch(function (error) {
+            // Previously swallowed, which hid both the envelope mismatch and
+            // fast-AJAX 500s. Keep the badge on its server-rendered value.
+            if (window.console && window.console.warn) {
+                window.console.warn('[JankxMiniCart] cart refresh failed:', error);
+            }
             return null;
         });
     }
@@ -257,7 +316,11 @@
             var itemKey = removeButton.getAttribute('data-item-key');
             removeButton.disabled = true;
 
-            getJson(restUrl + '/cart/items/' + encodeURIComponent(itemKey), 'DELETE').then(function (response) {
+            var url = window.JankxAjax 
+                ? window.JankxAjax.url + '/ecommerce/cart/remove-item/' + encodeURIComponent(itemKey) 
+                : restUrl + '/cart/items/' + encodeURIComponent(itemKey);
+
+            getJson(url, 'POST').then(function (response) {
                 if (response.success) {
                     refreshCart();
                     return;

@@ -1,12 +1,36 @@
 (function () {
     'use strict';
 
+    function nonceFor(url) {
+        // Two transports, two different nonce actions — and they are not
+        // interchangeable:
+        //   fast AJAX → NonceMiddleware verifies against the 'jankx_ajax' action
+        //   REST      → rest_cookie_check_errors() verifies against 'wp_rest'
+        // Sending the fast-AJAX nonce to a REST route fails cookie auth with
+        // 403 rest_cookie_invalid_nonce, so pick per target rather than globally.
+        var fastBase = window.JankxAjax && window.JankxAjax.url;
+        var isFastAjax = !!(fastBase && typeof url === 'string' && url.indexOf(fastBase) === 0);
+
+        if (isFastAjax) {
+            return (window.JankxAjax && window.JankxAjax.nonce) || '';
+        }
+
+        return (window.jankxEcommerce && window.jankxEcommerce.nonce) || '';
+    }
+
     function getJson(data) {
+        var headers = {
+            'Content-Type': 'application/json'
+        };
+
+        var nonce = nonceFor(data.url);
+        if (nonce) {
+            headers['X-WP-Nonce'] = nonce;
+        }
+
         return fetch(data.url, {
             method: data.method,
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: headers,
             body: data.body ? JSON.stringify(data.body) : undefined
         }).then(function (response) {
             return response.json().then(function (json) {
@@ -26,10 +50,12 @@
 
         event.preventDefault();
         var itemKey = button.getAttribute('data-item-key');
-        var url = window.jankxEcommerce.restUrl + '/cart/items/' + encodeURIComponent(itemKey);
+        var url = window.JankxAjax 
+            ? window.JankxAjax.url + '/ecommerce/cart/remove-item/' + encodeURIComponent(itemKey) 
+            : window.jankxEcommerce.restUrl + '/cart/items/' + encodeURIComponent(itemKey);
 
         button.disabled = true;
-        getJson({ url: url, method: 'DELETE' }).then(function (response) {
+        getJson({ url: url, method: 'POST' }).then(function (response) {
             if (response.success) {
                 window.location.reload();
                 return;
@@ -59,10 +85,14 @@
         var current = parseInt(valueEl.textContent, 10) || 1;
         var next = Math.max(1, current + step);
 
+        var url = window.JankxAjax
+            ? window.JankxAjax.url + '/ecommerce/cart/update-quantity/' + encodeURIComponent(itemKey)
+            : window.jankxEcommerce.restUrl + '/cart/items/' + encodeURIComponent(itemKey) + '/quantity';
+
         button.disabled = true;
         getJson({
-            url: window.jankxEcommerce.restUrl + '/cart/items/' + encodeURIComponent(itemKey) + '/quantity',
-            method: 'PUT',
+            url: url,
+            method: 'POST',
             body: { quantity: next }
         }).then(function (response) {
             if (response.success) {
@@ -141,8 +171,12 @@
                 var batchOriginalText = button.textContent;
                 button.textContent = window.jankxEcommerce.i18n ? window.jankxEcommerce.i18n.adding : 'Đang thêm...';
 
+                var url = window.JankxAjax
+                    ? window.JankxAjax.url + '/ecommerce/cart/add-batch'
+                    : window.jankxEcommerce.restUrl + '/cart/items/batch';
+
                 getJson({
-                    url: window.jankxEcommerce.restUrl + '/cart/items/batch',
+                    url: url,
                     method: 'POST',
                     body: batchBody
                 }).then(function (response) {
@@ -203,8 +237,12 @@
         var originalText = button.textContent;
         button.textContent = window.jankxEcommerce.i18n ? window.jankxEcommerce.i18n.adding : 'Đang thêm...';
 
+        var url = window.JankxAjax
+            ? window.JankxAjax.url + '/ecommerce/cart/add-item'
+            : window.jankxEcommerce.restUrl + '/cart/items';
+
         getJson({
-            url: window.jankxEcommerce.restUrl + '/cart/items',
+            url: url,
             method: 'POST',
             body: body
         }).then(function (response) {
@@ -315,15 +353,10 @@
                     return;
                 }
 
-                // QR payment without redirect: render QR to scan directly
-                if (response.payment_status === 'qr' && response.qr_image && response.order) {
-                    checkoutForm.innerHTML = '<div class="jankx-checkout-success">'
-                        + '<span class="jankx-empty-icon" aria-hidden="true">&#10004;</span>'
-                        + '<h2 class="jankx-section-title">' + window.jankxEcommerce.i18n.successTitle + '</h2>'
-                        + '<p>' + window.jankxEcommerce.i18n.successMessage.replace('%s', response.order.order_number) + '</p>'
-                        + '<div class="jankx-qrviet-image"><img src="' + response.qr_image + '" alt="VietQR - ' + response.order.order_number + '" width="280" height="280"></div>'
-                        + '<p class="description">Quét mã QR bằng ứng dụng ngân hàng để hoàn tất thanh toán.</p>'
-                        + '</div>';
+                // QR payment without redirect: show QR modal
+                if ((response.type === 'qr' || response.payment_status === 'qr') && response.qr_image) {
+                    submitButton.disabled = false;
+                    showQrModal(response);
                     return;
                 }
 
@@ -636,4 +669,166 @@
             initPaymentResultPoller(orderNumber, orderStatus);
         }
     }
+
+    // ── QR Viet Payment Modal ──────────────────────────────────────────────────
+
+    function copyToClipboard(text, btn) {
+        navigator.clipboard.writeText(text).then(function () {
+            var orig = btn.innerHTML;
+            btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+            setTimeout(function () { btn.innerHTML = orig; }, 1500);
+        });
+    }
+
+    function buildCopyBtn(text) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'jankx-qr-modal__copy-btn';
+        btn.title = 'Sao chép';
+        btn.setAttribute('aria-label', 'Sao chép');
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+        btn.addEventListener('click', function () { copyToClipboard(text, btn); });
+        return btn;
+    }
+
+    function showQrModal(response) {
+        var order = response.order || {};
+        var bank = response.bank_info || {};
+        var qrImage = response.qr_image || '';
+        var orderNumber = order.order_number || response.order_number || '';
+        var amount = order.formatted_total || (order.total ? Number(order.total).toLocaleString('vi-VN') + '₫' : '');
+        var bankName = bank.bank_name || bank.bank_code || '';
+        var bankAccount = bank.bank_account || '';
+        var accountName = bank.account_name || '';
+        var transferContent = bank.transfer_content || response.qr_transfer_content || response.qr_code || '';
+        var ordersUrl = (window.jankxEcommerce && window.jankxEcommerce.ordersUrl) || '';
+
+        var backdrop = document.createElement('div');
+        backdrop.className = 'jankx-qr-modal__backdrop';
+
+        var modal = document.createElement('div');
+        modal.className = 'jankx-qr-modal';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-label', 'Thanh toán QR');
+
+        var countdownTimer, pollTimer;
+        var closeModal = function () {
+            if (countdownTimer) { clearInterval(countdownTimer); }
+            if (pollTimer)      { clearInterval(pollTimer); }
+            if (document.body.contains(backdrop)) { document.body.removeChild(backdrop); }
+            if (ordersUrl) { window.location.href = ordersUrl; }
+        };
+        backdrop.addEventListener('click', function (e) {
+            if (e.target === backdrop) { closeModal(); }
+        });
+        document.addEventListener('keydown', function escHandler(e) {
+            if (e.key === 'Escape') { closeModal(); document.removeEventListener('keydown', escHandler); }
+        });
+
+        var header = document.createElement('div');
+        header.className = 'jankx-qr-modal__header';
+        var headerLeft = document.createElement('div');
+        headerLeft.innerHTML = '<strong class="jankx-qr-modal__title">Thanh toán QR</strong>'
+            + '<span class="jankx-qr-modal__subtitle">Thông tin thanh toán được cập nhật tự động.</span>';
+        var closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'jankx-qr-modal__close';
+        closeBtn.setAttribute('aria-label', 'Đóng');
+        closeBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+        closeBtn.addEventListener('click', closeModal);
+        header.appendChild(headerLeft);
+        header.appendChild(closeBtn);
+
+        var body = document.createElement('div');
+        body.className = 'jankx-qr-modal__body';
+
+        var leftCol = document.createElement('div');
+        leftCol.className = 'jankx-qr-modal__left';
+        var amountEl = document.createElement('div');
+        amountEl.className = 'jankx-qr-modal__amount';
+        amountEl.textContent = amount;
+        var qrImg = document.createElement('img');
+        qrImg.src = qrImage;
+        qrImg.alt = 'QR - ' + orderNumber;
+        qrImg.width = 220;
+        qrImg.height = 220;
+        qrImg.className = 'jankx-qr-modal__qr-img';
+        var scanHint = document.createElement('p');
+        scanHint.className = 'jankx-qr-modal__scan-hint';
+        scanHint.textContent = 'Quét mã bằng ứng dụng ngân hàng';
+        var countdown = document.createElement('span');
+        countdown.className = 'jankx-qr-modal__countdown';
+        leftCol.appendChild(amountEl);
+        leftCol.appendChild(qrImg);
+        leftCol.appendChild(scanHint);
+        leftCol.appendChild(countdown);
+
+        var rightCol = document.createElement('div');
+        rightCol.className = 'jankx-qr-modal__right';
+        var infoTitle = document.createElement('p');
+        infoTitle.className = 'jankx-qr-modal__info-title';
+        infoTitle.textContent = 'Thông tin chuyển khoản';
+        rightCol.appendChild(infoTitle);
+
+        function makeRow(label, value, copyable) {
+            var row = document.createElement('div');
+            row.className = 'jankx-qr-modal__info-row';
+            var lbl = document.createElement('span');
+            lbl.className = 'jankx-qr-modal__info-label';
+            lbl.textContent = label;
+            var valWrap = document.createElement('div');
+            valWrap.className = 'jankx-qr-modal__info-val-wrap';
+            var val = document.createElement('span');
+            val.className = 'jankx-qr-modal__info-val';
+            val.textContent = value || '-';
+            valWrap.appendChild(val);
+            if (copyable && value) { valWrap.appendChild(buildCopyBtn(value)); }
+            row.appendChild(lbl);
+            row.appendChild(valWrap);
+            return row;
+        }
+
+        if (bankName)        rightCol.appendChild(makeRow('Ngân hàng', bankName, false));
+        if (accountName)     rightCol.appendChild(makeRow('Chủ tài khoản', accountName, false));
+        if (bankAccount)     rightCol.appendChild(makeRow('Số tài khoản', bankAccount, true));
+        if (amount)          rightCol.appendChild(makeRow('Số tiền', amount, true));
+        if (transferContent) rightCol.appendChild(makeRow('Nội dung chuyển khoản', transferContent, true));
+
+        body.appendChild(leftCol);
+        body.appendChild(rightCol);
+        modal.appendChild(header);
+        modal.appendChild(body);
+        backdrop.appendChild(modal);
+        document.body.appendChild(backdrop);
+
+        var totalSeconds = 15 * 60;
+        countdown.textContent = 'Còn 15 phút 00 giây';
+        countdownTimer = setInterval(function () {
+            totalSeconds -= 1;
+            if (totalSeconds <= 0) { clearInterval(countdownTimer); countdown.textContent = 'Mã QR đã hết hạn'; return; }
+            var m = Math.floor(totalSeconds / 60);
+            var s = totalSeconds % 60;
+            countdown.textContent = 'Còn ' + m + ' phút ' + (s < 10 ? '0' : '') + s + ' giây';
+        }, 1000);
+
+        if (orderNumber) {
+            var pollCount = 0;
+            pollTimer = setInterval(function () {
+                pollCount += 1;
+                if (pollCount >= 180) { clearInterval(pollTimer); return; }
+                var pollUrl = window.jankxEcommerce.restUrl + '/orders/' + encodeURIComponent(orderNumber);
+                getJson({ url: pollUrl, method: 'GET' }).then(function (data) {
+                    var st = (data.order || {}).status || '';
+                    if (['completed', 'processing', 'failed', 'cancelled'].indexOf(st) !== -1) {
+                        clearInterval(pollTimer);
+                        clearInterval(countdownTimer);
+                        if (document.body.contains(backdrop)) { document.body.removeChild(backdrop); }
+                        if (ordersUrl) { window.location.href = ordersUrl; }
+                    }
+                }).catch(function () {});
+            }, 5000);
+        }
+    }
+
 })();

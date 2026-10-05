@@ -8,6 +8,7 @@ use Jankx\Extensions\Ecommerce\Order\Order;
 use Jankx\Extensions\Ecommerce\Order\OrderCreationManager;
 use Jankx\Extensions\Ecommerce\Payment\PaymentManager;
 use Jankx\Extensions\Ecommerce\Registry\ProductRegistry;
+use Jankx\Extensions\Ecommerce\Support\CacheBypass;
 
 /**
  * REST API for the shared cart & checkout flow.
@@ -32,6 +33,8 @@ class EcommerceController
 
     public function register_routes(): void
     {
+        add_filter('rest_pre_dispatch', [$this, 'bypassCache'], 10, 3);
+
         register_rest_route(self::REST_NAMESPACE, '/cart', [
             'methods'             => \WP_REST_Server::READABLE,
             'callback'            => [$this, 'getCart'],
@@ -255,6 +258,15 @@ class EcommerceController
                 ],
             ],
         ]);
+    }
+
+    public function bypassCache($result, $server, $request)
+    {
+        if (0 === strpos((string) $request->get_route(), '/' . self::REST_NAMESPACE)) {
+            CacheBypass::mark('jankx-ecommerce-rest');
+        }
+
+        return $result;
     }
 
     public function getCart(\WP_REST_Request $request): \WP_REST_Response
@@ -590,6 +602,50 @@ class EcommerceController
             $response['qr_code'] = $result['qr_code'];
         }
 
+        if (($result['payment_status'] ?? '') === 'qr') {
+            $gatewayConfig = apply_filters('jankx/payment/gateway/qrviet/default_config', []);
+            $savedConfig = get_option('jankx_payment_gateway_qrviet', []);
+            $config = array_merge($gatewayConfig, $savedConfig);
+            $isTest = !empty($config['testMode']);
+            $prefix = $isTest ? 'sandbox' : 'production';
+
+            $bankCode    = (string) ($config["{$prefix}_bank_code"]    ?? '');
+            $bankAccount = (string) ($config["{$prefix}_bank_account"] ?? '');
+            $accountName = (string) ($config["{$prefix}_account_name"] ?? '');
+
+            $bankNames = [
+                'ACB'  => 'ACB',        'VCB'  => 'Vietcombank', 'TCB' => 'Techcombank',
+                'MB'   => 'MBBank',     'VPB'  => 'VPBank',      'VIB' => 'VIB',
+                'MSB'  => 'MSB',        'TPB'  => 'TPBank',      'OCB' => 'OCB',
+                'BIDV' => 'BIDV',       'VTB'  => 'Vietinbank',  'AGR' => 'Agribank',
+                'SHB'  => 'SHB',        'HDB'  => 'HDBank',      'SCB' => 'SCB',
+            ];
+            $bankName = $bankNames[strtoupper($bankCode)] ?? strtoupper($bankCode);
+
+            // Ưu tiên đọc nội dung chuyển khoản đã được lưu vào transaction meta
+            // (ổn định theo session — không tính lại mỗi request).
+            $transferContent = '';
+            $transactionId = $result['transaction_id'] ?? 0;
+            if ($transactionId > 0) {
+                $transaction = new \Jankx\Extensions\PaymentSystem\Models\Transaction((int) $transactionId);
+                if ($transaction->getId()) {
+                    $transferContent = $transaction->getMeta('_transfer_content');
+                }
+            }
+            // Fallback sang giá trị từ gateway nếu transaction chưa được persist
+            if ($transferContent === '') {
+                $transferContent = (string) ($result['qr_transfer_content'] ?? '');
+            }
+
+            $response['bank_info'] = [
+                'bank_code'        => $bankCode,
+                'bank_name'        => $bankName,
+                'bank_account'     => $bankAccount,
+                'account_name'     => $accountName,
+                'transfer_content' => $transferContent,
+            ];
+        }
+
         return rest_ensure_response($response);
     }
 
@@ -757,12 +813,21 @@ class EcommerceController
 
         // QR payment: return the QR payload to render inline (no redirect).
         if (!empty($result['payment_status']) && $result['payment_status'] === 'qr') {
+            $qrBankInfo = apply_filters('jankx/ecommerce/qr_payment/bank_info', [], $gateway, $order);
+
             return rest_ensure_response([
-                'success'      => true,
-                'type'         => 'qr',
-                'qr_image'     => $result['qr_image'] ?? '',
-                'qr_code'      => $result['qr_code'] ?? '',
-                'order_number' => $order->getOrderNumber(),
+                'success'           => true,
+                'type'              => 'qr',
+                'qr_image'          => $result['qr_image'] ?? '',
+                'qr_code'           => $result['qr_code'] ?? '',
+                'qr_transfer_content' => $result['qr_transfer_content'] ?? '',
+                'order_number'      => $order->getOrderNumber(),
+                'order'             => [
+                    'order_number'    => $order->getOrderNumber(),
+                    'total'           => $order->getTotal(),
+                    'formatted_total' => number_format((int) $order->getTotal(), 0, ',', '.') . '₫',
+                ],
+                'bank_info'         => $qrBankInfo,
             ]);
         }
 

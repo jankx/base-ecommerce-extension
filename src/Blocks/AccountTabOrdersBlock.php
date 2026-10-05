@@ -388,10 +388,10 @@ class AccountTabOrdersBlock extends Block
     protected function renderOrderProgress(string $status): string
     {
         $steps = [
-            Order::STATUS_PENDING    => ['label' => __('Placed', 'base-ecommerce'),    'icon' => 'check-circle'],
-            Order::STATUS_PROCESSING => ['label' => __('Processing', 'base-ecommerce'), 'icon' => 'spinner'],
-            Order::STATUS_SHIPPING   => ['label' => __('Shipping', 'base-ecommerce'),   'icon' => 'truck'],
-            Order::STATUS_COMPLETED  => ['label' => __('Completed', 'base-ecommerce'),  'icon' => 'check-circle'],
+            Order::STATUS_PENDING    => ['label' => Order::getStatusLabel(Order::STATUS_PENDING),    'icon' => 'check-circle'],
+            Order::STATUS_PROCESSING => ['label' => Order::getStatusLabel(Order::STATUS_PROCESSING), 'icon' => 'spinner'],
+            Order::STATUS_SHIPPING   => ['label' => Order::getStatusLabel(Order::STATUS_SHIPPING),   'icon' => 'truck'],
+            Order::STATUS_COMPLETED  => ['label' => Order::getStatusLabel(Order::STATUS_COMPLETED),  'icon' => 'check-circle'],
         ];
 
         $isTerminal = in_array($status, [Order::STATUS_FAILED, Order::STATUS_CANCELLED, Order::STATUS_REFUNDED], true);
@@ -673,16 +673,7 @@ class AccountTabOrdersBlock extends Block
 
     protected function getStatusLabel(string $status): string
     {
-        $labels = [
-            Order::STATUS_PENDING    => __('Pending', 'base-ecommerce'),
-            Order::STATUS_PROCESSING => __('Processing', 'base-ecommerce'),
-            Order::STATUS_COMPLETED  => __('Completed', 'base-ecommerce'),
-            Order::STATUS_FAILED     => __('Failed', 'base-ecommerce'),
-            Order::STATUS_CANCELLED  => __('Cancelled', 'base-ecommerce'),
-            Order::STATUS_REFUNDED   => __('Refunded', 'base-ecommerce'),
-        ];
-
-        return $labels[$status] ?? ucfirst($status);
+        return Order::getStatusLabel($status);
     }
 
     protected function getUserOrders(int $userId): array

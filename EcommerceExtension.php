@@ -56,6 +56,7 @@ use Jankx\Extensions\Ecommerce\Payment\PaymentManager;
 use Jankx\Extensions\Ecommerce\Registry\ProductRegistry;
 use Jankx\Extensions\Ecommerce\Registry\PriceMetaRegistry;
 use Jankx\Extensions\Ecommerce\Rest\EcommerceController;
+use Jankx\Extensions\Ecommerce\Support\CacheBypass;
 use Jankx\Extensions\NotificationSystem\NotificationService;
 
 /**
@@ -173,6 +174,10 @@ class EcommerceExtension extends AbstractExtension
         // Inject the "Orders" sub-page into My Account.
         add_action('jankx/my_account/register_sub_pages', [$this, 'register_my_account_sub_pages']);
 
+        // Cart/checkout/payment-result pages depend on the visitor's session
+        // cookie - never let them enter a shared page cache (LiteSpeed).
+        add_action('template_redirect', [$this, 'bypassDynamicPageCache'], -10);
+
         // Send notifications on order lifecycle events.
         add_action('jankx/ecommerce/order/created', [$this, 'on_order_created'], 10, 2);
         add_action('jankx/ecommerce/order/status_changed', [$this, 'on_order_status_changed'], 10, 4);
@@ -180,6 +185,19 @@ class EcommerceExtension extends AbstractExtension
         // Default post-checkout redirect: order detail page (payment info,
         // VietQR, pay button) for orders without a gateway redirect.
         add_filter('jankx/ecommerce/checkout/redirect_url', [$this, 'get_checkout_redirect_url'], 10, 3);
+    }
+
+    public function bypassDynamicPageCache(): void
+    {
+        $pageIds = array_filter([
+            self::get_cart_page_id(),
+            self::get_checkout_page_id(),
+            self::get_payment_result_page_id(),
+        ]);
+
+        if ($pageIds && is_page($pageIds)) {
+            CacheBypass::mark('jankx-ecommerce-pages');
+        }
     }
 
     /**
@@ -445,6 +463,7 @@ class EcommerceExtension extends AbstractExtension
 
         wp_localize_script('jankx-ecommerce', 'jankxEcommerce', [
             'restUrl' => esc_url_raw(rest_url(EcommerceController::REST_NAMESPACE)),
+            'nonce' => wp_create_nonce('wp_rest'),
             'cartUrl' => self::get_cart_page_url(),
             'checkoutUrl' => self::get_checkout_page_url(),
             'ordersUrl' => self::get_orders_page_url(),

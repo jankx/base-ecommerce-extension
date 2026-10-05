@@ -933,9 +933,6 @@ class OrderAdmin
                     <!-- Sidebar -->
                     <div class="jankx-order-sidebar">
 
-                        <!-- QR Viet payment code (rendered when the qrviet extension is installed) -->
-                        <?php $this->renderQrVietBox($order); ?>
-
                         <!-- Update Status Meta Box -->
                         <div id="jankx_order_status" class="postbox">
                             <h2 class="hndle"><span><?php esc_html_e('Update Status', 'base-ecommerce'); ?></span></h2>
@@ -1112,6 +1109,17 @@ class OrderAdmin
         })();
         </script>
         <?php
+
+        /**
+         * Extension point at the bottom of the order detail screen.
+         *
+         * Order-level actions that belong to a separate extension (e.g. issuing
+         * an e-invoice) render themselves here rather than being hardcoded into
+         * this screen.
+         *
+         * @param Order $order
+         */
+        do_action('jankx/ecommerce/order_detail/after_content', $order);
     }
 
     protected function renderQrVietBox(Order $order): void
