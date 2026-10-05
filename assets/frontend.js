@@ -354,7 +354,7 @@
                 }
 
                 // QR payment without redirect: show QR modal
-                if (response.payment_status === 'qr' && response.qr_image && response.order) {
+                if ((response.type === 'qr' || response.payment_status === 'qr') && response.qr_image) {
                     submitButton.disabled = false;
                     showQrModal(response);
                     return;
@@ -695,12 +695,12 @@
         var order = response.order || {};
         var bank = response.bank_info || {};
         var qrImage = response.qr_image || '';
-        var orderNumber = order.order_number || '';
+        var orderNumber = order.order_number || response.order_number || '';
         var amount = order.formatted_total || (order.total ? Number(order.total).toLocaleString('vi-VN') + '₫' : '');
         var bankName = bank.bank_name || bank.bank_code || '';
         var bankAccount = bank.bank_account || '';
         var accountName = bank.account_name || '';
-        var transferContent = bank.transfer_content || response.qr_code || '';
+        var transferContent = bank.transfer_content || response.qr_transfer_content || response.qr_code || '';
         var ordersUrl = (window.jankxEcommerce && window.jankxEcommerce.ordersUrl) || '';
 
         var backdrop = document.createElement('div');

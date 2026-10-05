@@ -801,12 +801,21 @@ class EcommerceController
 
         // QR payment: return the QR payload to render inline (no redirect).
         if (!empty($result['payment_status']) && $result['payment_status'] === 'qr') {
+            $qrBankInfo = apply_filters('jankx/ecommerce/qr_payment/bank_info', [], $gateway, $order);
+
             return rest_ensure_response([
-                'success'      => true,
-                'type'         => 'qr',
-                'qr_image'     => $result['qr_image'] ?? '',
-                'qr_code'      => $result['qr_code'] ?? '',
-                'order_number' => $order->getOrderNumber(),
+                'success'           => true,
+                'type'              => 'qr',
+                'qr_image'          => $result['qr_image'] ?? '',
+                'qr_code'           => $result['qr_code'] ?? '',
+                'qr_transfer_content' => $result['qr_transfer_content'] ?? '',
+                'order_number'      => $order->getOrderNumber(),
+                'order'             => [
+                    'order_number'    => $order->getOrderNumber(),
+                    'total'           => $order->getTotal(),
+                    'formatted_total' => number_format((int) $order->getTotal(), 0, ',', '.') . '₫',
+                ],
+                'bank_info'         => $qrBankInfo,
             ]);
         }
 
