@@ -933,9 +933,6 @@ class OrderAdmin
                     <!-- Sidebar -->
                     <div class="jankx-order-sidebar">
 
-                        <!-- QR Viet payment code (rendered when the qrviet extension is installed) -->
-                        <?php $this->renderQrVietBox($order); ?>
-
                         <!-- Update Status Meta Box -->
                         <div id="jankx_order_status" class="postbox">
                             <h2 class="hndle"><span><?php esc_html_e('Update Status', 'base-ecommerce'); ?></span></h2>

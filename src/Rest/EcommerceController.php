@@ -8,6 +8,7 @@ use Jankx\Extensions\Ecommerce\Order\Order;
 use Jankx\Extensions\Ecommerce\Order\OrderCreationManager;
 use Jankx\Extensions\Ecommerce\Payment\PaymentManager;
 use Jankx\Extensions\Ecommerce\Registry\ProductRegistry;
+use Jankx\Extensions\Ecommerce\Support\CacheBypass;
 
 /**
  * REST API for the shared cart & checkout flow.
@@ -32,6 +33,8 @@ class EcommerceController
 
     public function register_routes(): void
     {
+        add_filter('rest_pre_dispatch', [$this, 'bypassCache'], 10, 3);
+
         register_rest_route(self::REST_NAMESPACE, '/cart', [
             'methods'             => \WP_REST_Server::READABLE,
             'callback'            => [$this, 'getCart'],
@@ -255,6 +258,15 @@ class EcommerceController
                 ],
             ],
         ]);
+    }
+
+    public function bypassCache($result, $server, $request)
+    {
+        if (0 === strpos((string) $request->get_route(), '/' . self::REST_NAMESPACE)) {
+            CacheBypass::mark('jankx-ecommerce-rest');
+        }
+
+        return $result;
     }
 
     public function getCart(\WP_REST_Request $request): \WP_REST_Response
