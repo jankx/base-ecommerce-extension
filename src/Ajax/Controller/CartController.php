@@ -11,6 +11,8 @@ class CartController extends AbstractController
     {
         $mode = $this->input('mode', 'normal');
         if ($mode === 'quick') {
+            // Falls back to the regular cart when the quick session expired,
+            // so a stale quick request never reports an empty cart.
             $this->success(Cart::get_active_cart()->toArray());
             return;
         }
@@ -27,10 +29,9 @@ class CartController extends AbstractController
         $args = is_array($args) ? $this->sanitizeArgs($args) : [];
 
         if ($mode === 'quick') {
-            $cart = Cart::get_active_cart();
-            // Switch scope BEFORE emptying so we replace the quick session,
+            // Target the quick scope directly and replace the quick session,
             // never the main cart.
-            $cart->setScope(Cart::SCOPE_QUICK);
+            $cart = Cart::getQuickCart();
             $cart->emptyCart();
 
             $added = $cart->addItem($productId, $quantity, $args);
@@ -85,8 +86,8 @@ class CartController extends AbstractController
 
         $mode = $this->input('mode', 'normal');
         if ($mode === 'quick') {
-            $added = Cart::get_active_cart()->quickAddItems($normalized, $commonArgs);
-            $cart = Cart::get_active_cart();
+            $cart = Cart::getQuickCart();
+            $added = $cart->quickAddItems($normalized, $commonArgs);
         } else {
             $added = Cart::get_instance()->addItems($normalized, $commonArgs);
             $cart = Cart::get_instance();

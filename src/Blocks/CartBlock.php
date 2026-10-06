@@ -31,6 +31,10 @@ class CartBlock extends Block
 
     public function render($attributes, $content = '', $block = null)
     {
+        // Opening the cart page means the customer wants the real cart, so a
+        // leftover "đặt ngay" session must not survive into the checkout page.
+        Cart::clearQuickMode();
+
         $cart = Cart::get_instance();
         $wrapperAttrs = get_block_wrapper_attributes([
             'class' => 'jankx-cart-block',

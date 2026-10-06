@@ -43,6 +43,14 @@ class CheckoutBlock extends Block
 
     public function render($attributes, $content = '', $block = null): string
     {
+        // Only the "Đặt ngay" redirect opens the quick-buy cart: it is the
+        // single link carrying ?mode=quick. Every other entry (mini cart,
+        // cart totals, header) uses the plain checkout URL, so it must show
+        // the regular cart and drop any leftover quick-buy session first.
+        if (!$this->isQuickRequest()) {
+            Cart::clearQuickMode();
+        }
+
         $cart = Cart::get_active_cart();
         $wrapperAttrs = get_block_wrapper_attributes([
             'class' => 'jankx-checkout-block',
@@ -59,6 +67,14 @@ class CheckoutBlock extends Block
         $output .= '</div>';
 
         return $output;
+    }
+
+    protected function isQuickRequest(): bool
+    {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- mode is not an action, it only selects the cart scope.
+        $mode = isset($_GET['mode']) ? sanitize_key(wp_unslash($_GET['mode'])) : '';
+
+        return $mode === 'quick';
     }
 
     protected function renderEmpty($block): string

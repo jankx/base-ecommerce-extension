@@ -178,6 +178,10 @@ class EcommerceExtension extends AbstractExtension
         // cookie - never let them enter a shared page cache (LiteSpeed).
         add_action('template_redirect', [$this, 'bypassDynamicPageCache'], -10);
 
+        // Every other cached page renders prices server-side, so the shared
+        // cache must be split per selected currency.
+        $this->setupLiteSpeedCurrencyVary();
+
         // Send notifications on order lifecycle events.
         add_action('jankx/ecommerce/order/created', [$this, 'on_order_created'], 10, 2);
         add_action('jankx/ecommerce/order/status_changed', [$this, 'on_order_status_changed'], 10, 4);
@@ -198,6 +202,37 @@ class EcommerceExtension extends AbstractExtension
         if ($pageIds && is_page($pageIds)) {
             CacheBypass::mark('jankx-ecommerce-pages');
         }
+    }
+
+    /**
+     * Make the LiteSpeed page cache vary on the currency cookie.
+     *
+     * Prices are rendered server-side on every cacheable page (home, tour
+     * detail, header ...), so without the cookie in the cache key every
+     * visitor would keep seeing the currency of whoever filled the cache
+     * first.
+     *
+     * - `litespeed_vary_cookies` feeds the Cache-Vary rewrite rule (cache key)
+     * - `litespeed_vary_curr_cookies` feeds the X-LiteSpeed-Vary response header
+     */
+    protected function setupLiteSpeedCurrencyVary(): void
+    {
+        add_filter('litespeed_vary_cookies', function ($cookies) {
+            $cookies = is_array($cookies) ? $cookies : [];
+            $cookies[] = CurrencyManager::SESSION_KEY;
+
+            return array_values(array_unique($cookies));
+        });
+
+        add_filter('litespeed_vary_curr_cookies', function ($cookies) {
+            $cookies = is_array($cookies) ? $cookies : [];
+
+            if (!empty($_COOKIE[CurrencyManager::SESSION_KEY])) {
+                $cookies[] = CurrencyManager::SESSION_KEY;
+            }
+
+            return array_values(array_unique($cookies));
+        });
     }
 
     /**
@@ -466,6 +501,9 @@ class EcommerceExtension extends AbstractExtension
             'nonce' => wp_create_nonce('wp_rest'),
             'cartUrl' => self::get_cart_page_url(),
             'checkoutUrl' => self::get_checkout_page_url(),
+            // The only link that opens the quick-buy (đặt ngay) cart - the
+            // checkout block reads ?mode=quick to pick the quick scope.
+            'quickCheckoutUrl' => esc_url_raw(add_query_arg('mode', 'quick', self::get_checkout_page_url())),
             'ordersUrl' => self::get_orders_page_url(),
             'resultUrl' => self::get_payment_result_page_url(),
             'i18n' => [

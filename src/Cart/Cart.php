@@ -105,23 +105,62 @@ class Cart implements CartInterface
         return $cart;
     }
 
+    /**
+     * A fresh instance bound to the quick-buy (đặt ngay) storage, regardless
+     * of whether quick mode is currently flagged as active.
+     */
+    public static function getQuickCart(): self
+    {
+        $cart = new self();
+        $cart->setScope(self::SCOPE_QUICK);
+
+        return $cart;
+    }
+
     public static function enableQuickMode(): void
     {
         set_transient(self::QUICK_MODE_FLAG_PREFIX . self::get_instance()->getCartKey(), 1, self::CART_TTL);
     }
 
+    /**
+     * Turn the quick-buy session off while keeping its cart payload, so the
+     * checkout page falls back to the regular cart.
+     *
+     * Only writes when the flag is actually set - this runs on every regular
+     * cart change and on every plain checkout/cart page load.
+     */
+    public static function clearQuickMode(): void
+    {
+        $flag = self::QUICK_MODE_FLAG_PREFIX . self::get_instance()->getCartKey();
+
+        if (get_transient($flag)) {
+            delete_transient($flag);
+        }
+    }
+
     public static function disableQuickMode(): void
     {
-        delete_transient(self::QUICK_MODE_FLAG_PREFIX . self::get_instance()->getCartKey());
-
-        $quickCart = new self();
-        $quickCart->setScope(self::SCOPE_QUICK);
-        $quickCart->emptyCart();
+        self::clearQuickMode();
+        self::getQuickCart()->emptyCart();
     }
 
     public static function isQuickModeActive(): bool
     {
-        return (bool) get_transient(self::QUICK_MODE_FLAG_PREFIX . self::get_instance()->getCartKey());
+        $flag = self::QUICK_MODE_FLAG_PREFIX . self::get_instance()->getCartKey();
+
+        if (!get_transient($flag)) {
+            return false;
+        }
+
+        // A flag without a quick cart (expired, emptied by a failed quick-buy,
+        // or left behind by an old session) must not blank out the checkout
+        // page while the regular cart still has items.
+        if (self::getQuickCart()->isEmpty()) {
+            delete_transient($flag);
+            return false;
+        }
+
+        return true;
     }
 
     public function getCartKey(): string
@@ -167,6 +206,13 @@ class Cart implements CartInterface
     protected function save(): void
     {
         set_transient($this->getTransientPrefix() . $this->getCartKey(), $this->items, self::CART_TTL);
+
+        // Any change to the regular cart ends the quick-buy session, otherwise
+        // the checkout page keeps rendering the "đặt ngay" cart forever while
+        // the mini cart already shows the updated one.
+        if (!$this->isQuickScope()) {
+            self::clearQuickMode();
+        }
     }
 
     protected function buildItemKey(int $productId, array $args = []): string

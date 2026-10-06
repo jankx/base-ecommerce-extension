@@ -273,6 +273,8 @@ class EcommerceController
     {
         $mode = $request->get_param('mode');
         if ($mode === 'quick') {
+            // Falls back to the regular cart when the quick session expired,
+            // so a stale quick request never reports an empty cart.
             return rest_ensure_response(Cart::get_active_cart()->toArray());
         }
 
@@ -347,10 +349,9 @@ class EcommerceController
         $mode = $request->get_param('mode');
 
         if ($mode === 'quick') {
-            $cart = Cart::get_active_cart();
-            // Switch scope BEFORE emptying so we replace the quick session,
+            // Target the quick scope directly and replace the quick session,
             // never the main cart.
-            $cart->setScope(Cart::SCOPE_QUICK);
+            $cart = Cart::getQuickCart();
             $cart->emptyCart();
 
             $added = $cart->addItem(
@@ -470,8 +471,8 @@ class EcommerceController
 
         $mode = $request->get_param('mode');
         if ($mode === 'quick') {
-            $added = Cart::get_active_cart()->quickAddItems($normalized, $commonArgs);
-            $cart = Cart::get_active_cart();
+            $cart = Cart::getQuickCart();
+            $added = $cart->quickAddItems($normalized, $commonArgs);
         } else {
             $added = Cart::get_instance()->addItems($normalized, $commonArgs);
             $cart = Cart::get_instance();
@@ -554,9 +555,16 @@ class EcommerceController
             ], 400);
         }
 
-        $cart = Cart::get_active_cart();
+        // The posted mode decides the scope - never a leftover flag - so a
+        // checkout submitted from the regular cart always orders the regular
+        // cart. A quick checkout whose session vanished falls back to the
+        // regular cart instead of creating an empty order.
+        $cart = Cart::get_instance();
         if ($request->get_param('mode') === 'quick') {
-            $cart->setScope(Cart::SCOPE_QUICK);
+            $quickCart = Cart::getQuickCart();
+            if (!$quickCart->isEmpty()) {
+                $cart = $quickCart;
+            }
         }
 
         $result = CheckoutManager::get_instance()->checkout(

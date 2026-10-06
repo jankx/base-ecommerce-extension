@@ -107,6 +107,14 @@
         });
     });
 
+    // Quick-buy (đặt ngay) must land on checkout with ?mode=quick, otherwise
+    // the checkout page treats the visit as a regular "Thanh toán" link and
+    // renders the regular cart.
+    function quickCheckoutUrl() {
+        var base = window.jankxEcommerce && window.jankxEcommerce.quickCheckoutUrl;
+        return base || (window.jankxEcommerce && window.jankxEcommerce.checkoutUrl) || '';
+    }
+
     document.addEventListener('submit', function (event) {
         var form = event.target.closest('.jankx-add-to-cart-form');
         if (!form) {
@@ -201,7 +209,7 @@
                         }, 1500);
                         return;
                     }
-                    var batchRedirect = isQuick ? window.jankxEcommerce.checkoutUrl : window.jankxEcommerce.cartUrl;
+                    var batchRedirect = isQuick ? quickCheckoutUrl() : window.jankxEcommerce.cartUrl;
                     if (batchRedirect) {
                         window.location.href = batchRedirect;
                         return;
@@ -267,7 +275,7 @@
                 }, 1500);
                 return;
             }
-            var redirectUrl = isQuick ? window.jankxEcommerce.checkoutUrl : window.jankxEcommerce.cartUrl;
+            var redirectUrl = isQuick ? quickCheckoutUrl() : window.jankxEcommerce.cartUrl;
             if (redirectUrl) {
                 window.location.href = redirectUrl;
                 return;
