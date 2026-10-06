@@ -125,9 +125,16 @@ class EcommerceExtension extends AbstractExtension
         // It is purely per-request data (exchange-rate API results) and
         // storing it in a persistent object cache causes "Server has gone
         // away" MySQL errors when Redis is slow or unavailable.
-        \wp_cache_add_non_persistent_groups([
-            \Jankx\Extensions\Ecommerce\Currency\Converters\CacheDecoratorConverter::CACHE_GROUP,
-        ]);
+        //
+        // Fast-AJAX runs outside WordPress (flight-wordpress-concept only
+        // stubs wp_cache_get/set/add/delete/flush), where its object cache is
+        // in-memory per request anyway - so the group is already volatile and
+        // the core helper is simply not there.
+        if (function_exists('wp_cache_add_non_persistent_groups')) {
+            \wp_cache_add_non_persistent_groups([
+                \Jankx\Extensions\Ecommerce\Currency\Converters\CacheDecoratorConverter::CACHE_GROUP,
+            ]);
+        }
 
         // Load this extension's translations (.mo for PHP, .json for block JS).
         $this->load_textdomain();
