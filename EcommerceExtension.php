@@ -125,7 +125,7 @@ class EcommerceExtension extends AbstractExtension
         // It is purely per-request data (exchange-rate API results) and
         // storing it in a persistent object cache causes "Server has gone
         // away" MySQL errors when Redis is slow or unavailable.
-        wp_cache_add_non_persistent_groups([
+        \wp_cache_add_non_persistent_groups([
             \Jankx\Extensions\Ecommerce\Currency\Converters\CacheDecoratorConverter::CACHE_GROUP,
         ]);
 
