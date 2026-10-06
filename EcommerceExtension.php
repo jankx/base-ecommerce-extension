@@ -121,6 +121,14 @@ class EcommerceExtension extends AbstractExtension
 
     public function register_hooks(): void
     {
+        // Currency converter cache must never be pushed to Redis/Memcached.
+        // It is purely per-request data (exchange-rate API results) and
+        // storing it in a persistent object cache causes "Server has gone
+        // away" MySQL errors when Redis is slow or unavailable.
+        wp_cache_add_non_persistent_groups([
+            \Jankx\Extensions\Ecommerce\Currency\Converters\CacheDecoratorConverter::CACHE_GROUP,
+        ]);
+
         // Load this extension's translations (.mo for PHP, .json for block JS).
         $this->load_textdomain();
 

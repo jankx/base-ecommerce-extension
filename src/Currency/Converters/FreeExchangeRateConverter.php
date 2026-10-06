@@ -133,7 +133,11 @@ class FreeExchangeRateConverter implements CurrencyConverterInterface
         }
 
         $cacheKey = 'jankx_free_rates_' . $baseCurrency;
-        $cached = wp_cache_get($cacheKey);
+        try {
+            $cached = wp_cache_get($cacheKey, CacheDecoratorConverter::CACHE_GROUP);
+        } catch (\Throwable $e) {
+            $cached = false;
+        }
         if ($cached !== false) {
             return $cached;
         }
@@ -184,7 +188,11 @@ class FreeExchangeRateConverter implements CurrencyConverterInterface
             'rates_count' => count($data['rates']),
         ]);
 
-        wp_cache_set($cacheKey, $data, '', 3600);
+        try {
+            wp_cache_set($cacheKey, $data, CacheDecoratorConverter::CACHE_GROUP, 3600);
+        } catch (\Throwable $e) {
+            // Redis unavailable – in-process caches already populated.
+        }
 
         return $data;
     }

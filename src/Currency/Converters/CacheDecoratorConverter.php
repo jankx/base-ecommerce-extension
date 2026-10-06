@@ -7,10 +7,29 @@ namespace Jankx\Extensions\Ecommerce\Currency\Converters;
  * Wraps another converter and caches conversion results to reduce
  * API calls and improve performance.
  *
+ * Cache strategy (two layers):
+ *
+ *  L1 – in-process PHP array ($rateCache / $convertCache).
+ *     Survives even when Redis is down, prevents duplicate API calls
+ *     within the same HTTP request.
+ *
+ *  L2 – WordPress Object Cache group "jankx_currency".
+ *     The group is registered as NON-PERSISTENT via
+ *     wp_cache_add_non_persistent_groups() so Redis/Memcached never
+ *     receives these keys. This prevents the "Server has gone away"
+ *     MySQL error that was triggered when Redis threw an exception
+ *     during a long-running cart/checkout request.
+ *
  * @package Jankx\Extensions\Ecommerce\Currency\Converters
  */
 class CacheDecoratorConverter implements CurrencyConverterInterface
 {
+    /**
+     * WP Object Cache group used for all currency cache entries.
+     * Registered as non-persistent so Redis/Memcached never store it.
+     */
+    const CACHE_GROUP = 'jankx_currency';
+
     // Cache TTL in seconds
     // Exchange rates: 10 minutes (600s) - rates change frequently
     // Conversions: 1 hour (3600s) - same day prices usually stable
@@ -21,6 +40,12 @@ class CacheDecoratorConverter implements CurrencyConverterInterface
     private $cacheEnabled;
     private $rateCacheTTL;
     private $conversionCacheTTL;
+
+    /** @var array<string, float> L1 in-process rate cache */
+    private $rateCache = [];
+
+    /** @var array<string, float> L1 in-process conversion cache */
+    private $convertCache = [];
 
     public function __construct(CurrencyConverterInterface $converter, bool $cacheEnabled = true)
     {
@@ -37,16 +62,24 @@ class CacheDecoratorConverter implements CurrencyConverterInterface
         }
 
         $cacheKey = $this->getCacheKey('convert', $amount, $fromCode, $toCode);
-        $cached = wp_cache_get($cacheKey);
 
-        if ($cached !== false) {
-            return $cached;
+        // L1: in-process array
+        if (isset($this->convertCache[$cacheKey])) {
+            return $this->convertCache[$cacheKey];
+        }
+
+        // L2: WP Object Cache (non-persistent group, Redis-safe)
+        $cached = $this->cacheGet($cacheKey);
+        if ($cached !== false && $cached !== null) {
+            $this->convertCache[$cacheKey] = (float) $cached;
+            return (float) $cached;
         }
 
         $result = $this->converter->convert($amount, $fromCode, $toCode);
 
         if ($result !== null) {
-            wp_cache_set($cacheKey, $result, '', $this->conversionCacheTTL);
+            $this->convertCache[$cacheKey] = $result;
+            $this->cacheSet($cacheKey, $result, $this->conversionCacheTTL);
         }
 
         return $result;
@@ -59,16 +92,24 @@ class CacheDecoratorConverter implements CurrencyConverterInterface
         }
 
         $cacheKey = $this->getCacheKey('rate', $fromCode, $toCode);
-        $cached = wp_cache_get($cacheKey);
 
-        if ($cached !== false) {
-            return $cached;
+        // L1: in-process array
+        if (isset($this->rateCache[$cacheKey])) {
+            return $this->rateCache[$cacheKey];
+        }
+
+        // L2: WP Object Cache (non-persistent group, Redis-safe)
+        $cached = $this->cacheGet($cacheKey);
+        if ($cached !== false && $cached !== null) {
+            $this->rateCache[$cacheKey] = (float) $cached;
+            return (float) $cached;
         }
 
         $result = $this->converter->getRate($fromCode, $toCode);
 
         if ($result !== null) {
-            wp_cache_set($cacheKey, $result, '', $this->rateCacheTTL);
+            $this->rateCache[$cacheKey] = $result;
+            $this->cacheSet($cacheKey, $result, $this->rateCacheTTL);
         }
 
         return $result;
@@ -117,7 +158,15 @@ class CacheDecoratorConverter implements CurrencyConverterInterface
      */
     public function clearCache(): void
     {
-        wp_cache_flush();
+        $this->rateCache    = [];
+        $this->convertCache = [];
+        try {
+            if (function_exists('wp_cache_flush_group')) {
+                wp_cache_flush_group(self::CACHE_GROUP);
+            }
+        } catch (\Throwable $e) {
+            // Redis unavailable – in-process caches already cleared above.
+        }
     }
 
     /**
@@ -160,6 +209,36 @@ class CacheDecoratorConverter implements CurrencyConverterInterface
     public function getConversionCacheTTL(): int
     {
         return $this->conversionCacheTTL;
+    }
+
+    // ── Internal cache helpers (Redis-safe) ─────────────────────────────────
+
+    /**
+     * wp_cache_get wrapper that silences Redis exceptions.
+     *
+     * @return mixed The cached value, or false on miss/error.
+     */
+    private function cacheGet(string $key)
+    {
+        try {
+            return wp_cache_get($key, self::CACHE_GROUP);
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    /**
+     * wp_cache_set wrapper that silences Redis exceptions.
+     *
+     * @param mixed $value
+     */
+    private function cacheSet(string $key, $value, int $ttl): void
+    {
+        try {
+            wp_cache_set($key, $value, self::CACHE_GROUP, $ttl);
+        } catch (\Throwable $e) {
+            // Redis unavailable – L1 in-process cache is still populated.
+        }
     }
 
     /**

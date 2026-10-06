@@ -98,7 +98,11 @@ class FixerIOConverter implements CurrencyConverterInterface
     private function fetchRates(string $baseCurrency): ?array
     {
         $cacheKey = 'jankx_fixerio_rates_' . $baseCurrency;
-        $cached = wp_cache_get($cacheKey);
+        try {
+            $cached = wp_cache_get($cacheKey, CacheDecoratorConverter::CACHE_GROUP);
+        } catch (\Throwable $e) {
+            $cached = false;
+        }
 
         if ($cached !== false) {
             return $cached;
@@ -152,7 +156,11 @@ class FixerIOConverter implements CurrencyConverterInterface
         $rates = (array) $data['rates'];
 
         // Cache for 24 hours
-        wp_cache_set($cacheKey, $rates, '', self::CACHE_TTL);
+        try {
+            wp_cache_set($cacheKey, $rates, CacheDecoratorConverter::CACHE_GROUP, self::CACHE_TTL);
+        } catch (\Throwable $e) {
+            // Redis unavailable – in-process cache still populated.
+        }
 
         return $rates;
     }
