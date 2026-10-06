@@ -24,6 +24,8 @@ class FreeExchangeRateConverter implements CurrencyConverterInterface
     private const API_BASE = 'https://open.er-api.com/v6/latest';
     private const API_LATEST = self::API_BASE;
 
+    private $rateCache = [];
+
     /**
      * Convert amount from one currency to another.
      *
@@ -67,13 +69,23 @@ class FreeExchangeRateConverter implements CurrencyConverterInterface
             return 1.0;
         }
 
+        $cacheKey = "{$fromCode}_{$toCode}";
+        if (isset($this->rateCache[$cacheKey])) {
+            return $this->rateCache[$cacheKey];
+        }
+
         $response = $this->fetchRates($fromCode);
 
         if ($response === null) {
             return null;
         }
 
-        return $response['rates'][$toCode] ?? null;
+        $rate = $response['rates'][$toCode] ?? null;
+        if ($rate !== null) {
+            $this->rateCache[$cacheKey] = (float) $rate;
+        }
+
+        return $rate;
     }
 
     /**
@@ -118,6 +130,12 @@ class FreeExchangeRateConverter implements CurrencyConverterInterface
         if ($baseCurrency === '') {
             Log::error('[FreeExchangeRateConverter] Empty base currency – request skipped');
             return null;
+        }
+
+        $cacheKey = 'jankx_free_rates_' . $baseCurrency;
+        $cached = wp_cache_get($cacheKey);
+        if ($cached !== false) {
+            return $cached;
         }
 
         $url = self::API_LATEST . '/' . rawurlencode($baseCurrency);
@@ -165,6 +183,8 @@ class FreeExchangeRateConverter implements CurrencyConverterInterface
             'base' => $baseCurrency,
             'rates_count' => count($data['rates']),
         ]);
+
+        wp_cache_set($cacheKey, $data, '', 3600);
 
         return $data;
     }
