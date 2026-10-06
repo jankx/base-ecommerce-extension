@@ -199,7 +199,7 @@ class EcommerceExtension extends AbstractExtension
             self::get_payment_result_page_id(),
         ]);
 
-        if ($pageIds && is_page($pageIds)) {
+        if (($pageIds && is_page($pageIds)) || has_block('jankx/checkout') || has_block('jankx/cart')) {
             CacheBypass::mark('jankx-ecommerce-pages');
         }
     }
