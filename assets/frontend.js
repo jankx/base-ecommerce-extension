@@ -42,6 +42,53 @@
         });
     }
 
+    // Fast AJAX wraps the payload in {success, data, time_ms} while REST
+    // answers with a flat object. Flatten it so the handlers below read one
+    // shape regardless of which transport served the request.
+    function unwrapEnvelope(payload) {
+        var isEnvelope = payload
+            && payload.success === true
+            && payload.data
+            && typeof payload.data === 'object'
+            && payload.order === undefined;
+
+        if (!isEnvelope) {
+            return payload;
+        }
+
+        payload.data.success = true;
+        return payload.data;
+    }
+
+    // Error messages differ per transport too: REST sends `message`
+    // (string|array), Fast AJAX sends `error` (string).
+    function errorText(payload) {
+        if (!payload) {
+            return '';
+        }
+
+        var raw = payload.message !== undefined ? payload.message : payload.error;
+
+        if (Array.isArray(raw)) {
+            return raw.join(', ');
+        }
+
+        return typeof raw === 'string' ? raw : '';
+    }
+
+    // Checkout needs a booted WordPress (options, users, core REST helpers),
+    // so only the rewrite Fast AJAX boot may take it. Everything else falls
+    // back to the REST route, which always boots WP in full.
+    function checkoutUrl() {
+        var fast = window.JankxAjax;
+
+        if (fast && fast.url && fast.mode !== 'standalone') {
+            return fast.url + '/ecommerce/checkout/submit';
+        }
+
+        return window.jankxEcommerce.restUrl + '/checkout';
+    }
+
     document.addEventListener('click', function (event) {
         var button = event.target.closest('.jankx-cart-remove, .jankx-cart-item__remove');
         if (!button) {
@@ -309,6 +356,11 @@
                 errorBox.hidden = false;
             }
 
+            function field(selector) {
+                var el = checkoutForm.querySelector(selector);
+                return el ? String(el.value) : '';
+            }
+
             errorBox.hidden = true;
             submitButton.disabled = true;
 
@@ -343,15 +395,41 @@
                 checkoutBody.mode = checkoutMode;
             }
 
+            // Card fields travel with the order so the gateway can act on them.
+            var cardNumber = checkoutForm.querySelector('#jankx_card_number');
+            if (cardNumber && String(cardNumber.value).trim() !== '') {
+                checkoutBody.payment_params = {
+                    card_number: cardNumber.value,
+                    card_expiry: field('#jankx_card_expiry'),
+                    card_cvv: field('#jankx_card_cvv'),
+                    card_holder: field('#jankx_card_holder')
+                };
+            }
+
             getJson({
-                url: window.jankxEcommerce.restUrl + '/checkout',
+                url: checkoutUrl(),
                 method: 'POST',
                 body: checkoutBody
-            }).then(function (response) {
+            }).then(function (raw) {
+                var response = unwrapEnvelope(raw);
+
                 if (!response.success) {
-                    var message = Array.isArray(response.message) ? response.message.join(', ') : response.message;
-                    showError(message || 'Checkout failed.');
+                    showError(errorText(response) || 'Checkout failed.');
                     submitButton.disabled = false;
+                    return;
+                }
+
+                var paymentType = response.payment_type || '';
+                var isQr = paymentType === 'qr'
+                    || response.type === 'qr'
+                    || response.payment_status === 'qr';
+
+                // QR payments have nothing to follow in the browser: render the
+                // modal first. redirect_url (the order detail page) only kicks in
+                // when there is no QR payload to show at all.
+                if (isQr && (response.qr_image || response.qr_code || response.qr_link)) {
+                    submitButton.disabled = false;
+                    showQrModal(response);
                     return;
                 }
 
@@ -361,14 +439,7 @@
                     return;
                 }
 
-                // QR payment without redirect: show QR modal
-                if ((response.type === 'qr' || response.payment_status === 'qr') && response.qr_image) {
-                    submitButton.disabled = false;
-                    showQrModal(response);
-                    return;
-                }
-
-                var redirect = window.jankxEcommerce.ordersUrl;
+                var redirect = response.orders_url || window.jankxEcommerce.ordersUrl;
                 if (redirect) {
                     window.location.href = redirect;
                     return;
@@ -380,8 +451,7 @@
                     + '<p>' + window.jankxEcommerce.i18n.successMessage.replace('%s', response.order.order_number) + '</p>'
                     + '</div>';
             }).catch(function (error) {
-                var message = Array.isArray(error && error.message) ? error.message.join(', ') : (error && error.message);
-                showError(message || 'Checkout failed.');
+                showError(errorText(error) || 'Checkout failed.');
                 submitButton.disabled = false;
             });
         });
@@ -699,6 +769,46 @@
         return btn;
     }
 
+    // QR encoder (qrcode-generator, MIT) is only needed when the server did
+    // not hand over a usable image, so pull it in on demand instead of paying
+    // for it on every checkout page.
+    var qrLibraryPromise = null;
+
+    function loadQrLibrary() {
+        if (window.qrcode) {
+            return Promise.resolve(window.qrcode);
+        }
+
+        if (qrLibraryPromise) {
+            return qrLibraryPromise;
+        }
+
+        var src = (window.jankxEcommerce && window.jankxEcommerce.qrLibUrl) || '';
+        if (!src) {
+            return Promise.reject(new Error('QR library URL is not configured.'));
+        }
+
+        qrLibraryPromise = new Promise(function (resolve, reject) {
+            var script = document.createElement('script');
+            script.src = src;
+            script.async = true;
+            script.onload = function () {
+                if (window.qrcode) {
+                    resolve(window.qrcode);
+                } else {
+                    reject(new Error('QR library did not expose qrcode.'));
+                }
+            };
+            script.onerror = function () {
+                qrLibraryPromise = null;
+                reject(new Error('QR library failed to load.'));
+            };
+            document.head.appendChild(script);
+        });
+
+        return qrLibraryPromise;
+    }
+
     function showQrModal(response) {
         var order = response.order || {};
         var bank = response.bank_info || {};
@@ -756,8 +866,8 @@
         var amountEl = document.createElement('div');
         amountEl.className = 'jankx-qr-modal__amount';
         amountEl.textContent = amount;
+        var qrPayload = response.qr_code || '';
         var qrImg = document.createElement('img');
-        qrImg.src = qrImage;
         qrImg.alt = 'QR - ' + orderNumber;
         qrImg.width = 220;
         qrImg.height = 220;
@@ -767,6 +877,40 @@
         scanHint.textContent = 'Quét mã bằng ứng dụng ngân hàng';
         var countdown = document.createElement('span');
         countdown.className = 'jankx-qr-modal__countdown';
+
+        var qrFallbackHint = 'Không hiển thị được mã QR. Vui lòng dùng thông tin bên phải để chuyển khoản.';
+
+        function renderClientQr() {
+            // Guard against re-entering from the generated image's own error event.
+            qrImg.removeEventListener('error', renderClientQr);
+
+            if (!qrPayload) {
+                qrImg.hidden = true;
+                scanHint.textContent = qrFallbackHint;
+                return;
+            }
+
+            loadQrLibrary().then(function (qrcode) {
+                var qr = qrcode(0, 'M');
+                qr.addData(qrPayload);
+                qr.make();
+                qrImg.hidden = false;
+                qrImg.src = qr.createDataURL(6, 16);
+            }).catch(function () {
+                qrImg.hidden = true;
+                scanHint.textContent = qrFallbackHint;
+            });
+        }
+
+        // Prefer the server image; when it is missing or fails to load, draw
+        // the same code locally from the raw QR payload.
+        if (qrImage) {
+            qrImg.addEventListener('error', renderClientQr);
+            qrImg.src = qrImage;
+        } else {
+            renderClientQr();
+        }
+
         leftCol.appendChild(amountEl);
         leftCol.appendChild(qrImg);
         leftCol.appendChild(scanHint);

@@ -58,17 +58,13 @@ class CheckoutManager
      * @param Cart   $cart
      * @param array  $customer Customer data: id, name, email, phone, address.
      * @param array  $options  Optional: gateway, currency.
-     * @return array{order: Order|null, redirect_url: string}
+     * @return array{order: Order|null, redirect_url: string}&array<string, mixed>
      */
     public function createOrder(Cart $cart, array $customer, array $options = []): array
     {
         $order = Order::createFromCart($cart, $customer, $options);
         $redirectUrl = '';
-        $qrPayload = [
-            'payment_status' => '',
-            'qr_image'       => '',
-            'qr_code'        => '',
-        ];
+        $paymentResult = [];
 
         if ($order && !empty($options['gateway'])) {
             $gateway = (string) $options['gateway'];
@@ -80,34 +76,68 @@ class CheckoutManager
 
             // QR payments have no browser redirect; send the customer to the
             // order detail page where the QR code is displayed for scanning.
-            if (!empty($paymentResult['payment_status']) && $paymentResult['payment_status'] === 'qr') {
+            if (($paymentResult['payment_status'] ?? '') === 'qr') {
                 $accountUrl = function_exists('jankx_get_account_endpoint_url')
                     ? jankx_get_account_endpoint_url('orders')
                     : home_url('/tai-khoan-cua-toi/orders/');
 
                 $redirectUrl = rtrim($accountUrl, '/') . '/' . $order->getOrderNumber() . '/';
-
-                $qrPayload = [
-                    'payment_status' => 'qr',
-                    'qr_image'       => $paymentResult['qr_image'] ?? '',
-                    'qr_code'        => $paymentResult['qr_code'] ?? '',
-                ];
             }
         }
 
-        return [
-            'order'          => $order,
-            'redirect_url'   => $redirectUrl,
-            'payment_status' => $qrPayload['payment_status'],
-            'qr_image'       => $qrPayload['qr_image'],
-            'qr_code'        => $qrPayload['qr_code'],
+        return array_merge(
+            [
+                'order'        => $order,
+                'redirect_url' => $redirectUrl,
+            ],
+            self::paymentFields($paymentResult)
+        );
+    }
+
+    /**
+     * Payment facts the browser needs to pick its next step (redirect, QR, ...).
+     *
+     * Empty values are dropped so callers keep reading missing keys as
+     * "nothing happened" — the same contract as before only QR was forwarded.
+     *
+     * @param array $paymentResult Result of PaymentManager::process().
+     * @return array<string, mixed>
+     */
+    protected static function paymentFields(array $paymentResult): array
+    {
+        $fields = [];
+
+        $keys = [
+            'payment_status',
+            'payment_type',
+            'qr_image',
+            'qr_code',
+            'qr_link',
+            'qr_transfer_content',
+            'transaction_id',
+            'error',
+            'error_code',
         ];
+
+        foreach ($keys as $key) {
+            $value = $paymentResult[$key] ?? '';
+
+            if ($value === '' || $value === null || $value === false || $value === 0 || $value === []) {
+                continue;
+            }
+
+            $fields[$key] = $value;
+        }
+
+        return $fields;
     }
 
     /**
      * Full checkout: validate, create order from cart, clear the cart.
      *
-     * @return array [success, errors, order, redirect_url]
+     * @return array{success: bool, errors: string[], order: Order|null, redirect_url: string}&array<string, mixed>
+     *         Plus every non-empty payment field returned by createOrder()
+     *         (payment_status, qr_*, transaction_id, error, ...).
      */
     public function checkout(Cart $cart, array $customer, array $options = []): array
     {
@@ -162,15 +192,12 @@ class CheckoutManager
             $redirectUrl = (string) apply_filters('jankx/ecommerce/checkout/redirect_url', '', $order, $result);
         }
 
-        return [
-            'success'        => true,
-            'errors'         => [],
-            'order'          => $order,
-            'redirect_url'   => $redirectUrl,
-            'payment_status' => $result['payment_status'] ?? '',
-            'qr_image'       => $result['qr_image'] ?? '',
-            'qr_code'        => $result['qr_code'] ?? '',
-        ];
+        return array_merge($result, [
+            'success'      => true,
+            'errors'       => [],
+            // May have been redirected by the filter above, never by createOrder.
+            'redirect_url' => $redirectUrl,
+        ]);
     }
 
     /**

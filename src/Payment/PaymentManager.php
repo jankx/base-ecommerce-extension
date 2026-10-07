@@ -126,6 +126,9 @@ class PaymentManager
             'customer_email' => $order->getCustomerEmail(),
             'customer_phone' => $order->getCustomerPhone(),
             'customer_name'  => $order->getCustomerName(),
+            // Card / extra checkout fields posted with the order. Namespaced so
+            // a gateway can never shadow the core parameters above.
+            'payment_params' => $params,
         ]);
 
         if (!is_array($result)) {

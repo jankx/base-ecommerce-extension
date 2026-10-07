@@ -521,6 +521,9 @@ class EcommerceExtension extends AbstractExtension
             'quickCheckoutUrl' => esc_url_raw(add_query_arg('mode', 'quick', self::get_checkout_page_url())),
             'ordersUrl' => self::get_orders_page_url(),
             'resultUrl' => self::get_payment_result_page_url(),
+            // Lazy-loaded QR encoder used when the payment QR image is missing.
+            'qrLibUrl' => $this->get_extension_url() . '/assets/vendor/qrcode.js'
+                . '?ver=' . filemtime($this->get_extension_path() . '/assets/vendor/qrcode.js'),
             'i18n' => [
                 'successTitle' => __('Order placed successfully!', 'base-ecommerce'),
                 'successMessage' => __('Your order number is %s.', 'base-ecommerce'),
