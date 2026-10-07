@@ -274,8 +274,13 @@ class CheckoutPaymentMethodsBlock extends CheckoutSectionBlock
             . '<div class="jankx-field-row">'
             . '<div class="jankx-field">'
             . '<label for="jankx_card_number">' . esc_html__('Thẻ tín dụng/Ghi nợ', 'base-ecommerce') . '</label>'
+            // The brand badge is filled in by frontend.js as soon as the typed
+            // IIN matches a known scheme - it stays empty for unknown cards.
+            . '<div class="jankx-card-number-wrap">'
             . '<input type="text" id="jankx_card_number" name="card_number" class="jankx-input" '
-            . 'placeholder="4220 2923 2332 1002" maxlength="19" autocomplete="cc-number">'
+            . 'placeholder="4220 2923 2332 1002" maxlength="19" autocomplete="cc-number" inputmode="numeric">'
+            . '<span class="jankx-card-brand" role="img" hidden></span>'
+            . '</div>'
             . '</div>'
             . '</div>'
             . '<div class="jankx-field-row jankx-field-row--half">'

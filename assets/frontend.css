@@ -477,6 +477,59 @@
     background: #fff;
 }
 
+/* --- Card scheme badge (credit card number field) --- */
+.jankx-card-number-wrap {
+    position: relative;
+}
+
+/* Reserve room on the right so the badge never overlaps typed digits. */
+.jankx-card-number-wrap .jankx-input {
+    padding-right: 3.75rem;
+}
+
+.jankx-card-brand {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    display: block;
+    width: 40px;
+    height: 26px;
+    line-height: 0;
+    pointer-events: none;
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
+    animation: jankx-card-brand-in 0.18s ease-out;
+}
+
+.jankx-card-brand[hidden] {
+    display: none;
+}
+
+.jankx-card-brand svg {
+    display: block;
+    width: 40px;
+    height: 26px;
+    border-radius: 3px;
+}
+
+@keyframes jankx-card-brand-in {
+    from {
+        opacity: 0;
+        transform: translateY(-50%) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(-50%) scale(1);
+    }
+}
+
+@media (max-width: 600px) {
+    .jankx-card-number-wrap .jankx-input {
+        padding-right: 3.5rem;
+    }
+}
+
 /* --- Section cards --- */
 .jankx-checkout-section {
     background: #fff;

@@ -89,6 +89,181 @@
         return window.jankxEcommerce.restUrl + '/checkout';
     }
 
+    // ── Card brand preview ──────────────────────────────────────────────
+    // Paint a scheme badge next to the card number field while the visitor
+    // types. Detection is IIN prefix based: a scheme is only claimed once the
+    // typed digits can no longer belong to a rival scheme ("22" stays blank
+    // until the 4th digit rules the Mastercard 2-series in or out).
+    function cardBadge(inner) {
+        return '<svg viewBox="0 0 40 26" width="40" height="26" focusable="false" aria-hidden="true">'
+            + inner + '</svg>';
+    }
+
+    // Order matters only where ranges overlap; every rule is anchored so a
+    // partial number can never match a scheme it does not belong to.
+    var CARD_BRANDS = [
+        {
+            id: 'amex',
+            label: 'American Express',
+            test: /^3[47]/,
+            svg: cardBadge(
+                '<rect width="40" height="26" rx="3" fill="#2E77BC"/>'
+                + '<text x="20" y="17" text-anchor="middle" fill="#FFFFFF"'
+                + ' font-family="Helvetica,Arial,sans-serif" font-size="10" font-weight="700"'
+                + ' letter-spacing="0.5">AMEX</text>'
+            )
+        },
+        {
+            id: 'diners',
+            label: 'Diners Club',
+            test: /^(30[0-5]|3095|36|38|39)/,
+            svg: cardBadge(
+                '<rect width="40" height="26" rx="3" fill="#FFFFFF"/>'
+                + '<rect x="0.5" y="0.5" width="39" height="25" rx="2.5" fill="none" stroke="#DCDCDC"/>'
+                + '<text x="20" y="17" text-anchor="middle" fill="#0079BE"'
+                + ' font-family="Helvetica,Arial,sans-serif" font-size="7.5" font-weight="700"'
+                + ' letter-spacing="0.2">DINERS</text>'
+            )
+        },
+        {
+            id: 'jcb',
+            label: 'JCB',
+            test: /^35(2[89]|[3-8][0-9])/,
+            svg: cardBadge(
+                '<rect width="40" height="26" rx="3" fill="#FFFFFF"/>'
+                + '<rect x="0.5" y="0.5" width="39" height="25" rx="2.5" fill="none" stroke="#DCDCDC"/>'
+                + '<rect x="6" y="5" width="9" height="16" rx="2" fill="#0B4EA2"/>'
+                + '<rect x="15.5" y="5" width="9" height="16" rx="2" fill="#B31942"/>'
+                + '<rect x="25" y="5" width="9" height="16" rx="2" fill="#1B7A3E"/>'
+                + '<text x="10.5" y="16.5" text-anchor="middle" fill="#FFFFFF"'
+                + ' font-family="Helvetica,Arial,sans-serif" font-size="7.5" font-weight="700">J</text>'
+                + '<text x="20" y="16.5" text-anchor="middle" fill="#FFFFFF"'
+                + ' font-family="Helvetica,Arial,sans-serif" font-size="7.5" font-weight="700">C</text>'
+                + '<text x="29.5" y="16.5" text-anchor="middle" fill="#FFFFFF"'
+                + ' font-family="Helvetica,Arial,sans-serif" font-size="7.5" font-weight="700">B</text>'
+            )
+        },
+        {
+            id: 'mastercard',
+            label: 'Mastercard',
+            test: /^(5[1-5]|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)/,
+            svg: cardBadge(
+                '<rect width="40" height="26" rx="3" fill="#F5F5F5"/>'
+                + '<rect x="0.5" y="0.5" width="39" height="25" rx="2.5" fill="none" stroke="#DCDCDC"/>'
+                + '<circle cx="16" cy="13" r="7.5" fill="#EB001B"/>'
+                + '<circle cx="24" cy="13" r="7.5" fill="#F79E1B"/>'
+                + '<path d="M20 6.66A7.5 7.5 0 0 1 20 19.34A7.5 7.5 0 0 0 20 6.66Z" fill="#FF5F00"/>'
+            )
+        },
+        {
+            id: 'discover',
+            label: 'Discover',
+            test: /^(6011|64[4-9]|65)/,
+            svg: cardBadge(
+                '<rect width="40" height="26" rx="3" fill="#FFFFFF"/>'
+                + '<rect x="0.5" y="0.5" width="39" height="25" rx="2.5" fill="none" stroke="#DCDCDC"/>'
+                + '<text x="16.5" y="16.5" text-anchor="middle" fill="#231F20"'
+                + ' font-family="Helvetica,Arial,sans-serif" font-size="5" font-weight="700"'
+                + ' letter-spacing="0">DISCOVER</text>'
+                + '<circle cx="35" cy="13" r="3.5" fill="#F76B1C"/>'
+            )
+        },
+        {
+            id: 'unionpay',
+            label: 'UnionPay',
+            test: /^62/,
+            svg: cardBadge(
+                '<rect width="40" height="26" rx="3" fill="#FFFFFF"/>'
+                + '<rect x="0.5" y="0.5" width="39" height="25" rx="2.5" fill="none" stroke="#DCDCDC"/>'
+                + '<path d="M11 5H16L13 21H8Z" fill="#E21836"/>'
+                + '<path d="M18 5H23L20 21H15Z" fill="#00447C"/>'
+                + '<path d="M25 5H30L27 21H22Z" fill="#007B84"/>'
+            )
+        },
+        {
+            id: 'napas',
+            label: 'Thẻ ATM nội địa (Napas)',
+            test: /^9704/,
+            svg: cardBadge(
+                '<rect width="40" height="26" rx="3" fill="#FFFFFF"/>'
+                + '<rect x="0.5" y="0.5" width="39" height="25" rx="2.5" fill="none" stroke="#DCDCDC"/>'
+                + '<text x="20" y="17" text-anchor="middle" fill="#0B5FA5"'
+                + ' font-family="Helvetica,Arial,sans-serif" font-size="8" font-weight="700"'
+                + ' letter-spacing="0.3">NAPAS</text>'
+            )
+        },
+        {
+            id: 'visa',
+            label: 'Visa',
+            test: /^4/,
+            svg: cardBadge(
+                '<rect width="40" height="26" rx="3" fill="#1A1F71"/>'
+                + '<text x="20" y="17.5" text-anchor="middle" fill="#FFFFFF"'
+                + ' font-family="Helvetica,Arial,sans-serif" font-size="11" font-style="italic"'
+                + ' font-weight="700" letter-spacing="0.5">VISA</text>'
+            )
+        }
+    ];
+
+    function detectCardBrand(value) {
+        var digits = String(value || '').replace(/[^0-9]/g, '');
+
+        if (digits.length === 0) {
+            return null;
+        }
+
+        for (var i = 0; i < CARD_BRANDS.length; i++) {
+            if (CARD_BRANDS[i].test.test(digits)) {
+                return CARD_BRANDS[i];
+            }
+        }
+
+        return null;
+    }
+
+    function initCardBrandPreview(form) {
+        var input = form.querySelector('#jankx_card_number');
+        var slot = form.querySelector('.jankx-card-brand');
+
+        if (!input || !slot) {
+            return;
+        }
+
+        var rendered = null;
+
+        function update() {
+            var brand = detectCardBrand(input.value);
+            var id = brand ? brand.id : '';
+
+            // Re-rendering the same badge would restart its entrance
+            // animation on every keystroke.
+            if (id === rendered) {
+                return;
+            }
+            rendered = id;
+
+            if (!brand) {
+                slot.hidden = true;
+                slot.innerHTML = '';
+                slot.removeAttribute('aria-label');
+                slot.removeAttribute('title');
+                slot.removeAttribute('data-card-brand');
+                input.removeAttribute('data-card-brand');
+                return;
+            }
+
+            slot.hidden = false;
+            slot.innerHTML = brand.svg;
+            slot.setAttribute('aria-label', brand.label);
+            slot.setAttribute('title', brand.label);
+            slot.setAttribute('data-card-brand', brand.id);
+            input.setAttribute('data-card-brand', brand.id);
+        }
+
+        input.addEventListener('input', update);
+        update();
+    }
+
     document.addEventListener('click', function (event) {
         var button = event.target.closest('.jankx-cart-remove, .jankx-cart-item__remove');
         if (!button) {
@@ -345,6 +520,8 @@
 
     var checkoutForm = document.querySelector('.jankx-checkout-form');
     if (checkoutForm) {
+        initCardBrandPreview(checkoutForm);
+
         checkoutForm.addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -661,15 +838,19 @@
                 // Refresh discount rows
                 var discountRow = document.querySelector('.jankx-review-discount-row');
                 var discountVal = document.querySelector('.jankx-review-discount-value');
-                if (discountRow && discountVal && response.discount_formatted) {
-                    discountVal.textContent = '-' + response.discount_formatted;
+                var discountText = response.discount_formatted || (response.cart && response.cart.formatted_coupon_discount);
+                if (discountRow && discountVal && discountText) {
+                    discountVal.textContent = '-' + discountText;
                     discountRow.hidden = false;
                 }
                 var totalVal = document.querySelector('.jankx-review-total-value');
-                if (totalVal && response.total_formatted) {
-                    totalVal.textContent = response.total_formatted;
+                var totalText = response.total_formatted || (response.cart && response.cart.formatted_total);
+                if (totalVal && totalText) {
+                    totalVal.textContent = totalText;
+                }
+                if (totalText) {
                     var btnTotal = document.querySelector('.jankx-btn-total');
-                    if (btnTotal) btnTotal.textContent = response.total_formatted;
+                    if (btnTotal) btnTotal.textContent = totalText;
                 }
                 if (msgEl) {
                     msgEl.style.color = '#27ae60';
