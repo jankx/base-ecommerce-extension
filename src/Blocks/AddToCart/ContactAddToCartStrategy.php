@@ -19,6 +19,17 @@ class ContactAddToCartStrategy implements AddToCartStrategyInterface
             . esc_html__('Liên hệ với chúng tôi để được tư vấn và báo giá.', 'base-ecommerce')
             . '</p>';
 
+        $formTarget = 'jankx-product-order-card-' . $postId;
+
+        $output .= '<div class="jankx-add-to-cart__row">';
+        $output .= sprintf(
+            '<button type="button" class="jankx-btn jankx-btn-primary jankx-add-to-cart__btn jankx-scroll-to-order-form" data-target="%s">',
+            esc_attr($formTarget)
+        );
+        $output .= esc_html__('Gửi yêu cầu đặt hàng', 'base-ecommerce');
+        $output .= '</button>';
+        $output .= '</div>';
+
         $output .= '</div>';
 
         return $output;
