@@ -57,6 +57,16 @@ class Cart implements CartInterface
      */
     protected $loaded = false;
 
+    /**
+     * A cart key was minted during this request but no cookie was sent yet.
+     * The cookie is only written once the cart actually holds items, so
+     * plain HTML responses keep no Set-Cookie header and stay cacheable
+     * by the LiteSpeed page cache.
+     *
+     * @var bool
+     */
+    protected $cartKeyNeedsCookie = false;
+
     public static function get_instance(): self
     {
         if (!self::$instance) {
@@ -184,9 +194,7 @@ class Cart implements CartInterface
             // otherwise fresh instances (e.g. Cart::get_active_cart()) would
             // each generate their own key and read/write different storages.
             $_COOKIE[self::CART_COOKIE] = $key;
-            if (!headers_sent()) {
-                setcookie(self::CART_COOKIE, $key, time() + self::CART_TTL, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
-            }
+            $this->cartKeyNeedsCookie = true;
         }
 
         return $key;
@@ -213,6 +221,33 @@ class Cart implements CartInterface
         if (!$this->isQuickScope()) {
             self::clearQuickMode();
         }
+
+        if (!empty($this->items)) {
+            $this->persistCartKeyCookie();
+        }
+    }
+
+    /**
+     * Send the cart key cookie once the cart really needs to survive a
+     * request. Called late (on cart mutations) so cached HTML responses stay
+     * free of Set-Cookie headers.
+     */
+    protected function persistCartKeyCookie(): void
+    {
+        if (!$this->cartKeyNeedsCookie || headers_sent()) {
+            return;
+        }
+
+        setcookie(
+            self::CART_COOKIE,
+            $this->cartKey,
+            time() + self::CART_TTL,
+            COOKIEPATH,
+            COOKIE_DOMAIN,
+            is_ssl(),
+            true
+        );
+        $this->cartKeyNeedsCookie = false;
     }
 
     protected function buildItemKey(int $productId, array $args = []): string
